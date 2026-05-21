@@ -1,0 +1,20 @@
+[package]
+name = "preprocess"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "preprocess"
+path = "src/main.rs"
+
+[dependencies]
+syn = { version = "2", features = ["full", "visit"] }
+quote = "1"
+rig-core = "0.9"
+rusqlite = { version = "0.32", features = ["bundled"] }
+tokio = { version = "1", features = ["full"] }
+walkdir = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
