@@ -12,7 +12,7 @@ syn = { version = "2", features = ["full", "visit"] }
 quote = "1"
 prettyplease = "0.2"
 rig-core = "0.9"
-rusqlite = { version = "0.32", features = ["bundled"] }
+polarisdb = { version = "0.1", features = ["async"] }
 tokio = { version = "1", features = ["full"] }
 walkdir = "2"
 serde = { version = "1", features = ["derive"] }

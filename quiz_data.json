@@ -1,371 +1,110 @@
 [
   {
-    "code": "let dot: f64 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();\nlet norm_a: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();\nlet norm_b: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();\nif norm_a == 0.0 || norm_b == 0.0 {\n    return 1.0;\n}\n1.0 - (dot / (norm_a * norm_b))",
-    "correct": "Calculates the cosine similarity between two vectors a and b, returning zero if either vector is of length zero.",
+    "code": "let dot: f32 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();\nlet norm_a: f32 = a.iter().map(|x| x * x).sum::<f32>().sqrt();\nlet norm_b: f32 = b.iter().map(|x| x * x).sum::<f32>().sqrt();\nif norm_a == 0.0 || norm_b == 0.0 {\n    return 1.0;\n}\n1.0 - (dot / (norm_a * norm_b))",
+    "correct": "Calculates the cosine similarity between two vectors a and b, returning zero if either vector's magnitude is zero.",
     "distractors": [
-      "Calculates the cosine similarity between two vectors represented by arrays 'a' and 'b'.",
-      "Calculates the cosine of an angle given two vectors represented by arrays a and b after ensuring neither is zero-length.",
-      "Calculates the normalized dot product of two vectors if neither vector has a zero magnitude."
+      "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz.",
+      "Generates a grid of styled answer buttons based on user selections and correctness, displaying them in a web view.",
+      "Generates a random permutation of an array and identifies the index of its original first element."
     ]
   },
   {
-    "code": "let mut stmt = conn\n    .prepare(\"SELECT id, embedding FROM chunks WHERE embedding IS NOT NULL\")?;\nlet rows: Vec<(i64, Vec<f64>)> = stmt\n    .query_map(\n        [],\n        |row| {\n            let id: i64 = row.get(0)?;\n            let blob: Vec<u8> = row.get(1)?;\n            Ok((id, blob))\n        },\n    )?\n    .filter_map(|r| r.ok())\n    .map(|(id, blob)| (id, blob_to_vec(&blob)))\n    .collect();\nlet n = rows.len();\nif n == 0 {\n    anyhow::bail!(\"No chunks with embeddings found in database\");\n}\nlet actual_target = target.min(n);\nprintln!(\"Selecting {} most diverse chunks from {} total...\", actual_target, n);\nlet mut min_dist = vec![f64::MAX; n];\nlet mut selected_indices: Vec<usize> = Vec::with_capacity(actual_target);\nselected_indices.push(0);\nfor i in 0..n {\n    min_dist[i] = cosine_distance(&rows[0].1, &rows[i].1);\n}\nwhile selected_indices.len() < actual_target {\n    let next = (0..n)\n        .filter(|i| !selected_indices.contains(i))\n        .max_by(|&a, &b| min_dist[a].partial_cmp(&min_dist[b]).unwrap())\n        .unwrap();\n    selected_indices.push(next);\n    let new_vec = &rows[next].1;\n    for i in 0..n {\n        let d = cosine_distance(new_vec, &rows[i].1);\n        if d < min_dist[i] {\n            min_dist[i] = d;\n        }\n    }\n    if selected_indices.len() % 10 == 0 {\n        println!(\"  Selected {}/{}\", selected_indices.len(), actual_target);\n    }\n}\nlet selected_ids: Vec<i64> = selected_indices.iter().map(|&i| rows[i].0).collect();\nfor id in &selected_ids {\n    conn.execute(\"UPDATE chunks SET selected = 1 WHERE id = ?1\", [id])?;\n}\nprintln!(\"Marked {} chunks as selected\", selected_ids.len());\nOk(())",
-    "correct": "Retrieves and marks the most diverse set of non-null embeddings from a database as 'selected' based on cosine distance, then prints out how many were marked.",
+    "code": "let inner = collection.inner();\nlet n = inner.len();\nif n == 0 {\n    anyhow::bail!(\"No chunks found in collection\");\n}\nlet mut rows: Vec<(u64, Vec<f32>, Payload)> = Vec::with_capacity(n);\nfor id in 1..=(n as u64) {\n    if let Some((vec, payload)) = inner.get(id) {\n        rows.push((id, vec, payload));\n    }\n}\nif rows.is_empty() {\n    anyhow::bail!(\"Could not read any entries from the collection\");\n}\nlet actual_n = rows.len();\nlet actual_target = target.min(actual_n);\nprintln!(\n    \"Selecting {} most diverse chunks from {} total...\", actual_target, actual_n\n);\nfor (id, vec, payload) in &rows {\n    let reset_payload = Payload::new()\n        .with_field(\"file_path\", payload.get_str(\"file_path\").unwrap_or(\"\"))\n        .with_field(\"fn_name\", payload.get_str(\"fn_name\").unwrap_or(\"\"))\n        .with_field(\"body\", payload.get_str(\"body\").unwrap_or(\"\"))\n        .with_field(\"selected\", \"0\")\n        .with_field(\"description\", payload.get_str(\"description\").unwrap_or(\"\"));\n    collection.update(*id, vec.clone(), reset_payload).await?;\n}\nlet mut min_dist = vec![f32::MAX; actual_n];\nlet mut selected_indices: Vec<usize> = Vec::with_capacity(actual_target);\nselected_indices.push(0);\nfor i in 0..actual_n {\n    min_dist[i] = cosine_distance(&rows[0].1, &rows[i].1);\n}\nwhile selected_indices.len() < actual_target {\n    let next = (0..actual_n)\n        .filter(|i| !selected_indices.contains(i))\n        .max_by(|&a, &b| min_dist[a].partial_cmp(&min_dist[b]).unwrap())\n        .unwrap();\n    selected_indices.push(next);\n    let new_vec = &rows[next].1;\n    for i in 0..actual_n {\n        let d = cosine_distance(new_vec, &rows[i].1);\n        if d < min_dist[i] {\n            min_dist[i] = d;\n        }\n    }\n    if selected_indices.len() % 10 == 0 {\n        println!(\"  Selected {}/{}\", selected_indices.len(), actual_target);\n    }\n}\nfor idx in &selected_indices {\n    let (id, vec, payload) = &rows[*idx];\n    let updated_payload = Payload::new()\n        .with_field(\"file_path\", payload.get_str(\"file_path\").unwrap_or(\"\"))\n        .with_field(\"fn_name\", payload.get_str(\"fn_name\").unwrap_or(\"\"))\n        .with_field(\"body\", payload.get_str(\"body\").unwrap_or(\"\"))\n        .with_field(\"selected\", \"1\")\n        .with_field(\"description\", payload.get_str(\"description\").unwrap_or(\"\"));\n    collection.update(*id, vec.clone(), updated_payload).await?;\n}\ncollection.flush().await?;\nprintln!(\"Marked {} chunks as selected\", selected_indices.len());\nOk(())",
+    "correct": "The code selects and marks the most diverse subsets of items from a given set.",
     "distractors": [
-      "The code selects and marks the most diverse set of embeddings from a database, then updates them in the storage.",
-      "The code selects and marks the most diverse specified number of database entries based on cosine distance.",
-      "The code retrieves selected, non-null entries from a database and prepares them for quiz creation by calculating cosine similarities between their embeddings."
+      "Generates quiz questions with selected answers and associated distractors from a dataset.",
+      "Generates and updates a dataset with descriptions for selected chunks of Rust code.",
+      "The code asynchronously processes text data in batches and stores the resulting embeddings along with metadata into a collection."
     ]
   },
   {
-    "code": "let conn = Connection::open(db_path)?;\nconn.execute_batch(\n    \"\n    CREATE TABLE IF NOT EXISTS chunks (\n        id          INTEGER PRIMARY KEY AUTOINCREMENT,\n        file_path   TEXT NOT NULL,\n        fn_name     TEXT NOT NULL,\n        body        TEXT NOT NULL,\n        embedding   BLOB,\n        selected    INTEGER NOT NULL DEFAULT 0,\n        description TEXT\n    );\n\",\n)?;\nOk(conn)",
-    "correct": "Creates a database table called 'chunks' with specified columns and returns the connection object if successful.",
+    "code": "let config = CollectionConfig::new(EMBEDDING_DIMS, DistanceMetric::Cosine);\nlet collection = AsyncCollection::open_or_create(db_path.to_string(), config).await?;\nOk(collection)",
+    "correct": "Opens an asynchronous database connection and retrieves or creates a collection with specified embedding dimensions and cosine distance metric.",
     "distractors": [
-      "Creates a database table if it doesn't exist and returns the connection.",
-      "The code creates a database table with specified columns if it doesn't already exist.",
-      "Retrieves and marks the most diverse set of non-null embeddings from a database as 'selected' based on cosine distance, then prints out how many were marked."
+      "Generates and updates a dataset with descriptions for selected chunks of Rust code.",
+      "The code selects and marks the most diverse subsets of items from a given set.",
+      "The code parses Rust files from a repository and generates an educational dataset with diverse chunks for quizzes."
     ]
   },
   {
-    "code": "let client = ollama::Client::new();\nlet model = client.embedding_model(ollama::NOMIC_EMBED_TEXT);\nconst BATCH: usize = 32;\nlet total = chunks.len();\nfor (batch_idx, batch) in chunks.chunks(BATCH).enumerate() {\n    let texts: Vec<String> = batch.iter().map(|c| c.body.clone()).collect();\n    println!(\n        \"Embedding batch {}/{} ({} chunks)...\", batch_idx + 1, (total + BATCH - 1) /\n        BATCH, texts.len()\n    );\n    let embeddings: Vec<rig::embeddings::Embedding> = model\n        .embed_texts(texts)\n        .await?;\n    for (chunk, embedding) in batch.iter().zip(embeddings.iter()) {\n        let blob = vec_to_blob(&embedding.vec);\n        conn.execute(\n            \"INSERT INTO chunks (file_path, fn_name, body, embedding) VALUES (?1, ?2, ?3, ?4)\",\n            params![chunk.file_path, chunk.fn_name, chunk.body, blob],\n        )?;\n    }\n}\nprintln!(\"Stored {} embeddings in database\", total);\nOk(())",
-    "correct": "The code batch processes text data to generate and store their corresponding embeddings into a database.",
+    "code": "let client = ollama::Client::new();\nlet model = client.embedding_model(ollama::NOMIC_EMBED_TEXT);\nlet mut count = 0usize;\nfor chunk_result in chunks {\n    let chunk = chunk_result?;\n    let embeddings = model.embed_texts(vec![chunk.body.clone()]).await?;\n    let vec_f32: Vec<f32> = embeddings[0].vec.iter().map(|&v| v as f32).collect();\n    let payload = Payload::new()\n        .with_field(\"file_path\", chunk.file_path.clone())\n        .with_field(\"fn_name\", chunk.fn_name.clone())\n        .with_field(\"body\", chunk.body.clone())\n        .with_field(\"selected\", \"0\")\n        .with_field(\"description\", \"\");\n    collection.insert_auto(vec_f32, payload).await?;\n    count += 1;\n    if count % 10 == 0 {\n        println!(\"  Embedded {} chunks...\", count);\n    }\n}\ncollection.flush().await?;\nOk(count)",
+    "correct": "The code asynchronously processes text data in batches and stores the resulting embeddings along with metadata into a collection.",
     "distractors": [
-      "The code asynchronously embeds a series of text chunks into vectors using an embedding model and stores them as blobs in batches to a database.",
-      "The code batches and asynchronously embeds text data into an NLP model before storing the resulting vector embeddings along with metadata into a relational database.",
-      "Generates and updates a database with summaries for selected entries in Rust code."
-    ]
-  },
-  {
-    "code": "let wrapper = quote! {\n    fn __wrapper() # block\n};\nlet Ok(ast) = syn::parse2::<syn::File>(wrapper) else {\n    return block\n        .stmts\n        .iter()\n        .map(|s| quote!(# s).to_string())\n        .collect::<Vec<_>>()\n        .join(\"\\n\");\n};\nlet formatted = prettyplease::unparse(&ast);\nlet start = formatted.find('{').map(|i| i + 1).unwrap_or(0);\nlet end = formatted.rfind('}').unwrap_or(formatted.len());\nlet inner = &formatted[start..end];\ndedent(inner).trim().to_string()",
-    "correct": "Parses and pretty-prints Rust code contained within a block into an AST, removes outermost braces, trims whitespace, and returns the cleaned content.",
-    "distractors": [
-      "Generates a Rust function definition from provided code block.",
-      "Generates a Rust code block from an abstract syntax tree and formats it.",
-      "Parses Rust files from a repository and generates an educational quiz with embedded code chunks."
-    ]
-  },
-  {
-    "code": "let mut all_chunks = Vec::new();\nfor entry in WalkDir::new(repo_path)\n    .into_iter()\n    .filter_map(|e| e.ok())\n    .filter(|e| e.file_type().is_file())\n    .filter(|e| e.path().extension().and_then(|s| s.to_str()) == Some(\"rs\"))\n{\n    let path = entry.path();\n    let src = std::fs::read_to_string(path)\n        .with_context(|| format!(\"Failed to read {}\", path.display()))?;\n    let ast = match syn::parse_file(&src) {\n        Ok(a) => a,\n        Err(e) => {\n            eprintln!(\"Warning: failed to parse {}: {}\", path.display(), e);\n            continue;\n        }\n    };\n    let mut collector = ChunkCollector::new(\n        path.display().to_string(),\n        min_stmts,\n        max_stmts,\n    );\n    collector.visit_file(&ast);\n    all_chunks.extend(collector.chunks);\n}\nprintln!(\"Extracted {} chunks from .rs files\", all_chunks.len());\nOk(all_chunks)",
-    "correct": "Collects and counts the number of functions in Rust source code files within a specified repository.",
-    "distractors": [
-      "Collects and counts the number of function-like syntax elements in Rust source code files within a specified directory.",
-      "Parses Rust source code to extract and count the number of 'chunk' items in each `.rs` file within a given directory.",
-      "Parses Rust files from a repository and generates an educational quiz with embedded code chunks."
-    ]
-  },
-  {
-    "code": "let dot: f64 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();\nlet norm_a: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();\nlet norm_b: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();\nif norm_a == 0.0 || norm_b == 0.0 {\n    return 0.0;\n}\ndot / (norm_a * norm_b)",
-    "correct": "Calculates the cosine of an angle given two vectors represented by arrays a and b after ensuring neither is zero-length.",
-    "distractors": [
-      "Calculates the normalized dot product of two vectors if neither vector has a zero magnitude.",
-      "Calculates the normalized dot product of two vectors if neither vector's magnitude is zero.",
-      "Calculates the cosine similarity between two vectors a and b, returning zero if either vector is of length zero."
-    ]
-  },
-  {
-    "code": "let mut stmt = conn\n    .prepare(\n        \"SELECT id, body, description, embedding FROM chunks WHERE selected = 1 AND description IS NOT NULL AND embedding IS NOT NULL\",\n    )?;\nlet chunks: Vec<ChunkWithData> = stmt\n    .query_map(\n        [],\n        |row| {\n            let id: i64 = row.get(0)?;\n            let body: String = row.get(1)?;\n            let description: String = row.get(2)?;\n            let blob: Vec<u8> = row.get(3)?;\n            Ok((id, body, description, blob))\n        },\n    )?\n    .filter_map(|r| r.ok())\n    .map(|(id, body, description, blob)| ChunkWithData {\n        id,\n        body,\n        description,\n        embedding: blob_to_vec(&blob),\n    })\n    .collect();\nprintln!(\"Building quiz entries with distractors for {} chunks...\", chunks.len());\nlet entries = chunks\n    .iter()\n    .map(|chunk| {\n        let mut similarities: Vec<(usize, f64)> = chunks\n            .iter()\n            .enumerate()\n            .filter(|(_, other)| other.id != chunk.id)\n            .map(|(i, other)| {\n                let sim = cosine_similarity(&chunk.embedding, &other.embedding);\n                (i, sim)\n            })\n            .collect();\n        similarities.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());\n        let distractors: [String; 3] = [\n            chunks[similarities[0].0].description.clone(),\n            chunks[similarities[1].0].description.clone(),\n            chunks[similarities[2].0].description.clone(),\n        ];\n        QuizEntry {\n            body: chunk.body.clone(),\n            correct: chunk.description.clone(),\n            distractors,\n        }\n    })\n    .collect();\nOk(entries)",
-    "correct": "The code retrieves selected, non-null entries from a database and prepares them for quiz creation by calculating cosine similarities between their embeddings.",
-    "distractors": [
-      "Retrieves and processes selected database entries into structured quiz data with similarity-based distractors.",
-      "The code generates quiz entries with similar distractor descriptions for selected database records based on cosine similarity.",
-      "Retrieves and marks the most diverse set of non-null embeddings from a database as 'selected' based on cosine distance, then prints out how many were marked."
-    ]
-  },
-  {
-    "code": "let items: Vec<QuizItemJson> = entries\n    .iter()\n    .map(|e| QuizItemJson {\n        code: &e.body,\n        correct: &e.correct,\n        distractors: [&e.distractors[0], &e.distractors[1], &e.distractors[2]],\n    })\n    .collect();\nlet json = serde_json::to_string_pretty(&items)?;\nif let Some(parent) = output_path.parent() {\n    std::fs::create_dir_all(parent)?;\n}\nstd::fs::write(output_path, json)?;\nprintln!(\"Exported {} quiz items to {}\", items.len(), output_path.display());\nOk(())",
-    "correct": "Generates and writes a pretty-printed JSON file of formatted questions and their components based on input entries.",
-    "distractors": [
-      "Generates and writes a pretty-printed JSON file of formatted quiz item data from entries to the specified path.",
-      "Generates and exports a pretty-printed JSON file containing structured data about multiple quizzes.",
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score."
-    ]
-  },
-  {
-    "code": "let client = ollama::Client::new();\nlet agent = client.agent(LLM_MODEL).preamble(SYSTEM_PROMPT).build();\nlet mut stmt = conn\n    .prepare(\n        \"SELECT id, body FROM chunks WHERE selected = 1 AND description IS NULL\",\n    )?;\nlet rows: Vec<(i64, String)> = stmt\n    .query_map([], |row| Ok((row.get(0)?, row.get(1)?)))?\n    .filter_map(|r| r.ok())\n    .collect();\nlet total = rows.len();\nprintln!(\"Generating descriptions for {} selected chunks...\", total);\nfor (idx, (id, body)) in rows.iter().enumerate() {\n    let prompt = format!(\n        \"Describe what this Rust code does in one sentence:\\n\\n{}\", body\n    );\n    let description: String = match agent.prompt(prompt.as_str()).await {\n        Ok(d) => d.trim().to_string(),\n        Err(e) => {\n            eprintln!(\"  Warning: failed to describe chunk {}: {}\", id, e);\n            continue;\n        }\n    };\n    conn.execute(\n        \"UPDATE chunks SET description = ?1 WHERE id = ?2\",\n        params![description, id],\n    )?;\n    println!(\"  [{}/{}] described chunk {}\", idx + 1, total, id);\n}\nprintln!(\"Done generating descriptions.\");\nOk(())",
-    "correct": "Generates and updates a database with summaries for selected entries in Rust code.",
-    "distractors": [
-      "Generates and updates database records with generated descriptions for selected SQL query results.",
-      "Generates and updates the 'description' field for selected chunks in a database based on their body using an LLM agent.",
-      "The code batch processes text data to generate and store their corresponding embeddings into a database."
-    ]
-  },
-  {
-    "code": "let args = Args::parse();\nprintln!(\"=== Step 1: Parsing .rs files in {:?} ===\", args.repo);\nlet chunks = parser::extract_chunks_from_repo(\n    &args.repo,\n    args.min_stmts,\n    args.max_stmts,\n)?;\nif chunks.is_empty() {\n    anyhow::bail!(\"No suitable code chunks found in the repository.\");\n}\nprintln!(\"\\n=== Step 2: Embedding chunks and storing in {:?} ===\", args.db);\nlet conn = embedder::open_db(args.db.to_str().unwrap())?;\nembedder::embed_and_store(&conn, &chunks).await?;\nprintln!(\"\\n=== Step 3: Selecting {} most diverse chunks ===\", args.target);\ndiversity::select_diverse(&conn, args.target)?;\nprintln!(\"\\n=== Step 4: Generating descriptions with phi4-mini:3.8b ===\");\ndescriber::describe_selected_chunks(&conn).await?;\nprintln!(\"\\n=== Step 5: Building quiz entries with distractors ===\");\nlet entries = distractors::build_quiz_entries(&conn)?;\nprintln!(\"\\n=== Step 6: Exporting to {:?} ===\", args.output);\nexport::export_json(&entries, &args.output)?;\nprintln!(\"\\nDone! Run 'trunk serve' in crates/frontend to start the quiz.\");\nOk(())",
-    "correct": "Parses Rust files from a repository and generates an educational quiz with embedded code chunks.",
-    "distractors": [
-      "The code parses Rust files from a repository and generates an interactive quiz based on diverse chunks extracted from them.",
-      "The code parses Rust source files from a repository and processes them through various steps including embedding into a database, selecting diverse chunks for description generation using an AI model, building interactive quiz entries with distractors, exporting results as JSON.",
-      "Collects and counts the number of functions in Rust source code files within a specified repository."
-    ]
-  },
-  {
-    "code": "let answers = StoredValue::new_local(answers);\nlet buttons: Vec<_> = (0..4)\n    .map(|i| {\n        let answer = answers.with_value(|a| a.get(i).cloned().unwrap_or_default());\n        let style = move || {\n            if !answered.get() {\n                \"margin:0.25rem 0;width:100%\".to_string()\n            } else if i == correct_idx {\n                \"margin:0.25rem 0;width:100%;background:#28a745;color:white\"\n                    .to_string()\n            } else if selected.get() == Some(i) {\n                \"margin:0.25rem 0;width:100%;background:#dc3545;color:white\"\n                    .to_string()\n            } else {\n                \"margin:0.25rem 0;width:100%;opacity:0.6\".to_string()\n            }\n        };\n        view! {\n            < div style = \"padding:0.1rem 0\" > < button style = style on : click =\n            move | _ | on_answer(i) > { answer } </ button > </ div >\n        }\n    })\n    .collect();\nview! {\n    < div style = \"margin-top:1rem\" > < pre class = \"language-rust\" > < code > { code\n    } </ code > </ pre > < p >< strong > \"What does this code do?\" </ strong ></ p >\n    < div > { buttons } </ div > </ div >\n}",
-    "correct": "Generates a set of interactive answer buttons with conditional styles based on their state and collects them into an HTML view.",
-    "distractors": [
-      "Generates a set of styled answer buttons with associated JavaScript click handlers for answering questions.",
-      "Generates a list of styled interactive answer options and displays them along with the question text.",
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score."
-    ]
-  },
-  {
-    "code": "let total = items.len();\nlet current = RwSignal::new(0usize);\nlet score = RwSignal::new(0usize);\nlet answered = RwSignal::new(false);\nlet selected = RwSignal::new(Option::<usize>::None);\nlet shuffled: Vec<(Vec<String>, usize)> = items\n    .iter()\n    .map(|item| {\n        let all = std::iter::once(item.correct.clone())\n            .chain(item.distractors.iter().cloned())\n            .collect::<Vec<_>>();\n        shuffle_answers(all)\n    })\n    .collect();\nlet shuffled = StoredValue::new_local(shuffled);\nlet items = StoredValue::new_local(items);\nlet on_answer = move |idx: usize| {\n    if answered.get() {\n        return;\n    }\n    answered.set(true);\n    selected.set(Some(idx));\n    let q = current.get();\n    let (_, correct_idx) = shuffled.with_value(|s| (s[q].0.clone(), s[q].1));\n    if idx == correct_idx {\n        score.update(|s| *s += 1);\n    }\n};\nlet on_next = move |_| {\n    current.update(|c| *c += 1);\n    answered.set(false);\n    selected.set(None);\n};\nview! {\n    < ScoreBoard score = score.into() total = total current = current.into() /> {\n    move || { let q = current.get(); if q >= total { view! { < div > < h2 >\n    \"Quiz complete!\" </ h2 > < p > \"Final score: \" { score.get() } \" / \" { total } </\n    p > </ div > } .into_any() } else { let code = items.with_value(| it | it[q].code\n    .clone()); let (answers, correct_idx) = shuffled.with_value(| s | s[q].clone());\n    view! { < QuizCard code = code answers = answers correct_idx = correct_idx\n    answered = answered.into() selected = selected.into() on_answer = on_answer /> <\n    div style = \"margin-top:1rem\" > { move || { if answered.get() && current.get() +\n    1 < total { view! { < button on : click = on_next > \"Next\" </ button > }\n    .into_any() } else { view! { < span ></ span > } .into_any() } } } </ div > }\n    .into_any() } } }\n}",
-    "correct": "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score.",
-    "distractors": [
-      "Generates a quiz interface with dynamic scoring and answer selection, updates progress as answers are given.",
-      "The code represents a quiz interface where users select answers for questions, track progress through quizzes and score their correct selections.",
-      "Generates a set of interactive answer buttons with conditional styles based on their state and collects them into an HTML view."
-    ]
-  },
-  {
-    "code": "let seed = answers[0]\n    .bytes()\n    .fold(0u64, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u64));\nlet n = answers.len();\nlet mut indices: Vec<usize> = (0..n).collect();\nlet mut rng = seed;\nfor i in (1..n).rev() {\n    rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);\n    let j = (rng >> 33) as usize % (i + 1);\n    indices.swap(i, j);\n}\nlet correct_idx = indices.iter().position(|&x| x == 0).unwrap();\nlet shuffled = indices.into_iter().map(|i| answers[i].clone()).collect();\n(shuffled, correct_idx)",
-    "correct": "Generates a random permutation of an array and identifies the original index of its first element.",
-    "distractors": [
-      "Generates a pseudo-random permutation of an array and identifies the index where '0' would be inserted if it were included in that arrangement.",
-      "Generates a random permutation of an input slice and returns it along with the index of its original first element.",
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score."
-    ]
-  },
-  {
-    "code": "let dot: f64 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();\nlet norm_a: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();\nlet norm_b: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();\nif norm_a == 0.0 || norm_b == 0.0 {\n    return 1.0;\n}\n1.0 - (dot / (norm_a * norm_b))",
-    "correct": "Calculates the cosine similarity between two vectors represented by arrays 'a' and 'b'.",
-    "distractors": [
-      "Calculates the cosine similarity between two vectors a and b, returning zero if either vector is of length zero.",
-      "Calculates the cosine of an angle given two vectors represented by arrays a and b after ensuring neither is zero-length.",
-      "Calculates the normalized dot product of two vectors if neither vector has a zero magnitude."
-    ]
-  },
-  {
-    "code": "let mut stmt = conn\n    .prepare(\"SELECT id, embedding FROM chunks WHERE embedding IS NOT NULL\")?;\nlet rows: Vec<(i64, Vec<f64>)> = stmt\n    .query_map(\n        [],\n        |row| {\n            let id: i64 = row.get(0)?;\n            let blob: Vec<u8> = row.get(1)?;\n            Ok((id, blob))\n        },\n    )?\n    .filter_map(|r| r.ok())\n    .map(|(id, blob)| (id, blob_to_vec(&blob)))\n    .collect();\nlet n = rows.len();\nif n == 0 {\n    anyhow::bail!(\"No chunks with embeddings found in database\");\n}\nlet actual_target = target.min(n);\nprintln!(\"Selecting {} most diverse chunks from {} total...\", actual_target, n);\nlet mut min_dist = vec![f64::MAX; n];\nlet mut selected_indices: Vec<usize> = Vec::with_capacity(actual_target);\nselected_indices.push(0);\nfor i in 0..n {\n    min_dist[i] = cosine_distance(&rows[0].1, &rows[i].1);\n}\nwhile selected_indices.len() < actual_target {\n    let next = (0..n)\n        .filter(|i| !selected_indices.contains(i))\n        .max_by(|&a, &b| min_dist[a].partial_cmp(&min_dist[b]).unwrap())\n        .unwrap();\n    selected_indices.push(next);\n    let new_vec = &rows[next].1;\n    for i in 0..n {\n        let d = cosine_distance(new_vec, &rows[i].1);\n        if d < min_dist[i] {\n            min_dist[i] = d;\n        }\n    }\n    if selected_indices.len() % 10 == 0 {\n        println!(\"  Selected {}/{}\", selected_indices.len(), actual_target);\n    }\n}\nlet selected_ids: Vec<i64> = selected_indices.iter().map(|&i| rows[i].0).collect();\nfor id in &selected_ids {\n    conn.execute(\"UPDATE chunks SET selected = 1 WHERE id = ?1\", [id])?;\n}\nprintln!(\"Marked {} chunks as selected\", selected_ids.len());\nOk(())",
-    "correct": "The code selects and marks the most diverse set of embeddings from a database, then updates them in the storage.",
-    "distractors": [
-      "Retrieves and marks the most diverse set of non-null embeddings from a database as 'selected' based on cosine distance, then prints out how many were marked.",
-      "The code selects and marks the most diverse specified number of database entries based on cosine distance.",
-      "The code retrieves selected, non-null entries from a database and prepares them for quiz creation by calculating cosine similarities between their embeddings."
-    ]
-  },
-  {
-    "code": "let conn = Connection::open(db_path)?;\nconn.execute_batch(\n    \"\n    CREATE TABLE IF NOT EXISTS chunks (\n        id          INTEGER PRIMARY KEY AUTOINCREMENT,\n        file_path   TEXT NOT NULL,\n        fn_name     TEXT NOT NULL,\n        body        TEXT NOT NULL,\n        embedding   BLOB,\n        selected    INTEGER NOT NULL DEFAULT 0,\n        description TEXT\n    );\n\",\n)?;\nOk(conn)",
-    "correct": "Creates a database table if it doesn't exist and returns the connection.",
-    "distractors": [
-      "Creates a database table called 'chunks' with specified columns and returns the connection object if successful.",
-      "The code creates a database table with specified columns if it doesn't already exist.",
-      "Retrieves and marks the most diverse set of non-null embeddings from a database as 'selected' based on cosine distance, then prints out how many were marked."
-    ]
-  },
-  {
-    "code": "let client = ollama::Client::new();\nlet model = client.embedding_model(ollama::NOMIC_EMBED_TEXT);\nconst BATCH: usize = 32;\nlet total = chunks.len();\nfor (batch_idx, batch) in chunks.chunks(BATCH).enumerate() {\n    let texts: Vec<String> = batch.iter().map(|c| c.body.clone()).collect();\n    println!(\n        \"Embedding batch {}/{} ({} chunks)...\", batch_idx + 1, (total + BATCH - 1) /\n        BATCH, texts.len()\n    );\n    let embeddings: Vec<rig::embeddings::Embedding> = model\n        .embed_texts(texts)\n        .await?;\n    for (chunk, embedding) in batch.iter().zip(embeddings.iter()) {\n        let blob = vec_to_blob(&embedding.vec);\n        conn.execute(\n            \"INSERT INTO chunks (file_path, fn_name, body, embedding) VALUES (?1, ?2, ?3, ?4)\",\n            params![chunk.file_path, chunk.fn_name, chunk.body, blob],\n        )?;\n    }\n}\nprintln!(\"Stored {} embeddings in database\", total);\nOk(())",
-    "correct": "The code asynchronously embeds a series of text chunks into vectors using an embedding model and stores them as blobs in batches to a database.",
-    "distractors": [
-      "The code batch processes text data to generate and store their corresponding embeddings into a database.",
-      "The code batches and asynchronously embeds text data into an NLP model before storing the resulting vector embeddings along with metadata into a relational database.",
-      "Generates and updates a database with summaries for selected entries in Rust code."
+      "Generates and updates a dataset with descriptions for selected chunks of Rust code.",
+      "The code selects and marks the most diverse subsets of items from a given set.",
+      "The code parses Rust files from a repository and generates an educational dataset with diverse chunks for quizzes."
     ]
   },
   {
     "code": "let wrapper = quote! {\n    fn __wrapper() # block\n};\nlet Ok(ast) = syn::parse2::<syn::File>(wrapper) else {\n    return block\n        .stmts\n        .iter()\n        .map(|s| quote!(# s).to_string())\n        .collect::<Vec<_>>()\n        .join(\"\\n\");\n};\nlet formatted = prettyplease::unparse(&ast);\nlet start = formatted.find('{').map(|i| i + 1).unwrap_or(0);\nlet end = formatted.rfind('}').unwrap_or(formatted.len());\nlet inner = &formatted[start..end];\ndedent(inner).trim().to_string()",
-    "correct": "Generates a Rust function definition from provided code block.",
+    "correct": "Generates a quoted block of code from Rust syntax items.",
     "distractors": [
-      "Parses and pretty-prints Rust code contained within a block into an AST, removes outermost braces, trims whitespace, and returns the cleaned content.",
-      "Generates a Rust code block from an abstract syntax tree and formats it.",
-      "Parses Rust files from a repository and generates an educational quiz with embedded code chunks."
+      "The code parses Rust files from a repository and generates an educational dataset with diverse chunks for quizzes.",
+      "Exports a collection of quiz questions in JSON format and writes them to an output file.",
+      "Generates quiz questions with selected answers and associated distractors from a dataset."
     ]
   },
   {
-    "code": "let mut all_chunks = Vec::new();\nfor entry in WalkDir::new(repo_path)\n    .into_iter()\n    .filter_map(|e| e.ok())\n    .filter(|e| e.file_type().is_file())\n    .filter(|e| e.path().extension().and_then(|s| s.to_str()) == Some(\"rs\"))\n{\n    let path = entry.path();\n    let src = std::fs::read_to_string(path)\n        .with_context(|| format!(\"Failed to read {}\", path.display()))?;\n    let ast = match syn::parse_file(&src) {\n        Ok(a) => a,\n        Err(e) => {\n            eprintln!(\"Warning: failed to parse {}: {}\", path.display(), e);\n            continue;\n        }\n    };\n    let mut collector = ChunkCollector::new(\n        path.display().to_string(),\n        min_stmts,\n        max_stmts,\n    );\n    collector.visit_file(&ast);\n    all_chunks.extend(collector.chunks);\n}\nprintln!(\"Extracted {} chunks from .rs files\", all_chunks.len());\nOk(all_chunks)",
-    "correct": "Collects and counts the number of function-like syntax elements in Rust source code files within a specified directory.",
+    "code": "let inner = collection.inner();\nlet n = inner.len();\nlet mut selected: Vec<(u64, Vec<f32>, Payload)> = Vec::new();\nfor id in 1..=(n as u64) {\n    if let Some((vec, payload)) = inner.get(id) {\n        let is_selected = payload.get_str(\"selected\") == Some(\"1\");\n        let has_description = payload\n            .get_str(\"description\")\n            .map(|d: &str| !d.is_empty())\n            .unwrap_or(false);\n        if is_selected && has_description {\n            selected.push((id, vec, payload));\n        }\n    }\n}\nprintln!(\"Building quiz entries with distractors for {} chunks...\", selected.len());\nlet mut entries: Vec<QuizEntry> = Vec::with_capacity(selected.len());\nfor (id, vec, payload) in &selected {\n    let body = payload.get_str(\"body\").unwrap_or(\"\").to_string();\n    let correct = payload.get_str(\"description\").unwrap_or(\"\").to_string();\n    let neighbors: Vec<SearchResult> = collection.search(vec, 5, None).await;\n    let distractors: Vec<String> = neighbors\n        .into_iter()\n        .filter(|r| r.id != *id)\n        .filter_map(|r| {\n            r.payload\n                .and_then(|p: Payload| {\n                    let desc = p.get_str(\"description\")?.to_string();\n                    if desc.is_empty() { None } else { Some(desc) }\n                })\n        })\n        .take(3)\n        .collect();\n    let d0 = distractors.get(0).cloned().unwrap_or_default();\n    let d1 = distractors.get(1).cloned().unwrap_or_default();\n    let d2 = distractors.get(2).cloned().unwrap_or_default();\n    entries\n        .push(QuizEntry {\n            body,\n            correct,\n            distractors: [d0, d1, d2],\n        });\n}\nOk(entries)",
+    "correct": "Generates quiz questions with selected answers and associated distractors from a dataset.",
     "distractors": [
-      "Collects and counts the number of functions in Rust source code files within a specified repository.",
-      "Parses Rust source code to extract and count the number of 'chunk' items in each `.rs` file within a given directory.",
-      "Parses Rust files from a repository and generates an educational quiz with embedded code chunks."
-    ]
-  },
-  {
-    "code": "let dot: f64 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();\nlet norm_a: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();\nlet norm_b: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();\nif norm_a == 0.0 || norm_b == 0.0 {\n    return 0.0;\n}\ndot / (norm_a * norm_b)",
-    "correct": "Calculates the normalized dot product of two vectors if neither vector has a zero magnitude.",
-    "distractors": [
-      "Calculates the cosine of an angle given two vectors represented by arrays a and b after ensuring neither is zero-length.",
-      "Calculates the normalized dot product of two vectors if neither vector's magnitude is zero.",
-      "Calculates the cosine similarity between two vectors a and b, returning zero if either vector is of length zero."
-    ]
-  },
-  {
-    "code": "let mut stmt = conn\n    .prepare(\n        \"SELECT id, body, description, embedding FROM chunks WHERE selected = 1 AND description IS NOT NULL AND embedding IS NOT NULL\",\n    )?;\nlet chunks: Vec<ChunkWithData> = stmt\n    .query_map(\n        [],\n        |row| {\n            let id: i64 = row.get(0)?;\n            let body: String = row.get(1)?;\n            let description: String = row.get(2)?;\n            let blob: Vec<u8> = row.get(3)?;\n            Ok((id, body, description, blob))\n        },\n    )?\n    .filter_map(|r| r.ok())\n    .map(|(id, body, description, blob)| ChunkWithData {\n        id,\n        body,\n        description,\n        embedding: blob_to_vec(&blob),\n    })\n    .collect();\nprintln!(\"Building quiz entries with distractors for {} chunks...\", chunks.len());\nlet entries = chunks\n    .iter()\n    .map(|chunk| {\n        let mut similarities: Vec<(usize, f64)> = chunks\n            .iter()\n            .enumerate()\n            .filter(|(_, other)| other.id != chunk.id)\n            .map(|(i, other)| {\n                let sim = cosine_similarity(&chunk.embedding, &other.embedding);\n                (i, sim)\n            })\n            .collect();\n        similarities.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());\n        let distractors: [String; 3] = [\n            chunks[similarities[0].0].description.clone(),\n            chunks[similarities[1].0].description.clone(),\n            chunks[similarities[2].0].description.clone(),\n        ];\n        QuizEntry {\n            body: chunk.body.clone(),\n            correct: chunk.description.clone(),\n            distractors,\n        }\n    })\n    .collect();\nOk(entries)",
-    "correct": "Retrieves and processes selected database entries into structured quiz data with similarity-based distractors.",
-    "distractors": [
-      "The code retrieves selected, non-null entries from a database and prepares them for quiz creation by calculating cosine similarities between their embeddings.",
-      "The code generates quiz entries with similar distractor descriptions for selected database records based on cosine similarity.",
-      "Retrieves and marks the most diverse set of non-null embeddings from a database as 'selected' based on cosine distance, then prints out how many were marked."
+      "The code selects and marks the most diverse subsets of items from a given set.",
+      "Generates and updates a dataset with descriptions for selected chunks of Rust code.",
+      "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz."
     ]
   },
   {
     "code": "let items: Vec<QuizItemJson> = entries\n    .iter()\n    .map(|e| QuizItemJson {\n        code: &e.body,\n        correct: &e.correct,\n        distractors: [&e.distractors[0], &e.distractors[1], &e.distractors[2]],\n    })\n    .collect();\nlet json = serde_json::to_string_pretty(&items)?;\nif let Some(parent) = output_path.parent() {\n    std::fs::create_dir_all(parent)?;\n}\nstd::fs::write(output_path, json)?;\nprintln!(\"Exported {} quiz items to {}\", items.len(), output_path.display());\nOk(())",
-    "correct": "Generates and writes a pretty-printed JSON file of formatted quiz item data from entries to the specified path.",
+    "correct": "Exports a collection of quiz questions in JSON format and writes them to an output file.",
     "distractors": [
-      "Generates and writes a pretty-printed JSON file of formatted questions and their components based on input entries.",
-      "Generates and exports a pretty-printed JSON file containing structured data about multiple quizzes.",
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score."
+      "The code parses Rust files from a repository and generates an educational dataset with diverse chunks for quizzes.",
+      "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz.",
+      "Generates quiz questions with selected answers and associated distractors from a dataset."
     ]
   },
   {
-    "code": "let client = ollama::Client::new();\nlet agent = client.agent(LLM_MODEL).preamble(SYSTEM_PROMPT).build();\nlet mut stmt = conn\n    .prepare(\n        \"SELECT id, body FROM chunks WHERE selected = 1 AND description IS NULL\",\n    )?;\nlet rows: Vec<(i64, String)> = stmt\n    .query_map([], |row| Ok((row.get(0)?, row.get(1)?)))?\n    .filter_map(|r| r.ok())\n    .collect();\nlet total = rows.len();\nprintln!(\"Generating descriptions for {} selected chunks...\", total);\nfor (idx, (id, body)) in rows.iter().enumerate() {\n    let prompt = format!(\n        \"Describe what this Rust code does in one sentence:\\n\\n{}\", body\n    );\n    let description: String = match agent.prompt(prompt.as_str()).await {\n        Ok(d) => d.trim().to_string(),\n        Err(e) => {\n            eprintln!(\"  Warning: failed to describe chunk {}: {}\", id, e);\n            continue;\n        }\n    };\n    conn.execute(\n        \"UPDATE chunks SET description = ?1 WHERE id = ?2\",\n        params![description, id],\n    )?;\n    println!(\"  [{}/{}] described chunk {}\", idx + 1, total, id);\n}\nprintln!(\"Done generating descriptions.\");\nOk(())",
-    "correct": "Generates and updates database records with generated descriptions for selected SQL query results.",
+    "code": "let client = ollama::Client::new();\nlet agent = client.agent(LLM_MODEL).preamble(SYSTEM_PROMPT).build();\nlet inner = collection.inner();\nlet n = inner.len();\nlet mut pending: Vec<(u64, Vec<f32>, Payload)> = Vec::new();\nfor id in 1..=(n as u64) {\n    if let Some((vec, payload)) = inner.get(id) {\n        let is_selected = payload.get_str(\"selected\") == Some(\"1\");\n        let has_description = payload\n            .get_str(\"description\")\n            .map(|d: &str| !d.is_empty())\n            .unwrap_or(false);\n        if is_selected && !has_description {\n            pending.push((id, vec, payload));\n        }\n    }\n}\nlet total = pending.len();\nprintln!(\"Generating descriptions for {} selected chunks...\", total);\nfor (idx, (id, vec, payload)) in pending.into_iter().enumerate() {\n    let body = payload.get_str(\"body\").unwrap_or(\"\").to_string();\n    let prompt = format!(\n        \"Describe what this Rust code does in one sentence:\\n\\n{}\", body\n    );\n    let description: String = match agent.prompt(prompt.as_str()).await {\n        Ok(d) => d.trim().to_string(),\n        Err(e) => {\n            eprintln!(\"  Warning: failed to describe chunk {}: {}\", id, e);\n            continue;\n        }\n    };\n    let updated_payload = Payload::new()\n        .with_field(\"file_path\", payload.get_str(\"file_path\").unwrap_or(\"\"))\n        .with_field(\"fn_name\", payload.get_str(\"fn_name\").unwrap_or(\"\"))\n        .with_field(\"body\", body)\n        .with_field(\"selected\", \"1\")\n        .with_field(\"description\", description);\n    collection.update(id, vec, updated_payload).await?;\n    println!(\"  [{}/{}] described chunk {}\", idx + 1, total, id);\n}\ncollection.flush().await?;\nprintln!(\"Done generating descriptions.\");\nOk(())",
+    "correct": "Generates and updates a dataset with descriptions for selected chunks of Rust code.",
     "distractors": [
-      "Generates and updates a database with summaries for selected entries in Rust code.",
-      "Generates and updates the 'description' field for selected chunks in a database based on their body using an LLM agent.",
-      "The code batch processes text data to generate and store their corresponding embeddings into a database."
+      "The code asynchronously processes text data in batches and stores the resulting embeddings along with metadata into a collection.",
+      "Generates quiz questions with selected answers and associated distractors from a dataset.",
+      "The code selects and marks the most diverse subsets of items from a given set."
     ]
   },
   {
-    "code": "let args = Args::parse();\nprintln!(\"=== Step 1: Parsing .rs files in {:?} ===\", args.repo);\nlet chunks = parser::extract_chunks_from_repo(\n    &args.repo,\n    args.min_stmts,\n    args.max_stmts,\n)?;\nif chunks.is_empty() {\n    anyhow::bail!(\"No suitable code chunks found in the repository.\");\n}\nprintln!(\"\\n=== Step 2: Embedding chunks and storing in {:?} ===\", args.db);\nlet conn = embedder::open_db(args.db.to_str().unwrap())?;\nembedder::embed_and_store(&conn, &chunks).await?;\nprintln!(\"\\n=== Step 3: Selecting {} most diverse chunks ===\", args.target);\ndiversity::select_diverse(&conn, args.target)?;\nprintln!(\"\\n=== Step 4: Generating descriptions with phi4-mini:3.8b ===\");\ndescriber::describe_selected_chunks(&conn).await?;\nprintln!(\"\\n=== Step 5: Building quiz entries with distractors ===\");\nlet entries = distractors::build_quiz_entries(&conn)?;\nprintln!(\"\\n=== Step 6: Exporting to {:?} ===\", args.output);\nexport::export_json(&entries, &args.output)?;\nprintln!(\"\\nDone! Run 'trunk serve' in crates/frontend to start the quiz.\");\nOk(())",
-    "correct": "The code parses Rust files from a repository and generates an interactive quiz based on diverse chunks extracted from them.",
+    "code": "let args = Args::parse();\nprintln!(\"=== Step 1: Parsing .rs files in {:?} ===\", args.repo);\nlet chunks = parser::iter_chunks_from_repo(\n    &args.repo,\n    args.min_stmts,\n    args.max_stmts,\n);\nprintln!(\"\\n=== Step 2: Embedding chunks and storing in {:?} ===\", args.db);\nlet collection = embedder::open_db(args.db.to_str().unwrap()).await?;\nlet total = embedder::embed_and_store(&collection, chunks).await?;\nif total == 0 {\n    anyhow::bail!(\"No suitable code chunks found in the repository.\");\n}\nprintln!(\"Stored {} embeddings in collection\", total);\nprintln!(\"\\n=== Step 3: Selecting {} most diverse chunks ===\", args.target);\ndiversity::select_diverse(&collection, args.target).await?;\nprintln!(\"\\n=== Step 4: Generating descriptions with phi4-mini:3.8b ===\");\ndescriber::describe_selected_chunks(&collection).await?;\nprintln!(\"\\n=== Step 5: Building quiz entries with distractors ===\");\nlet entries = distractors::build_quiz_entries(&collection).await?;\nprintln!(\"\\n=== Step 6: Exporting to {:?} ===\", args.output);\nexport::export_json(&entries, &args.output)?;\nprintln!(\"\\nDone! Run 'trunk serve' in crates/frontend to start the quiz.\");\nOk(())",
+    "correct": "The code parses Rust files from a repository and generates an educational dataset with diverse chunks for quizzes.",
     "distractors": [
-      "Parses Rust files from a repository and generates an educational quiz with embedded code chunks.",
-      "The code parses Rust source files from a repository and processes them through various steps including embedding into a database, selecting diverse chunks for description generation using an AI model, building interactive quiz entries with distractors, exporting results as JSON.",
-      "Collects and counts the number of functions in Rust source code files within a specified repository."
+      "Exports a collection of quiz questions in JSON format and writes them to an output file.",
+      "Generates quiz questions with selected answers and associated distractors from a dataset.",
+      "The code asynchronously processes text data in batches and stores the resulting embeddings along with metadata into a collection."
     ]
   },
   {
-    "code": "let answers = StoredValue::new_local(answers);\nlet buttons: Vec<_> = (0..4)\n    .map(|i| {\n        let answer = answers.with_value(|a| a.get(i).cloned().unwrap_or_default());\n        let style = move || {\n            if !answered.get() {\n                \"margin:0.25rem 0;width:100%\".to_string()\n            } else if i == correct_idx {\n                \"margin:0.25rem 0;width:100%;background:#28a745;color:white\"\n                    .to_string()\n            } else if selected.get() == Some(i) {\n                \"margin:0.25rem 0;width:100%;background:#dc3545;color:white\"\n                    .to_string()\n            } else {\n                \"margin:0.25rem 0;width:100%;opacity:0.6\".to_string()\n            }\n        };\n        view! {\n            < div style = \"padding:0.1rem 0\" > < button style = style on : click =\n            move | _ | on_answer(i) > { answer } </ button > </ div >\n        }\n    })\n    .collect();\nview! {\n    < div style = \"margin-top:1rem;display:flex;gap:1.5rem;align-items:flex-start\" >\n    < pre class = \"language-rust\" style = \"flex:1;min-width:0;overflow-x:auto\" > <\n    code > { code } </ code > </ pre > < div style =\n    \"flex:0 0 320px;display:flex;flex-direction:column\" > < p style = \"margin-top:0\"\n    >< strong > \"What does this code do?\" </ strong ></ p > { buttons } </ div > </\n    div >\n}",
-    "correct": "Generates a set of styled answer buttons with associated JavaScript click handlers for answering questions.",
+    "code": "let answers = StoredValue::new_local(answers);\nlet buttons: Vec<_> = (0..4)\n    .map(|i| {\n        let answer = answers.with_value(|a| a.get(i).cloned().unwrap_or_default());\n        let style = move || {\n            if !answered.get() {\n                \"margin:0.25rem 0;width:100%\".to_string()\n            } else if i == correct_idx {\n                \"margin:0.25rem 0;width:100%;background:#28a745;color:white\"\n                    .to_string()\n            } else if selected.get() == Some(i) {\n                \"margin:0.25rem 0;width:100%;background:#dc3545;color:white\"\n                    .to_string()\n            } else {\n                \"margin:0.25rem 0;width:100%;opacity:0.6\".to_string()\n            }\n        };\n        view! {\n            < div style = \"padding:0.1rem 0\" > < button style = style on : click =\n            move | _ | on_answer(i) > { answer } </ button > </ div >\n        }\n    })\n    .collect();\nview! {\n    < div class = \"grid\" > < div >< article > < pre >< code > { code } </ code ></\n    pre > </ article > </ div > < div > < p style = \"margin-top:0\" >< strong >\n    \"What does this code do?\" </ strong ></ p > { buttons } </ div > </ div >\n}",
+    "correct": "Generates a grid of styled answer buttons based on user selections and correctness, displaying them in a web view.",
     "distractors": [
-      "Generates a list of styled interactive answer options and displays them along with the question text.",
-      "Generates a set of interactive answer buttons with conditional styles based on their state and collects them into an HTML view.",
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score."
+      "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz.",
+      "Exports a collection of quiz questions in JSON format and writes them to an output file.",
+      "Generates a random permutation of an array and identifies the index of its original first element."
     ]
   },
   {
-    "code": "let total = items.len();\nlet current = RwSignal::new(0usize);\nlet score = RwSignal::new(0usize);\nlet answered = RwSignal::new(false);\nlet selected = RwSignal::new(Option::<usize>::None);\nlet shuffled: Vec<(Vec<String>, usize)> = items\n    .iter()\n    .map(|item| {\n        let all = std::iter::once(item.correct.clone())\n            .chain(item.distractors.iter().cloned())\n            .collect::<Vec<_>>();\n        shuffle_answers(all)\n    })\n    .collect();\nlet shuffled = StoredValue::new_local(shuffled);\nlet items = StoredValue::new_local(items);\nlet on_answer = move |idx: usize| {\n    if answered.get() {\n        return;\n    }\n    answered.set(true);\n    selected.set(Some(idx));\n    let q = current.get();\n    let (_, correct_idx) = shuffled.with_value(|s| (s[q].0.clone(), s[q].1));\n    if idx == correct_idx {\n        score.update(|s| *s += 1);\n    }\n};\nlet on_next = move |_| {\n    current.update(|c| *c += 1);\n    answered.set(false);\n    selected.set(None);\n};\nview! {\n    < ScoreBoard score = score.into() total = total current = current.into() /> {\n    move || { let q = current.get(); if q >= total { view! { < div > < h2 >\n    \"Quiz complete!\" </ h2 > < p > \"Final score: \" { score.get() } \" / \" { total } </\n    p > </ div > } .into_any() } else { let code = items.with_value(| it | it[q].code\n    .clone()); let (answers, correct_idx) = shuffled.with_value(| s | s[q].clone());\n    view! { < QuizCard code = code answers = answers correct_idx = correct_idx\n    answered = answered.into() selected = selected.into() on_answer = on_answer /> <\n    div style = \"margin-top:1rem\" > { move || { if answered.get() && current.get() +\n    1 < total { view! { < button on : click = on_next > \"Next\" </ button > }\n    .into_any() } else { view! { < span ></ span > } .into_any() } } } </ div > }\n    .into_any() } } }\n}",
-    "correct": "Generates a quiz interface with dynamic scoring and answer selection, updates progress as answers are given.",
+    "code": "let total = items.len();\nlet current = RwSignal::new(0usize);\nlet score = RwSignal::new(0usize);\nlet answered = RwSignal::new(false);\nlet selected = RwSignal::new(Option::<usize>::None);\nlet shuffled: Vec<(Vec<String>, usize)> = items\n    .iter()\n    .map(|item| {\n        let all = std::iter::once(item.correct.clone())\n            .chain(item.distractors.iter().cloned())\n            .collect::<Vec<_>>();\n        shuffle_answers(all)\n    })\n    .collect();\nlet shuffled = StoredValue::new_local(shuffled);\nlet items = StoredValue::new_local(items);\nlet on_answer = move |idx: usize| {\n    if answered.get() {\n        return;\n    }\n    answered.set(true);\n    selected.set(Some(idx));\n    let q = current.get();\n    let (_, correct_idx) = shuffled.with_value(|s| (s[q].0.clone(), s[q].1));\n    if idx == correct_idx {\n        score.update(|s| *s += 1);\n    }\n};\nlet on_next = move |_| {\n    current.update(|c| *c += 1);\n    answered.set(false);\n    selected.set(None);\n};\nview! {\n    < ScoreBoard score = score.into() total = total current = current.into() /> {\n    move || { let q = current.get(); if q >= total { view! { < div > < h2 >\n    \"Quiz complete!\" </ h2 > < p > \"Final score: \" { score.get() } \" / \" { total } </\n    p > </ div > } .into_any() } else { let code = items.with_value(| it | it[q].code\n    .clone()); let (answers, correct_idx) = shuffled.with_value(| s | s[q].clone());\n    view! { < div class = \"fluid-container\" style = \"text-align: right\" > { move || {\n    if answered.get() && current.get() + 1 < total { view! { < button on : click =\n    on_next > \"Next\" </ button > } .into_any() } else { view! { < span ></ span > }\n    .into_any() } } } </ div > < QuizCard code = code answers = answers correct_idx =\n    correct_idx answered = answered.into() selected = selected.into() on_answer =\n    on_answer /> } .into_any() } } }\n}",
+    "correct": "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz.",
     "distractors": [
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score.",
-      "The code represents a quiz interface where users select answers for questions, track progress through quizzes and score their correct selections.",
-      "Generates a set of interactive answer buttons with conditional styles based on their state and collects them into an HTML view."
-    ]
-  },
-  {
-    "code": "let seed = answers[0]\n    .bytes()\n    .fold(0u64, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u64));\nlet n = answers.len();\nlet mut indices: Vec<usize> = (0..n).collect();\nlet mut rng = seed;\nfor i in (1..n).rev() {\n    rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);\n    let j = (rng >> 33) as usize % (i + 1);\n    indices.swap(i, j);\n}\nlet correct_idx = indices.iter().position(|&x| x == 0).unwrap();\nlet shuffled = indices.into_iter().map(|i| answers[i].clone()).collect();\n(shuffled, correct_idx)",
-    "correct": "Generates a pseudo-random permutation of an array and identifies the index where '0' would be inserted if it were included in that arrangement.",
-    "distractors": [
-      "Generates a random permutation of an array and identifies the original index of its first element.",
-      "Generates a random permutation of an input slice and returns it along with the index of its original first element.",
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score."
-    ]
-  },
-  {
-    "code": "let mut stmt = conn\n    .prepare(\"SELECT id, embedding FROM chunks WHERE embedding IS NOT NULL\")?;\nlet rows: Vec<(i64, Vec<f64>)> = stmt\n    .query_map(\n        [],\n        |row| {\n            let id: i64 = row.get(0)?;\n            let blob: Vec<u8> = row.get(1)?;\n            Ok((id, blob))\n        },\n    )?\n    .filter_map(|r| r.ok())\n    .map(|(id, blob)| (id, blob_to_vec(&blob)))\n    .collect();\nlet n = rows.len();\nif n == 0 {\n    anyhow::bail!(\"No chunks with embeddings found in database\");\n}\nlet actual_target = target.min(n);\nprintln!(\"Selecting {} most diverse chunks from {} total...\", actual_target, n);\nlet mut min_dist = vec![f64::MAX; n];\nlet mut selected_indices: Vec<usize> = Vec::with_capacity(actual_target);\nselected_indices.push(0);\nfor i in 0..n {\n    min_dist[i] = cosine_distance(&rows[0].1, &rows[i].1);\n}\nwhile selected_indices.len() < actual_target {\n    let next = (0..n)\n        .filter(|i| !selected_indices.contains(i))\n        .max_by(|&a, &b| min_dist[a].partial_cmp(&min_dist[b]).unwrap())\n        .unwrap();\n    selected_indices.push(next);\n    let new_vec = &rows[next].1;\n    for i in 0..n {\n        let d = cosine_distance(new_vec, &rows[i].1);\n        if d < min_dist[i] {\n            min_dist[i] = d;\n        }\n    }\n    if selected_indices.len() % 10 == 0 {\n        println!(\"  Selected {}/{}\", selected_indices.len(), actual_target);\n    }\n}\nlet selected_ids: Vec<i64> = selected_indices.iter().map(|&i| rows[i].0).collect();\nfor id in &selected_ids {\n    conn.execute(\"UPDATE chunks SET selected = 1 WHERE id = ?1\", [id])?;\n}\nprintln!(\"Marked {} chunks as selected\", selected_ids.len());\nOk(())",
-    "correct": "The code selects and marks the most diverse specified number of database entries based on cosine distance.",
-    "distractors": [
-      "Retrieves and marks the most diverse set of non-null embeddings from a database as 'selected' based on cosine distance, then prints out how many were marked.",
-      "The code selects and marks the most diverse set of embeddings from a database, then updates them in the storage.",
-      "The code retrieves selected, non-null entries from a database and prepares them for quiz creation by calculating cosine similarities between their embeddings."
-    ]
-  },
-  {
-    "code": "let conn = Connection::open(db_path)?;\nconn.execute_batch(\n    \"\n    CREATE TABLE IF NOT EXISTS chunks (\n        id          INTEGER PRIMARY KEY AUTOINCREMENT,\n        file_path   TEXT NOT NULL,\n        fn_name     TEXT NOT NULL,\n        body        TEXT NOT NULL,\n        embedding   BLOB,\n        selected    INTEGER NOT NULL DEFAULT 0,\n        description TEXT\n    );\n\",\n)?;\nOk(conn)",
-    "correct": "The code creates a database table with specified columns if it doesn't already exist.",
-    "distractors": [
-      "Creates a database table called 'chunks' with specified columns and returns the connection object if successful.",
-      "Creates a database table if it doesn't exist and returns the connection.",
-      "Retrieves and marks the most diverse set of non-null embeddings from a database as 'selected' based on cosine distance, then prints out how many were marked."
-    ]
-  },
-  {
-    "code": "let client = ollama::Client::new();\nlet model = client.embedding_model(ollama::NOMIC_EMBED_TEXT);\nconst BATCH: usize = 32;\nlet total = chunks.len();\nfor (batch_idx, batch) in chunks.chunks(BATCH).enumerate() {\n    let texts: Vec<String> = batch.iter().map(|c| c.body.clone()).collect();\n    println!(\n        \"Embedding batch {}/{} ({} chunks)...\", batch_idx + 1, (total + BATCH - 1) /\n        BATCH, texts.len()\n    );\n    let embeddings: Vec<rig::embeddings::Embedding> = model\n        .embed_texts(texts)\n        .await?;\n    for (chunk, embedding) in batch.iter().zip(embeddings.iter()) {\n        let blob = vec_to_blob(&embedding.vec);\n        conn.execute(\n            \"INSERT INTO chunks (file_path, fn_name, body, embedding) VALUES (?1, ?2, ?3, ?4)\",\n            params![chunk.file_path, chunk.fn_name, chunk.body, blob],\n        )?;\n    }\n}\nprintln!(\"Stored {} embeddings in database\", total);\nOk(())",
-    "correct": "The code batches and asynchronously embeds text data into an NLP model before storing the resulting vector embeddings along with metadata into a relational database.",
-    "distractors": [
-      "The code batch processes text data to generate and store their corresponding embeddings into a database.",
-      "The code asynchronously embeds a series of text chunks into vectors using an embedding model and stores them as blobs in batches to a database.",
-      "Generates and updates a database with summaries for selected entries in Rust code."
-    ]
-  },
-  {
-    "code": "let wrapper = quote! {\n    fn __wrapper() # block\n};\nlet Ok(ast) = syn::parse2::<syn::File>(wrapper) else {\n    return block\n        .stmts\n        .iter()\n        .map(|s| quote!(# s).to_string())\n        .collect::<Vec<_>>()\n        .join(\"\\n\");\n};\nlet formatted = prettyplease::unparse(&ast);\nlet start = formatted.find('{').map(|i| i + 1).unwrap_or(0);\nlet end = formatted.rfind('}').unwrap_or(formatted.len());\nlet inner = &formatted[start..end];\ndedent(inner).trim().to_string()",
-    "correct": "Generates a Rust code block from an abstract syntax tree and formats it.",
-    "distractors": [
-      "Parses and pretty-prints Rust code contained within a block into an AST, removes outermost braces, trims whitespace, and returns the cleaned content.",
-      "Generates a Rust function definition from provided code block.",
-      "Parses Rust files from a repository and generates an educational quiz with embedded code chunks."
-    ]
-  },
-  {
-    "code": "let mut all_chunks = Vec::new();\nfor entry in WalkDir::new(repo_path)\n    .into_iter()\n    .filter_map(|e| e.ok())\n    .filter(|e| e.file_type().is_file())\n    .filter(|e| e.path().extension().and_then(|s| s.to_str()) == Some(\"rs\"))\n{\n    let path = entry.path();\n    let src = std::fs::read_to_string(path)\n        .with_context(|| format!(\"Failed to read {}\", path.display()))?;\n    let ast = match syn::parse_file(&src) {\n        Ok(a) => a,\n        Err(e) => {\n            eprintln!(\"Warning: failed to parse {}: {}\", path.display(), e);\n            continue;\n        }\n    };\n    let mut collector = ChunkCollector::new(\n        path.display().to_string(),\n        min_stmts,\n        max_stmts,\n    );\n    collector.visit_file(&ast);\n    all_chunks.extend(collector.chunks);\n}\nprintln!(\"Extracted {} chunks from .rs files\", all_chunks.len());\nOk(all_chunks)",
-    "correct": "Parses Rust source code to extract and count the number of 'chunk' items in each `.rs` file within a given directory.",
-    "distractors": [
-      "Collects and counts the number of functions in Rust source code files within a specified repository.",
-      "Collects and counts the number of function-like syntax elements in Rust source code files within a specified directory.",
-      "Parses Rust files from a repository and generates an educational quiz with embedded code chunks."
-    ]
-  },
-  {
-    "code": "let dot: f64 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();\nlet norm_a: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();\nlet norm_b: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();\nif norm_a == 0.0 || norm_b == 0.0 {\n    return 0.0;\n}\ndot / (norm_a * norm_b)",
-    "correct": "Calculates the normalized dot product of two vectors if neither vector's magnitude is zero.",
-    "distractors": [
-      "Calculates the cosine of an angle given two vectors represented by arrays a and b after ensuring neither is zero-length.",
-      "Calculates the normalized dot product of two vectors if neither vector has a zero magnitude.",
-      "Calculates the cosine similarity between two vectors a and b, returning zero if either vector is of length zero."
-    ]
-  },
-  {
-    "code": "let mut stmt = conn\n    .prepare(\n        \"SELECT id, body, description, embedding FROM chunks WHERE selected = 1 AND description IS NOT NULL AND embedding IS NOT NULL\",\n    )?;\nlet chunks: Vec<ChunkWithData> = stmt\n    .query_map(\n        [],\n        |row| {\n            let id: i64 = row.get(0)?;\n            let body: String = row.get(1)?;\n            let description: String = row.get(2)?;\n            let blob: Vec<u8> = row.get(3)?;\n            Ok((id, body, description, blob))\n        },\n    )?\n    .filter_map(|r| r.ok())\n    .map(|(id, body, description, blob)| ChunkWithData {\n        id,\n        body,\n        description,\n        embedding: blob_to_vec(&blob),\n    })\n    .collect();\nprintln!(\"Building quiz entries with distractors for {} chunks...\", chunks.len());\nlet entries = chunks\n    .iter()\n    .map(|chunk| {\n        let mut similarities: Vec<(usize, f64)> = chunks\n            .iter()\n            .enumerate()\n            .filter(|(_, other)| other.id != chunk.id)\n            .map(|(i, other)| {\n                let sim = cosine_similarity(&chunk.embedding, &other.embedding);\n                (i, sim)\n            })\n            .collect();\n        similarities.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());\n        let distractors: [String; 3] = [\n            chunks[similarities[0].0].description.clone(),\n            chunks[similarities[1].0].description.clone(),\n            chunks[similarities[2].0].description.clone(),\n        ];\n        QuizEntry {\n            body: chunk.body.clone(),\n            correct: chunk.description.clone(),\n            distractors,\n        }\n    })\n    .collect();\nOk(entries)",
-    "correct": "The code generates quiz entries with similar distractor descriptions for selected database records based on cosine similarity.",
-    "distractors": [
-      "The code retrieves selected, non-null entries from a database and prepares them for quiz creation by calculating cosine similarities between their embeddings.",
-      "Retrieves and processes selected database entries into structured quiz data with similarity-based distractors.",
-      "Retrieves and marks the most diverse set of non-null embeddings from a database as 'selected' based on cosine distance, then prints out how many were marked."
-    ]
-  },
-  {
-    "code": "let items: Vec<QuizItemJson> = entries\n    .iter()\n    .map(|e| QuizItemJson {\n        code: &e.body,\n        correct: &e.correct,\n        distractors: [&e.distractors[0], &e.distractors[1], &e.distractors[2]],\n    })\n    .collect();\nlet json = serde_json::to_string_pretty(&items)?;\nif let Some(parent) = output_path.parent() {\n    std::fs::create_dir_all(parent)?;\n}\nstd::fs::write(output_path, json)?;\nprintln!(\"Exported {} quiz items to {}\", items.len(), output_path.display());\nOk(())",
-    "correct": "Generates and exports a pretty-printed JSON file containing structured data about multiple quizzes.",
-    "distractors": [
-      "Generates and writes a pretty-printed JSON file of formatted questions and their components based on input entries.",
-      "Generates and writes a pretty-printed JSON file of formatted quiz item data from entries to the specified path.",
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score."
-    ]
-  },
-  {
-    "code": "let client = ollama::Client::new();\nlet agent = client.agent(LLM_MODEL).preamble(SYSTEM_PROMPT).build();\nlet mut stmt = conn\n    .prepare(\n        \"SELECT id, body FROM chunks WHERE selected = 1 AND description IS NULL\",\n    )?;\nlet rows: Vec<(i64, String)> = stmt\n    .query_map([], |row| Ok((row.get(0)?, row.get(1)?)))?\n    .filter_map(|r| r.ok())\n    .collect();\nlet total = rows.len();\nprintln!(\"Generating descriptions for {} selected chunks...\", total);\nfor (idx, (id, body)) in rows.iter().enumerate() {\n    let prompt = format!(\n        \"Describe what this Rust code does in one sentence:\\n\\n{}\", body\n    );\n    let description: String = match agent.prompt(prompt.as_str()).await {\n        Ok(d) => d.trim().to_string(),\n        Err(e) => {\n            eprintln!(\"  Warning: failed to describe chunk {}: {}\", id, e);\n            continue;\n        }\n    };\n    conn.execute(\n        \"UPDATE chunks SET description = ?1 WHERE id = ?2\",\n        params![description, id],\n    )?;\n    println!(\"  [{}/{}] described chunk {}\", idx + 1, total, id);\n}\nprintln!(\"Done generating descriptions.\");\nOk(())",
-    "correct": "Generates and updates the 'description' field for selected chunks in a database based on their body using an LLM agent.",
-    "distractors": [
-      "Generates and updates a database with summaries for selected entries in Rust code.",
-      "Generates and updates database records with generated descriptions for selected SQL query results.",
-      "The code batch processes text data to generate and store their corresponding embeddings into a database."
-    ]
-  },
-  {
-    "code": "let args = Args::parse();\nprintln!(\"=== Step 1: Parsing .rs files in {:?} ===\", args.repo);\nlet chunks = parser::extract_chunks_from_repo(\n    &args.repo,\n    args.min_stmts,\n    args.max_stmts,\n)?;\nif chunks.is_empty() {\n    anyhow::bail!(\"No suitable code chunks found in the repository.\");\n}\nprintln!(\"\\n=== Step 2: Embedding chunks and storing in {:?} ===\", args.db);\nlet conn = embedder::open_db(args.db.to_str().unwrap())?;\nembedder::embed_and_store(&conn, &chunks).await?;\nprintln!(\"\\n=== Step 3: Selecting {} most diverse chunks ===\", args.target);\ndiversity::select_diverse(&conn, args.target)?;\nprintln!(\"\\n=== Step 4: Generating descriptions with phi4-mini:3.8b ===\");\ndescriber::describe_selected_chunks(&conn).await?;\nprintln!(\"\\n=== Step 5: Building quiz entries with distractors ===\");\nlet entries = distractors::build_quiz_entries(&conn)?;\nprintln!(\"\\n=== Step 6: Exporting to {:?} ===\", args.output);\nexport::export_json(&entries, &args.output)?;\nprintln!(\"\\nDone! Run 'trunk serve' in crates/frontend to start the quiz.\");\nOk(())",
-    "correct": "The code parses Rust source files from a repository and processes them through various steps including embedding into a database, selecting diverse chunks for description generation using an AI model, building interactive quiz entries with distractors, exporting results as JSON.",
-    "distractors": [
-      "Parses Rust files from a repository and generates an educational quiz with embedded code chunks.",
-      "The code parses Rust files from a repository and generates an interactive quiz based on diverse chunks extracted from them.",
-      "Collects and counts the number of functions in Rust source code files within a specified repository."
-    ]
-  },
-  {
-    "code": "let answers = StoredValue::new_local(answers);\nlet buttons: Vec<_> = (0..4)\n    .map(|i| {\n        let answer = answers.with_value(|a| a.get(i).cloned().unwrap_or_default());\n        let style = move || {\n            if !answered.get() {\n                \"margin:0.25rem 0;width:100%\".to_string()\n            } else if i == correct_idx {\n                \"margin:0.25rem 0;width:100%;background:#28a745;color:white\"\n                    .to_string()\n            } else if selected.get() == Some(i) {\n                \"margin:0.25rem 0;width:100%;background:#dc3545;color:white\"\n                    .to_string()\n            } else {\n                \"margin:0.25rem 0;width:100%;opacity:0.6\".to_string()\n            }\n        };\n        view! {\n            < div style = \"padding:0.1rem 0\" > < button style = style on : click =\n            move | _ | on_answer(i) > { answer } </ button > </ div >\n        }\n    })\n    .collect();\nview! {\n    < div style = \"margin-top:1rem;display:flex;gap:1.5rem;align-items:flex-start\" >\n    < pre class = \"language-rust\" style = \"flex:1;min-width:0;overflow-x:auto\" > <\n    code > { code } </ code > </ pre > < div style =\n    \"flex:0 0 320px;display:flex;flex-direction:column\" > < p style = \"margin-top:0\"\n    >< strong > \"What does this code do?\" </ strong ></ p > { buttons } </ div > </\n    div >\n}",
-    "correct": "Generates a list of styled interactive answer options and displays them along with the question text.",
-    "distractors": [
-      "Generates a set of styled answer buttons with associated JavaScript click handlers for answering questions.",
-      "Generates a set of interactive answer buttons with conditional styles based on their state and collects them into an HTML view.",
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score."
-    ]
-  },
-  {
-    "code": "let total = items.len();\nlet current = RwSignal::new(0usize);\nlet score = RwSignal::new(0usize);\nlet answered = RwSignal::new(false);\nlet selected = RwSignal::new(Option::<usize>::None);\nlet shuffled: Vec<(Vec<String>, usize)> = items\n    .iter()\n    .map(|item| {\n        let all = std::iter::once(item.correct.clone())\n            .chain(item.distractors.iter().cloned())\n            .collect::<Vec<_>>();\n        shuffle_answers(all)\n    })\n    .collect();\nlet shuffled = StoredValue::new_local(shuffled);\nlet items = StoredValue::new_local(items);\nlet on_answer = move |idx: usize| {\n    if answered.get() {\n        return;\n    }\n    answered.set(true);\n    selected.set(Some(idx));\n    let q = current.get();\n    let (_, correct_idx) = shuffled.with_value(|s| (s[q].0.clone(), s[q].1));\n    if idx == correct_idx {\n        score.update(|s| *s += 1);\n    }\n};\nlet on_next = move |_| {\n    current.update(|c| *c += 1);\n    answered.set(false);\n    selected.set(None);\n};\nview! {\n    < ScoreBoard score = score.into() total = total current = current.into() /> {\n    move || { let q = current.get(); if q >= total { view! { < div > < h2 >\n    \"Quiz complete!\" </ h2 > < p > \"Final score: \" { score.get() } \" / \" { total } </\n    p > </ div > } .into_any() } else { let code = items.with_value(| it | it[q].code\n    .clone()); let (answers, correct_idx) = shuffled.with_value(| s | s[q].clone());\n    view! { < QuizCard code = code answers = answers correct_idx = correct_idx\n    answered = answered.into() selected = selected.into() on_answer = on_answer /> <\n    div style = \"margin-top:1rem\" > { move || { if answered.get() && current.get() +\n    1 < total { view! { < button on : click = on_next > \"Next\" </ button > }\n    .into_any() } else { view! { < span ></ span > } .into_any() } } } </ div > }\n    .into_any() } } }\n}",
-    "correct": "The code represents a quiz interface where users select answers for questions, track progress through quizzes and score their correct selections.",
-    "distractors": [
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score.",
-      "Generates a quiz interface with dynamic scoring and answer selection, updates progress as answers are given.",
-      "Generates a set of interactive answer buttons with conditional styles based on their state and collects them into an HTML view."
+      "Generates a grid of styled answer buttons based on user selections and correctness, displaying them in a web view.",
+      "Generates quiz questions with selected answers and associated distractors from a dataset.",
+      "Generates a random permutation of an array and identifies the index of its original first element."
     ]
   },
   {
     "code": "let seed = answers[0]\n    .bytes()\n    .fold(0u64, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u64));\nlet n = answers.len();\nlet mut indices: Vec<usize> = (0..n).collect();\nlet mut rng = seed;\nfor i in (1..n).rev() {\n    rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);\n    let j = (rng >> 33) as usize % (i + 1);\n    indices.swap(i, j);\n}\nlet correct_idx = indices.iter().position(|&x| x == 0).unwrap();\nlet shuffled = indices.into_iter().map(|i| answers[i].clone()).collect();\n(shuffled, correct_idx)",
-    "correct": "Generates a random permutation of an input slice and returns it along with the index of its original first element.",
+    "correct": "Generates a random permutation of an array and identifies the index of its original first element.",
     "distractors": [
-      "Generates a random permutation of an array and identifies the original index of its first element.",
-      "Generates a pseudo-random permutation of an array and identifies the index where '0' would be inserted if it were included in that arrangement.",
-      "The code manages a quiz interface that tracks user progress, scores them for correct answers and displays the next question or concludes with their final score."
+      "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz.",
+      "The code selects and marks the most diverse subsets of items from a given set.",
+      "Generates quiz questions with selected answers and associated distractors from a dataset."
     ]
   }
 ]

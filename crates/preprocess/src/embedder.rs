@@ -1,64 +1,59 @@
 use anyhow::Result;
+use polarisdb::prelude::*;
+use polarisdb::AsyncCollection;
 use rig::embeddings::EmbeddingModel as _;
 use rig::providers::ollama;
-use rusqlite::{Connection, params};
 
 use crate::parser::CodeChunk;
 
-pub fn open_db(db_path: &str) -> Result<Connection> {
-    let conn = Connection::open(db_path)?;
-    conn.execute_batch("
-        CREATE TABLE IF NOT EXISTS chunks (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            file_path   TEXT NOT NULL,
-            fn_name     TEXT NOT NULL,
-            body        TEXT NOT NULL,
-            embedding   BLOB,
-            selected    INTEGER NOT NULL DEFAULT 0,
-            description TEXT
-        );
-    ")?;
-    Ok(conn)
+/// Number of dimensions produced by nomic-embed-text.
+pub const EMBEDDING_DIMS: usize = 768;
+
+/// Open or create the PolarisDB collection at `db_path`.
+pub async fn open_db(db_path: &str) -> Result<AsyncCollection> {
+    let config = CollectionConfig::new(EMBEDDING_DIMS, DistanceMetric::Cosine);
+    let collection = AsyncCollection::open_or_create(db_path.to_string(), config).await?;
+    Ok(collection)
 }
 
-pub async fn embed_and_store(conn: &Connection, chunks: &[CodeChunk]) -> Result<()> {
+/// Consume a lazy iterator of `CodeChunk`s, embedding and inserting each one
+/// into the PolarisDB collection as it arrives. This keeps memory usage flat
+/// even for very large codebases.
+///
+/// Metadata stored in the `Payload`:
+///   - `file_path`, `fn_name`, `body`  — source info
+///   - `selected`  — "0" until diversity selection marks it "1"
+///   - `description` — empty until the LLM fills it in
+pub async fn embed_and_store(
+    collection: &AsyncCollection,
+    chunks: impl Iterator<Item = Result<CodeChunk>>,
+) -> Result<usize> {
     let client = ollama::Client::new();
     let model = client.embedding_model(ollama::NOMIC_EMBED_TEXT);
 
-    // Process in batches of 32 to avoid overwhelming Ollama
-    const BATCH: usize = 32;
-    let total = chunks.len();
+    let mut count = 0usize;
+    for chunk_result in chunks {
+        let chunk = chunk_result?;
 
-    for (batch_idx, batch) in chunks.chunks(BATCH).enumerate() {
-        let texts: Vec<String> = batch.iter().map(|c| c.body.clone()).collect();
-        println!(
-            "Embedding batch {}/{} ({} chunks)...",
-            batch_idx + 1,
-            (total + BATCH - 1) / BATCH,
-            texts.len()
-        );
+        // Embed this single chunk
+        let embeddings = model.embed_texts(vec![chunk.body.clone()]).await?;
+        let vec_f32: Vec<f32> = embeddings[0].vec.iter().map(|&v| v as f32).collect();
 
-        let embeddings: Vec<rig::embeddings::Embedding> = model.embed_texts(texts).await?;
+        let payload = Payload::new()
+            .with_field("file_path", chunk.file_path.clone())
+            .with_field("fn_name", chunk.fn_name.clone())
+            .with_field("body", chunk.body.clone())
+            .with_field("selected", "0")
+            .with_field("description", "");
 
-        for (chunk, embedding) in batch.iter().zip(embeddings.iter()) {
-            let blob = vec_to_blob(&embedding.vec);
-            conn.execute(
-                "INSERT INTO chunks (file_path, fn_name, body, embedding) VALUES (?1, ?2, ?3, ?4)",
-                params![chunk.file_path, chunk.fn_name, chunk.body, blob],
-            )?;
+        collection.insert_auto(vec_f32, payload).await?;
+        count += 1;
+
+        if count % 10 == 0 {
+            println!("  Embedded {} chunks...", count);
         }
     }
 
-    println!("Stored {} embeddings in database", total);
-    Ok(())
-}
-
-pub fn vec_to_blob(v: &[f64]) -> Vec<u8> {
-    v.iter().flat_map(|f| f.to_le_bytes()).collect()
-}
-
-pub fn blob_to_vec(b: &[u8]) -> Vec<f64> {
-    b.chunks_exact(8)
-        .map(|c| f64::from_le_bytes(c.try_into().unwrap()))
-        .collect()
+    collection.flush().await?;
+    Ok(count)
 }

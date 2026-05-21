@@ -17,7 +17,7 @@ struct Args {
     #[arg(long)]
     repo: PathBuf,
 
-    /// Path to the SQLite database file (created if it doesn't exist)
+    /// Path to the PolarisDB collection directory (created if it doesn't exist)
     #[arg(long, default_value = "embeddings.db")]
     db: PathBuf,
 
@@ -43,29 +43,30 @@ async fn main() -> Result<()> {
     let args = Args::parse();
 
     println!("=== Step 1: Parsing .rs files in {:?} ===", args.repo);
-    let chunks = parser::extract_chunks_from_repo(&args.repo, args.min_stmts, args.max_stmts)?;
-    if chunks.is_empty() {
-        anyhow::bail!("No suitable code chunks found in the repository.");
-    }
+    let chunks = parser::iter_chunks_from_repo(&args.repo, args.min_stmts, args.max_stmts);
 
     println!(
         "\n=== Step 2: Embedding chunks and storing in {:?} ===",
         args.db
     );
-    let conn = embedder::open_db(args.db.to_str().unwrap())?;
-    embedder::embed_and_store(&conn, &chunks).await?;
+    let collection = embedder::open_db(args.db.to_str().unwrap()).await?;
+    let total = embedder::embed_and_store(&collection, chunks).await?;
+    if total == 0 {
+        anyhow::bail!("No suitable code chunks found in the repository.");
+    }
+    println!("Stored {} embeddings in collection", total);
 
     println!(
         "\n=== Step 3: Selecting {} most diverse chunks ===",
         args.target
     );
-    diversity::select_diverse(&conn, args.target)?;
+    diversity::select_diverse(&collection, args.target).await?;
 
     println!("\n=== Step 4: Generating descriptions with phi4-mini:3.8b ===");
-    describer::describe_selected_chunks(&conn).await?;
+    describer::describe_selected_chunks(&collection).await?;
 
     println!("\n=== Step 5: Building quiz entries with distractors ===");
-    let entries = distractors::build_quiz_entries(&conn)?;
+    let entries = distractors::build_quiz_entries(&collection).await?;
 
     println!("\n=== Step 6: Exporting to {:?} ===", args.output);
     export::export_json(&entries, &args.output)?;

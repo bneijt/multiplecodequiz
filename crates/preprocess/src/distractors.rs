@@ -1,24 +1,6 @@
 use anyhow::Result;
-use rusqlite::Connection;
-
-use crate::embedder::blob_to_vec;
-
-fn cosine_similarity(a: &[f64], b: &[f64]) -> f64 {
-    let dot: f64 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();
-    let norm_a: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();
-    let norm_b: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();
-    if norm_a == 0.0 || norm_b == 0.0 {
-        return 0.0;
-    }
-    dot / (norm_a * norm_b)
-}
-
-pub struct ChunkWithData {
-    pub id: i64,
-    pub body: String,
-    pub description: String,
-    pub embedding: Vec<f64>,
-}
+use polarisdb::prelude::*;
+use polarisdb::{AsyncCollection, SearchResult};
 
 pub struct QuizEntry {
     pub body: String,
@@ -26,60 +8,64 @@ pub struct QuizEntry {
     pub distractors: [String; 3],
 }
 
-pub fn build_quiz_entries(conn: &Connection) -> Result<Vec<QuizEntry>> {
-    let mut stmt = conn.prepare(
-        "SELECT id, body, description, embedding FROM chunks WHERE selected = 1 AND description IS NOT NULL AND embedding IS NOT NULL"
-    )?;
+pub async fn build_quiz_entries(collection: &AsyncCollection) -> Result<Vec<QuizEntry>> {
+    // Collect all selected chunks that have a description
+    let inner = collection.inner();
+    let n = inner.len();
 
-    let chunks: Vec<ChunkWithData> = stmt
-        .query_map([], |row| {
-            let id: i64 = row.get(0)?;
-            let body: String = row.get(1)?;
-            let description: String = row.get(2)?;
-            let blob: Vec<u8> = row.get(3)?;
-            Ok((id, body, description, blob))
-        })?
-        .filter_map(|r| r.ok())
-        .map(|(id, body, description, blob)| ChunkWithData {
-            id,
-            body,
-            description,
-            embedding: blob_to_vec(&blob),
-        })
-        .collect();
-
-    println!("Building quiz entries with distractors for {} chunks...", chunks.len());
-
-    let entries = chunks
-        .iter()
-        .map(|chunk| {
-            // Find the 3 other chunks with highest cosine similarity to this one
-            // (closest in embedding space = most plausible wrong answers)
-            let mut similarities: Vec<(usize, f64)> = chunks
-                .iter()
-                .enumerate()
-                .filter(|(_, other)| other.id != chunk.id)
-                .map(|(i, other)| {
-                    let sim = cosine_similarity(&chunk.embedding, &other.embedding);
-                    (i, sim)
-                })
-                .collect();
-
-            similarities.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-
-            let distractors: [String; 3] = [
-                chunks[similarities[0].0].description.clone(),
-                chunks[similarities[1].0].description.clone(),
-                chunks[similarities[2].0].description.clone(),
-            ];
-
-            QuizEntry {
-                body: chunk.body.clone(),
-                correct: chunk.description.clone(),
-                distractors,
+    let mut selected: Vec<(u64, Vec<f32>, Payload)> = Vec::new();
+    for id in 1..=(n as u64) {
+        if let Some((vec, payload)) = inner.get(id) {
+            let is_selected = payload.get_str("selected") == Some("1");
+            let has_description = payload
+                .get_str("description")
+                .map(|d: &str| !d.is_empty())
+                .unwrap_or(false);
+            if is_selected && has_description {
+                selected.push((id, vec, payload));
             }
-        })
-        .collect();
+        }
+    }
+
+    println!(
+        "Building quiz entries with distractors for {} chunks...",
+        selected.len()
+    );
+
+    let mut entries: Vec<QuizEntry> = Vec::with_capacity(selected.len());
+
+    for (id, vec, payload) in &selected {
+        let body = payload.get_str("body").unwrap_or("").to_string();
+        let correct = payload.get_str("description").unwrap_or("").to_string();
+
+        // Use PolarisDB ANN search to find the 4 nearest neighbours.
+        // The first result is the vector itself (distance ~0), so we skip it
+        // and take the next 3 as distractors.
+        let neighbors: Vec<SearchResult> = collection.search(vec, 5, None).await;
+
+        let distractors: Vec<String> = neighbors
+            .into_iter()
+            .filter(|r| r.id != *id) // exclude self
+            .filter_map(|r| {
+                r.payload.and_then(|p: Payload| {
+                    let desc = p.get_str("description")?.to_string();
+                    if desc.is_empty() { None } else { Some(desc) }
+                })
+            })
+            .take(3)
+            .collect();
+
+        // Pad with empty strings if there aren't 3 neighbours with descriptions
+        let d0 = distractors.get(0).cloned().unwrap_or_default();
+        let d1 = distractors.get(1).cloned().unwrap_or_default();
+        let d2 = distractors.get(2).cloned().unwrap_or_default();
+
+        entries.push(QuizEntry {
+            body,
+            correct,
+            distractors: [d0, d1, d2],
+        });
+    }
 
     Ok(entries)
 }

@@ -104,36 +104,39 @@ impl<'ast> Visit<'ast> for ChunkCollector {
     }
 }
 
-pub fn extract_chunks_from_repo(
+/// Returns a lazy iterator of `CodeChunk`s extracted from all `.rs` files under
+/// `repo_path`. Files are parsed on demand, so only one file's worth of chunks
+/// is held in memory at a time — suitable for huge codebases.
+pub fn iter_chunks_from_repo(
     repo_path: &Path,
     min_stmts: usize,
     max_stmts: usize,
-) -> Result<Vec<CodeChunk>> {
-    let mut all_chunks = Vec::new();
-
-    for entry in WalkDir::new(repo_path)
+) -> impl Iterator<Item = Result<CodeChunk>> {
+    WalkDir::new(repo_path)
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| e.file_type().is_file())
         .filter(|e| e.path().extension().and_then(|s| s.to_str()) == Some("rs"))
-    {
-        let path = entry.path();
-        let src = std::fs::read_to_string(path)
-            .with_context(|| format!("Failed to read {}", path.display()))?;
+        .flat_map(move |entry| {
+            let path = entry.into_path();
+            let src = match std::fs::read_to_string(&path)
+                .with_context(|| format!("Failed to read {}", path.display()))
+            {
+                Ok(s) => s,
+                Err(e) => return vec![Err(e)],
+            };
 
-        let ast = match syn::parse_file(&src) {
-            Ok(a) => a,
-            Err(e) => {
-                eprintln!("Warning: failed to parse {}: {}", path.display(), e);
-                continue;
-            }
-        };
+            let ast = match syn::parse_file(&src) {
+                Ok(a) => a,
+                Err(e) => {
+                    eprintln!("Warning: failed to parse {}: {}", path.display(), e);
+                    return vec![];
+                }
+            };
 
-        let mut collector = ChunkCollector::new(path.display().to_string(), min_stmts, max_stmts);
-        collector.visit_file(&ast);
-        all_chunks.extend(collector.chunks);
-    }
-
-    println!("Extracted {} chunks from .rs files", all_chunks.len());
-    Ok(all_chunks)
+            let mut collector =
+                ChunkCollector::new(path.display().to_string(), min_stmts, max_stmts);
+            collector.visit_file(&ast);
+            collector.chunks.into_iter().map(Ok).collect()
+        })
 }

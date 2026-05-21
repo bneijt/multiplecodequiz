@@ -1,70 +1,83 @@
 use anyhow::Result;
-use rusqlite::Connection;
+use polarisdb::prelude::*;
+use polarisdb::AsyncCollection;
 
-use crate::embedder::blob_to_vec;
-
-fn cosine_distance(a: &[f64], b: &[f64]) -> f64 {
-    let dot: f64 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();
-    let norm_a: f64 = a.iter().map(|x| x * x).sum::<f64>().sqrt();
-    let norm_b: f64 = b.iter().map(|x| x * x).sum::<f64>().sqrt();
+fn cosine_distance(a: &[f32], b: &[f32]) -> f32 {
+    let dot: f32 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();
+    let norm_a: f32 = a.iter().map(|x| x * x).sum::<f32>().sqrt();
+    let norm_b: f32 = b.iter().map(|x| x * x).sum::<f32>().sqrt();
     if norm_a == 0.0 || norm_b == 0.0 {
         return 1.0; // treat zero vectors as maximally distant
     }
     1.0 - (dot / (norm_a * norm_b))
 }
 
-/// Greedy max-min diversity selection:
-/// Repeatedly picks the chunk whose minimum distance to the already-selected
-/// set is largest (i.e. most dissimilar to all already chosen chunks).
-pub fn select_diverse(conn: &Connection, target: usize) -> Result<()> {
-    // Reset selection
-    conn.execute("UPDATE chunks SET selected = 0")?;
-
-    // Load all rows with embeddings
-    let mut stmt = conn.prepare("SELECT id, embedding FROM chunks WHERE embedding IS NOT NULL")?;
-    let rows: Vec<(i64, Vec<f64>)> = stmt
-        .query_map([], |row| {
-            let id: i64 = row.get(0)?;
-            let blob: Vec<u8> = row.get(1)?;
-            Ok((id, blob))
-        })?
-        .filter_map(|r| r.ok())
-        .map(|(id, blob)| (id, blob_to_vec(&blob)))
-        .collect();
-
-    let n = rows.len();
+/// Greedy max-min diversity selection over all vectors in the collection.
+/// Marks `selected = "1"` on the `target` most mutually dissimilar chunks.
+pub async fn select_diverse(collection: &AsyncCollection, target: usize) -> Result<()> {
+    // Collect all (id, vector, payload) from the collection via the sync inner view.
+    // We snapshot into a Vec here; diversity selection is inherently an all-pairs
+    // computation so we need everything in memory at once anyway.
+    let inner = collection.inner();
+    let n = inner.len();
     if n == 0 {
-        anyhow::bail!("No chunks with embeddings found in database");
+        anyhow::bail!("No chunks found in collection");
     }
 
-    let actual_target = target.min(n);
+    // Gather all entries. PolarisDB auto-assigns sequential u64 IDs starting at 1.
+    let mut rows: Vec<(u64, Vec<f32>, Payload)> = Vec::with_capacity(n);
+    for id in 1..=(n as u64) {
+        if let Some((vec, payload)) = inner.get(id) {
+            rows.push((id, vec, payload));
+        }
+    }
+
+    if rows.is_empty() {
+        anyhow::bail!("Could not read any entries from the collection");
+    }
+
+    let actual_n = rows.len();
+    let actual_target = target.min(actual_n);
     println!(
         "Selecting {} most diverse chunks from {} total...",
-        actual_target, n
+        actual_target, actual_n
     );
 
-    // min_dist[i] = min cosine distance from chunk i to any selected chunk
-    let mut min_dist = vec![f64::MAX; n];
+    // Reset selected flag on all entries
+    for (id, vec, payload) in &rows {
+        // Rebuild payload with selected = "0" (set() is &mut; use with_field instead)
+        let reset_payload = Payload::new()
+            .with_field("file_path", payload.get_str("file_path").unwrap_or(""))
+            .with_field("fn_name", payload.get_str("fn_name").unwrap_or(""))
+            .with_field("body", payload.get_str("body").unwrap_or(""))
+            .with_field("selected", "0")
+            .with_field(
+                "description",
+                payload.get_str("description").unwrap_or(""),
+            );
+        collection.update(*id, vec.clone(), reset_payload).await?;
+    }
+
+    // Greedy max-min farthest-point sampling
+    let mut min_dist = vec![f32::MAX; actual_n];
     let mut selected_indices: Vec<usize> = Vec::with_capacity(actual_target);
 
-    // Seed: pick the first chunk
+    // Seed with first chunk
     selected_indices.push(0);
-    for i in 0..n {
+    for i in 0..actual_n {
         min_dist[i] = cosine_distance(&rows[0].1, &rows[i].1);
     }
 
     while selected_indices.len() < actual_target {
-        // Find the chunk with max min_dist (most dissimilar to all selected)
-        let next = (0..n)
+        let next = (0..actual_n)
             .filter(|i| !selected_indices.contains(i))
             .max_by(|&a, &b| min_dist[a].partial_cmp(&min_dist[b]).unwrap())
             .unwrap();
 
         selected_indices.push(next);
 
-        // Update min_dist for all remaining chunks
         let new_vec = &rows[next].1;
-        for i in 0..n {
+        for i in 0..actual_n {
             let d = cosine_distance(new_vec, &rows[i].1);
             if d < min_dist[i] {
                 min_dist[i] = d;
@@ -76,12 +89,22 @@ pub fn select_diverse(conn: &Connection, target: usize) -> Result<()> {
         }
     }
 
-    // Mark selected chunks in DB
-    let selected_ids: Vec<i64> = selected_indices.iter().map(|&i| rows[i].0).collect();
-    for id in &selected_ids {
-        conn.execute("UPDATE chunks SET selected = 1 WHERE id = ?1", [id])?;
+    // Write selected = "1" back for chosen entries
+    for idx in &selected_indices {
+        let (id, vec, payload) = &rows[*idx];
+        let updated_payload = Payload::new()
+            .with_field("file_path", payload.get_str("file_path").unwrap_or(""))
+            .with_field("fn_name", payload.get_str("fn_name").unwrap_or(""))
+            .with_field("body", payload.get_str("body").unwrap_or(""))
+            .with_field("selected", "1")
+            .with_field(
+                "description",
+                payload.get_str("description").unwrap_or(""),
+            );
+        collection.update(*id, vec.clone(), updated_payload).await?;
     }
 
-    println!("Marked {} chunks as selected", selected_ids.len());
+    collection.flush().await?;
+    println!("Marked {} chunks as selected", selected_indices.len());
     Ok(())
 }
