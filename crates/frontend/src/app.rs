@@ -98,7 +98,7 @@ fn Quiz(items: Vec<QuizItem>) -> impl IntoView {
                 let code = items.with_value(|it| it[q].code.clone());
                 let (answers, correct_idx) = shuffled.with_value(|s| s[q].clone());
                 view! {
-                    <div style="margin-top:1rem">
+                    <div class="fluid-container" style="text-align: right">
                         {move || {
                             if answered.get() && current.get() + 1 < total {
                                 view! {
