@@ -1,0 +1,5 @@
+[build]
+target = "index.html"
+
+[tools]
+wasm_opt = "version_113"
