@@ -1,5 +1,5 @@
-use leptos::prelude::*;
 use gloo_net::http::Request;
+use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::components::{QuizCard, ScoreBoard};
@@ -13,7 +13,7 @@ pub struct QuizItem {
 }
 
 async fn load_quiz_data() -> Vec<QuizItem> {
-    let resp = Request::get("/quiz_data.json")
+    let resp = Request::get("/public/quiz_data.json")
         .send()
         .await
         .expect("Failed to fetch quiz_data.json");

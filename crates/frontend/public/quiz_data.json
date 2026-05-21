@@ -1,1 +1,182 @@
-[]
+[
+  {
+    "code": "{ let dot : f64 = a . iter () . zip (b . iter ()) . map (| (x , y) | x * y) . sum () ; let norm_a : f64 = a . iter () . map (| x | x * x) . sum :: < f64 > () . sqrt () ; let norm_b : f64 = b . iter () . map (| x | x * x) . sum :: < f64 > () . sqrt () ; if norm_a == 0.0 || norm_b == 0.0 { return 1.0 ; } 1.0 - (dot / (norm_a * norm_b)) }",
+    "correct": "Computes the Pearson correlation coefficient between two vectors a and b, handling cases where either vector has zero magnitude by returning NaN if both magnitudes are non-zero or one otherwise.",
+    "distractors": [
+      "Calculates the cosine similarity between two vectors, returning a value in [0,1].",
+      "Calculates the cosine of the angle between two vectors in a multidimensional space and checks for zero-length input vector normalization.",
+      "Calculates the cosine similarity between two vectors normalized by their magnitudes."
+    ]
+  },
+  {
+    "code": "{ let mut stmt = conn . prepare (\"SELECT id, embedding FROM chunks WHERE embedding IS NOT NULL\") ? ; let rows : Vec < (i64 , Vec < f64 >) > = stmt . query_map ([] , | row | { let id : i64 = row . get (0) ? ; let blob : Vec < u8 > = row . get (1) ? ; Ok ((id , blob)) }) ? . filter_map (| r | r . ok ()) . map (| (id , blob) | (id , blob_to_vec (& blob))) . collect () ; let n = rows . len () ; if n == 0 { anyhow :: bail ! (\"No chunks with embeddings found in database\") ; } let actual_target = target . min (n) ; println ! (\"Selecting {} most diverse chunks from {} total...\" , actual_target , n) ; let mut min_dist = vec ! [f64 :: MAX ; n] ; let mut selected_indices : Vec < usize > = Vec :: with_capacity (actual_target) ; selected_indices . push (0) ; for i in 0 .. n { min_dist [i] = cosine_distance (& rows [0] . 1 , & rows [i] . 1) ; } while selected_indices . len () < actual_target { let next = (0 .. n) . filter (| i | ! selected_indices . contains (i)) . max_by (| & a , & b | min_dist [a] . partial_cmp (& min_dist [b]) . unwrap ()) . unwrap () ; selected_indices . push (next) ; let new_vec = & rows [next] . 1 ; for i in 0 .. n { let d = cosine_distance (new_vec , & rows [i] . 1) ; if d < min_dist [i] { min_dist [i] = d ; } } if selected_indices . len () % 10 == 0 { println ! (\"  Selected {}/{}\" , selected_indices . len () , actual_target) ; } } let selected_ids : Vec < i64 > = selected_indices . iter () . map (| & i | rows [i] . 0) . collect () ; for id in & selected_ids { conn . execute (\"UPDATE chunks SET selected = 1 WHERE id = ?1\" , [id]) ? ; } println ! (\"Marked {} chunks as selected\" , selected_ids . len ()) ; Ok (()) }",
+    "correct": "The code selects and marks the most diverse set of non-null embedding entries from a database as 'selected' based on cosine distance.",
+    "distractors": [
+      "The code selects and marks the most diverse set of embeddings from a database.",
+      "Generates quiz entries with associated descriptions and random distractor phrases from a database of selected chunks after calculating cosine similarities among embeddings.",
+      "The code prepares and executes a database query to retrieve selected, non-null entries with their descriptions as quiz questions along with similar entry details for potential distractors."
+    ]
+  },
+  {
+    "code": "{ let client = ollama :: Client :: new () ; let model = client . embedding_model (ollama :: NOMIC_EMBED_TEXT) ; const BATCH : usize = 32 ; let total = chunks . len () ; for (batch_idx , batch) in chunks . chunks (BATCH) . enumerate () { let texts : Vec < String > = batch . iter () . map (| c | c . body . clone ()) . collect () ; println ! (\"Embedding batch {}/{} ({} chunks)...\" , batch_idx + 1 , (total + BATCH - 1) / BATCH , texts . len ()) ; let embeddings : Vec < rig :: embeddings :: Embedding > = model . embed_texts (texts) . await ? ; for (chunk , embedding) in batch . iter () . zip (embeddings . iter ()) { let blob = vec_to_blob (& embedding . vec) ; conn . execute (\"INSERT INTO chunks (file_path, fn_name, body, embedding) VALUES (?1, ?2, ?3, ?4)\" , params ! [chunk . file_path , chunk . fn_name , chunk . body , blob] ,) ? ; } } println ! (\"Stored {} embeddings in database\" , total) ; Ok (()) }",
+    "correct": "Embeds and stores text chunks with their corresponding embeddings into a database.",
+    "distractors": [
+      "The code processes text chunks and stores their corresponding embeddings into a database.",
+      "Executes a SQL query to retrieve selected and non-empty 'chunks', then uses an AI agent to generate descriptions for each, updating the database with these new description texts.",
+      "The code generates and updates description fields for selected database entries based on their contents."
+    ]
+  },
+  {
+    "code": "{ let dot : f64 = a . iter () . zip (b . iter ()) . map (| (x , y) | x * y) . sum () ; let norm_a : f64 = a . iter () . map (| x | x * x) . sum :: < f64 > () . sqrt () ; let norm_b : f64 = b . iter () . map (| x | x * x) . sum :: < f64 > () . sqrt () ; if norm_a == 0.0 || norm_b == 0.0 { return 0.0 ; } dot / (norm_a * norm_b) }",
+    "correct": "Calculates the cosine of the angle between two vectors in a multidimensional space and checks for zero-length input vector normalization.",
+    "distractors": [
+      "Calculates the cosine similarity between two vectors normalized by their magnitudes.",
+      "Computes the Pearson correlation coefficient between two vectors a and b, handling cases where either vector has zero magnitude by returning NaN if both magnitudes are non-zero or one otherwise.",
+      "Calculates the cosine similarity between two vectors, returning a value in [0,1]."
+    ]
+  },
+  {
+    "code": "{ let mut stmt = conn . prepare (\"SELECT id, body, description, embedding FROM chunks WHERE selected = 1 AND description IS NOT NULL AND embedding IS NOT NULL\") ? ; let chunks : Vec < ChunkWithData > = stmt . query_map ([] , | row | { let id : i64 = row . get (0) ? ; let body : String = row . get (1) ? ; let description : String = row . get (2) ? ; let blob : Vec < u8 > = row . get (3) ? ; Ok ((id , body , description , blob)) }) ? . filter_map (| r | r . ok ()) . map (| (id , body , description , blob) | ChunkWithData { id , body , description , embedding : blob_to_vec (& blob) , }) . collect () ; println ! (\"Building quiz entries with distractors for {} chunks...\" , chunks . len ()) ; let entries = chunks . iter () . map (| chunk | { let mut similarities : Vec < (usize , f64) > = chunks . iter () . enumerate () . filter (| (_ , other) | other . id != chunk . id) . map (| (i , other) | { let sim = cosine_similarity (& chunk . embedding , & other . embedding) ; (i , sim) }) . collect () ; similarities . sort_by (| a , b | b . 1 . partial_cmp (& a . 1) . unwrap ()) ; let distractors : [String ; 3] = [chunks [similarities [0] . 0] . description . clone () , chunks [similarities [1] . 0] . description . clone () , chunks [similarities [2] . 0] . description . clone () ,] ; QuizEntry { body : chunk . body . clone () , correct : chunk . description . clone () , distractors , } }) . collect () ; Ok (entries) }",
+    "correct": "Generates quiz entries with associated descriptions and random distractor phrases from a database of selected chunks after calculating cosine similarities among embeddings.",
+    "distractors": [
+      "The code prepares and executes a database query to retrieve selected, non-null entries with their descriptions as quiz questions along with similar entry details for potential distractors.",
+      "The code selects and marks the most diverse set of non-null embedding entries from a database as 'selected' based on cosine distance.",
+      "The code selects and marks the most diverse set of embeddings from a database."
+    ]
+  },
+  {
+    "code": "{ let items : Vec < QuizItemJson > = entries . iter () . map (| e | QuizItemJson { code : & e . body , correct : & e . correct , distractors : [& e . distractors [0] , & e . distractors [1] , & e . distractors [2] ,] , }) . collect () ; let json = serde_json :: to_string_pretty (& items) ? ; if let Some (parent) = output_path . parent () { std :: fs :: create_dir_all (parent) ? ; } std :: fs :: write (output_path , json) ? ; println ! (\"Exported {} quiz items to {}\" , items . len () , output_path . display ()) ; Ok (()) }",
+    "correct": "Generates a JSON file from QuizItemJson objects and writes it to the specified path, creating any necessary directories.",
+    "distractors": [
+      "Generates a JSON file from QuizItemJson entries and writes it, creating the directory if necessary.",
+      "Generates a quiz interface that tracks user answers, updates scores based on correctness and navigates through questions.",
+      "Displays a quiz interface that updates and tracks user responses, scores them for correct answers, allows navigation through questions, and shows final results after completion."
+    ]
+  },
+  {
+    "code": "{ let client = ollama :: Client :: new () ; let agent = client . agent (LLM_MODEL) . preamble (SYSTEM_PROMPT) . build () ; let mut stmt = conn . prepare (\"SELECT id, body FROM chunks WHERE selected = 1 AND description IS NULL\") ? ; let rows : Vec < (i64 , String) > = stmt . query_map ([] , | row | Ok ((row . get (0) ? , row . get (1) ?))) ? . filter_map (| r | r . ok ()) . collect () ; let total = rows . len () ; println ! (\"Generating descriptions for {} selected chunks...\" , total) ; for (idx , (id , body)) in rows . iter () . enumerate () { let prompt = format ! (\"Describe what this Rust code does in one sentence:\\n\\n{}\" , body) ; let description : String = match agent . prompt (prompt . as_str ()) . await { Ok (d) => d . trim () . to_string () , Err (e) => { eprintln ! (\"  Warning: failed to describe chunk {}: {}\" , id , e) ; continue ; } } ; conn . execute (\"UPDATE chunks SET description = ?1 WHERE id = ?2\" , params ! [description , id] ,) ? ; println ! (\"  [{}/{}] described chunk {}\" , idx + 1 , total , id) ; } println ! (\"Done generating descriptions.\") ; Ok (()) }",
+    "correct": "Executes a SQL query to retrieve selected and non-empty 'chunks', then uses an AI agent to generate descriptions for each, updating the database with these new description texts.",
+    "distractors": [
+      "The code generates and updates description fields for selected database entries based on their contents.",
+      "Embeds and stores text chunks with their corresponding embeddings into a database.",
+      "The code processes text chunks and stores their corresponding embeddings into a database."
+    ]
+  },
+  {
+    "code": "{ let args = Args :: parse () ; println ! (\"=== Step 1: Parsing .rs files in {:?} ===\" , args . repo) ; let chunks = parser :: extract_chunks_from_repo (& args . repo , args . min_stmts , args . max_stmts) ? ; if chunks . is_empty () { anyhow :: bail ! (\"No suitable code chunks found in the repository.\") ; } println ! (\"\\n=== Step 2: Embedding chunks and storing in {:?} ===\" , args . db) ; let conn = embedder :: open_db (args . db . to_str () . unwrap ()) ? ; embedder :: embed_and_store (& conn , & chunks) . await ? ; println ! (\"\\n=== Step 3: Selecting {} most diverse chunks ===\" , args . target) ; diversity :: select_diverse (& conn , args . target) ? ; println ! (\"\\n=== Step 4: Generating descriptions with phi4-mini:3.8b ===\") ; describer :: describe_selected_chunks (& conn) . await ? ; println ! (\"\\n=== Step 5: Building quiz entries with distractors ===\") ; let entries = distractors :: build_quiz_entries (& conn) ? ; println ! (\"\\n=== Step 6: Exporting to {:?} ===\" , args . output) ; export :: export_json (& entries , & args . output) ? ; println ! (\"\\nDone! Run 'trunk serve' in crates/frontend to start the quiz.\") ; Ok (()) }",
+    "correct": "Parses Rust files from a repository, extracts code chunks within specified statement limits, embeds and stores them into a database, selects diverse chunk samples for description generation using Phi-4-mini model 3.8b as distractors, builds quiz entries, exports results in JSON format to an output file, prompts the user to serve with 'trunk serve'.",
+    "distractors": [
+      "Parses Rust files, extracts code chunks based on criteria, embeds them into a database with diversity selection and embedding using phi-4-mini model for descriptions, builds quizzes including distractors from selected diverse chunks, exports results as JSON.",
+      "The code selects and marks the most diverse set of non-null embedding entries from a database as 'selected' based on cosine distance.",
+      "The code selects and marks the most diverse set of embeddings from a database."
+    ]
+  },
+  {
+    "code": "{ let total = items . len () ; let current = RwSignal :: new (0usize) ; let score = RwSignal :: new (0usize) ; let answered = RwSignal :: new (false) ; let selected = RwSignal :: new (Option :: < usize > :: None) ; let shuffled : Vec < (Vec < String > , usize) > = items . iter () . map (| item | { let all = std :: iter :: once (item . correct . clone ()) . chain (item . distractors . iter () . cloned ()) . collect :: < Vec < _ > > () ; shuffle_answers (all) }) . collect () ; let shuffled = StoredValue :: new_local (shuffled) ; let items = StoredValue :: new_local (items) ; let on_answer = move | idx : usize | { if answered . get () { return ; } answered . set (true) ; selected . set (Some (idx)) ; let q = current . get () ; let (_ , correct_idx) = shuffled . with_value (| s | (s [q] . 0 . clone () , s [q] . 1)) ; if idx == correct_idx { score . update (| s | * s += 1) ; } } ; let on_next = move | _ | { current . update (| c | * c += 1) ; answered . set (false) ; selected . set (None) ; } ; view ! { < ScoreBoard score = score . into () total = total current = current . into () /> { move || { let q = current . get () ; if q >= total { view ! { < div > < h2 > \"Quiz complete!\" </ h2 > < p > \"Final score: \" { score . get () } \" / \" { total } </ p > </ div > } . into_any () } else { let code = items . with_value (| it | it [q] . code . clone ()) ; let (answers , correct_idx) = shuffled . with_value (| s | s [q] . clone ()) ; view ! { < QuizCard code = code answers = answers correct_idx = correct_idx answered = answered . into () selected = selected . into () on_answer = on_answer /> < div style = \"margin-top:1rem\" > { move || { if answered . get () && current . get () + 1 < total { view ! { < button class = \"pure-button pure-button-primary\" on : click = on_next > \"Next\" </ button > } . into_any () } else { view ! { < span ></ span > } . into_any () } } } </ div > } . into_any () } } } } }",
+    "correct": "Generates a quiz interface that tracks user answers, updates scores based on correctness and navigates through questions.",
+    "distractors": [
+      "Displays a quiz interface that updates and tracks user responses, scores them for correct answers, allows navigation through questions, and shows final results after completion.",
+      "Generates a JSON file from QuizItemJson objects and writes it to the specified path, creating any necessary directories.",
+      "Generates a JSON file from QuizItemJson entries and writes it, creating the directory if necessary."
+    ]
+  },
+  {
+    "code": "{ let seed = answers [0] . bytes () . fold (0u64 , | acc , b | acc . wrapping_mul (31) . wrapping_add (b as u64)) ; let n = answers . len () ; let mut indices : Vec < usize > = (0 .. n) . collect () ; let mut rng = seed ; for i in (1 .. n) . rev () { rng = rng . wrapping_mul (6364136223846793005) . wrapping_add (1442695040888963407) ; let j = (rng >> 33) as usize % (i + 1) ; indices . swap (i , j) ; } let correct_idx = indices . iter () . position (| & x | x == 0) . unwrap () ; let shuffled = indices . into_iter () . map (| i | answers [i] . clone ()) . collect () ; (shuffled , correct_idx) }",
+    "correct": "The code performs a Fisher-Yates shuffle on an array, returning the randomly permuted list and index of any element that was originally at position zero.",
+    "distractors": [
+      "Generates a pseudo-random permutation of an array and finds the original index of its first zero element.",
+      "Generates a quiz interface that tracks user answers, updates scores based on correctness and navigates through questions.",
+      "Displays a quiz interface that updates and tracks user responses, scores them for correct answers, allows navigation through questions, and shows final results after completion."
+    ]
+  },
+  {
+    "code": "{ let dot : f64 = a . iter () . zip (b . iter ()) . map (| (x , y) | x * y) . sum () ; let norm_a : f64 = a . iter () . map (| x | x * x) . sum :: < f64 > () . sqrt () ; let norm_b : f64 = b . iter () . map (| x | x * x) . sum :: < f64 > () . sqrt () ; if norm_a == 0.0 || norm_b == 0.0 { return 1.0 ; } 1.0 - (dot / (norm_a * norm_b)) }",
+    "correct": "Calculates the cosine similarity between two vectors, returning a value in [0,1].",
+    "distractors": [
+      "Computes the Pearson correlation coefficient between two vectors a and b, handling cases where either vector has zero magnitude by returning NaN if both magnitudes are non-zero or one otherwise.",
+      "Calculates the cosine of the angle between two vectors in a multidimensional space and checks for zero-length input vector normalization.",
+      "Calculates the cosine similarity between two vectors normalized by their magnitudes."
+    ]
+  },
+  {
+    "code": "{ let mut stmt = conn . prepare (\"SELECT id, embedding FROM chunks WHERE embedding IS NOT NULL\") ? ; let rows : Vec < (i64 , Vec < f64 >) > = stmt . query_map ([] , | row | { let id : i64 = row . get (0) ? ; let blob : Vec < u8 > = row . get (1) ? ; Ok ((id , blob)) }) ? . filter_map (| r | r . ok ()) . map (| (id , blob) | (id , blob_to_vec (& blob))) . collect () ; let n = rows . len () ; if n == 0 { anyhow :: bail ! (\"No chunks with embeddings found in database\") ; } let actual_target = target . min (n) ; println ! (\"Selecting {} most diverse chunks from {} total...\" , actual_target , n) ; let mut min_dist = vec ! [f64 :: MAX ; n] ; let mut selected_indices : Vec < usize > = Vec :: with_capacity (actual_target) ; selected_indices . push (0) ; for i in 0 .. n { min_dist [i] = cosine_distance (& rows [0] . 1 , & rows [i] . 1) ; } while selected_indices . len () < actual_target { let next = (0 .. n) . filter (| i | ! selected_indices . contains (i)) . max_by (| & a , & b | min_dist [a] . partial_cmp (& min_dist [b]) . unwrap ()) . unwrap () ; selected_indices . push (next) ; let new_vec = & rows [next] . 1 ; for i in 0 .. n { let d = cosine_distance (new_vec , & rows [i] . 1) ; if d < min_dist [i] { min_dist [i] = d ; } } if selected_indices . len () % 10 == 0 { println ! (\"  Selected {}/{}\" , selected_indices . len () , actual_target) ; } } let selected_ids : Vec < i64 > = selected_indices . iter () . map (| & i | rows [i] . 0) . collect () ; for id in & selected_ids { conn . execute (\"UPDATE chunks SET selected = 1 WHERE id = ?1\" , [id]) ? ; } println ! (\"Marked {} chunks as selected\" , selected_ids . len ()) ; Ok (()) }",
+    "correct": "The code selects and marks the most diverse set of embeddings from a database.",
+    "distractors": [
+      "The code selects and marks the most diverse set of non-null embedding entries from a database as 'selected' based on cosine distance.",
+      "Generates quiz entries with associated descriptions and random distractor phrases from a database of selected chunks after calculating cosine similarities among embeddings.",
+      "The code prepares and executes a database query to retrieve selected, non-null entries with their descriptions as quiz questions along with similar entry details for potential distractors."
+    ]
+  },
+  {
+    "code": "{ let client = ollama :: Client :: new () ; let model = client . embedding_model (ollama :: NOMIC_EMBED_TEXT) ; const BATCH : usize = 32 ; let total = chunks . len () ; for (batch_idx , batch) in chunks . chunks (BATCH) . enumerate () { let texts : Vec < String > = batch . iter () . map (| c | c . body . clone ()) . collect () ; println ! (\"Embedding batch {}/{} ({} chunks)...\" , batch_idx + 1 , (total + BATCH - 1) / BATCH , texts . len ()) ; let embeddings : Vec < rig :: embeddings :: Embedding > = model . embed_texts (texts) . await ? ; for (chunk , embedding) in batch . iter () . zip (embeddings . iter ()) { let blob = vec_to_blob (& embedding . vec) ; conn . execute (\"INSERT INTO chunks (file_path, fn_name, body, embedding) VALUES (?1, ?2, ?3, ?4)\" , params ! [chunk . file_path , chunk . fn_name , chunk . body , blob] ,) ? ; } } println ! (\"Stored {} embeddings in database\" , total) ; Ok (()) }",
+    "correct": "The code processes text chunks and stores their corresponding embeddings into a database.",
+    "distractors": [
+      "Embeds and stores text chunks with their corresponding embeddings into a database.",
+      "Executes a SQL query to retrieve selected and non-empty 'chunks', then uses an AI agent to generate descriptions for each, updating the database with these new description texts.",
+      "The code generates and updates description fields for selected database entries based on their contents."
+    ]
+  },
+  {
+    "code": "{ let dot : f64 = a . iter () . zip (b . iter ()) . map (| (x , y) | x * y) . sum () ; let norm_a : f64 = a . iter () . map (| x | x * x) . sum :: < f64 > () . sqrt () ; let norm_b : f64 = b . iter () . map (| x | x * x) . sum :: < f64 > () . sqrt () ; if norm_a == 0.0 || norm_b == 0.0 { return 0.0 ; } dot / (norm_a * norm_b) }",
+    "correct": "Calculates the cosine similarity between two vectors normalized by their magnitudes.",
+    "distractors": [
+      "Calculates the cosine of the angle between two vectors in a multidimensional space and checks for zero-length input vector normalization.",
+      "Computes the Pearson correlation coefficient between two vectors a and b, handling cases where either vector has zero magnitude by returning NaN if both magnitudes are non-zero or one otherwise.",
+      "Calculates the cosine similarity between two vectors, returning a value in [0,1]."
+    ]
+  },
+  {
+    "code": "{ let mut stmt = conn . prepare (\"SELECT id, body, description, embedding FROM chunks WHERE selected = 1 AND description IS NOT NULL AND embedding IS NOT NULL\") ? ; let chunks : Vec < ChunkWithData > = stmt . query_map ([] , | row | { let id : i64 = row . get (0) ? ; let body : String = row . get (1) ? ; let description : String = row . get (2) ? ; let blob : Vec < u8 > = row . get (3) ? ; Ok ((id , body , description , blob)) }) ? . filter_map (| r | r . ok ()) . map (| (id , body , description , blob) | ChunkWithData { id , body , description , embedding : blob_to_vec (& blob) , }) . collect () ; println ! (\"Building quiz entries with distractors for {} chunks...\" , chunks . len ()) ; let entries = chunks . iter () . map (| chunk | { let mut similarities : Vec < (usize , f64) > = chunks . iter () . enumerate () . filter (| (_ , other) | other . id != chunk . id) . map (| (i , other) | { let sim = cosine_similarity (& chunk . embedding , & other . embedding) ; (i , sim) }) . collect () ; similarities . sort_by (| a , b | b . 1 . partial_cmp (& a . 1) . unwrap ()) ; let distractors : [String ; 3] = [chunks [similarities [0] . 0] . description . clone () , chunks [similarities [1] . 0] . description . clone () , chunks [similarities [2] . 0] . description . clone () ,] ; QuizEntry { body : chunk . body . clone () , correct : chunk . description . clone () , distractors , } }) . collect () ; Ok (entries) }",
+    "correct": "The code prepares and executes a database query to retrieve selected, non-null entries with their descriptions as quiz questions along with similar entry details for potential distractors.",
+    "distractors": [
+      "Generates quiz entries with associated descriptions and random distractor phrases from a database of selected chunks after calculating cosine similarities among embeddings.",
+      "The code selects and marks the most diverse set of non-null embedding entries from a database as 'selected' based on cosine distance.",
+      "The code selects and marks the most diverse set of embeddings from a database."
+    ]
+  },
+  {
+    "code": "{ let items : Vec < QuizItemJson > = entries . iter () . map (| e | QuizItemJson { code : & e . body , correct : & e . correct , distractors : [& e . distractors [0] , & e . distractors [1] , & e . distractors [2] ,] , }) . collect () ; let json = serde_json :: to_string_pretty (& items) ? ; if let Some (parent) = output_path . parent () { std :: fs :: create_dir_all (parent) ? ; } std :: fs :: write (output_path , json) ? ; println ! (\"Exported {} quiz items to {}\" , items . len () , output_path . display ()) ; Ok (()) }",
+    "correct": "Generates a JSON file from QuizItemJson entries and writes it, creating the directory if necessary.",
+    "distractors": [
+      "Generates a JSON file from QuizItemJson objects and writes it to the specified path, creating any necessary directories.",
+      "Generates a quiz interface that tracks user answers, updates scores based on correctness and navigates through questions.",
+      "Displays a quiz interface that updates and tracks user responses, scores them for correct answers, allows navigation through questions, and shows final results after completion."
+    ]
+  },
+  {
+    "code": "{ let client = ollama :: Client :: new () ; let agent = client . agent (LLM_MODEL) . preamble (SYSTEM_PROMPT) . build () ; let mut stmt = conn . prepare (\"SELECT id, body FROM chunks WHERE selected = 1 AND description IS NULL\") ? ; let rows : Vec < (i64 , String) > = stmt . query_map ([] , | row | Ok ((row . get (0) ? , row . get (1) ?))) ? . filter_map (| r | r . ok ()) . collect () ; let total = rows . len () ; println ! (\"Generating descriptions for {} selected chunks...\" , total) ; for (idx , (id , body)) in rows . iter () . enumerate () { let prompt = format ! (\"Describe what this Rust code does in one sentence:\\n\\n{}\" , body) ; let description : String = match agent . prompt (prompt . as_str ()) . await { Ok (d) => d . trim () . to_string () , Err (e) => { eprintln ! (\"  Warning: failed to describe chunk {}: {}\" , id , e) ; continue ; } } ; conn . execute (\"UPDATE chunks SET description = ?1 WHERE id = ?2\" , params ! [description , id] ,) ? ; println ! (\"  [{}/{}] described chunk {}\" , idx + 1 , total , id) ; } println ! (\"Done generating descriptions.\") ; Ok (()) }",
+    "correct": "The code generates and updates description fields for selected database entries based on their contents.",
+    "distractors": [
+      "Executes a SQL query to retrieve selected and non-empty 'chunks', then uses an AI agent to generate descriptions for each, updating the database with these new description texts.",
+      "Embeds and stores text chunks with their corresponding embeddings into a database.",
+      "The code processes text chunks and stores their corresponding embeddings into a database."
+    ]
+  },
+  {
+    "code": "{ let args = Args :: parse () ; println ! (\"=== Step 1: Parsing .rs files in {:?} ===\" , args . repo) ; let chunks = parser :: extract_chunks_from_repo (& args . repo , args . min_stmts , args . max_stmts) ? ; if chunks . is_empty () { anyhow :: bail ! (\"No suitable code chunks found in the repository.\") ; } println ! (\"\\n=== Step 2: Embedding chunks and storing in {:?} ===\" , args . db) ; let conn = embedder :: open_db (args . db . to_str () . unwrap ()) ? ; embedder :: embed_and_store (& conn , & chunks) . await ? ; println ! (\"\\n=== Step 3: Selecting {} most diverse chunks ===\" , args . target) ; diversity :: select_diverse (& conn , args . target) ? ; println ! (\"\\n=== Step 4: Generating descriptions with phi4-mini:3.8b ===\") ; describer :: describe_selected_chunks (& conn) . await ? ; println ! (\"\\n=== Step 5: Building quiz entries with distractors ===\") ; let entries = distractors :: build_quiz_entries (& conn) ? ; println ! (\"\\n=== Step 6: Exporting to {:?} ===\" , args . output) ; export :: export_json (& entries , & args . output) ? ; println ! (\"\\nDone! Run 'trunk serve' in crates/frontend to start the quiz.\") ; Ok (()) }",
+    "correct": "Parses Rust files, extracts code chunks based on criteria, embeds them into a database with diversity selection and embedding using phi-4-mini model for descriptions, builds quizzes including distractors from selected diverse chunks, exports results as JSON.",
+    "distractors": [
+      "Parses Rust files from a repository, extracts code chunks within specified statement limits, embeds and stores them into a database, selects diverse chunk samples for description generation using Phi-4-mini model 3.8b as distractors, builds quiz entries, exports results in JSON format to an output file, prompts the user to serve with 'trunk serve'.",
+      "The code selects and marks the most diverse set of non-null embedding entries from a database as 'selected' based on cosine distance.",
+      "The code selects and marks the most diverse set of embeddings from a database."
+    ]
+  },
+  {
+    "code": "{ let total = items . len () ; let current = RwSignal :: new (0usize) ; let score = RwSignal :: new (0usize) ; let answered = RwSignal :: new (false) ; let selected = RwSignal :: new (Option :: < usize > :: None) ; let shuffled : Vec < (Vec < String > , usize) > = items . iter () . map (| item | { let all = std :: iter :: once (item . correct . clone ()) . chain (item . distractors . iter () . cloned ()) . collect :: < Vec < _ > > () ; shuffle_answers (all) }) . collect () ; let shuffled = StoredValue :: new_local (shuffled) ; let items = StoredValue :: new_local (items) ; let on_answer = move | idx : usize | { if answered . get () { return ; } answered . set (true) ; selected . set (Some (idx)) ; let q = current . get () ; let (_ , correct_idx) = shuffled . with_value (| s | (s [q] . 0 . clone () , s [q] . 1)) ; if idx == correct_idx { score . update (| s | * s += 1) ; } } ; let on_next = move | _ | { current . update (| c | * c += 1) ; answered . set (false) ; selected . set (None) ; } ; view ! { < ScoreBoard score = score . into () total = total current = current . into () /> { move || { let q = current . get () ; if q >= total { view ! { < div > < h2 > \"Quiz complete!\" </ h2 > < p > \"Final score: \" { score . get () } \" / \" { total } </ p > </ div > } . into_any () } else { let code = items . with_value (| it | it [q] . code . clone ()) ; let (answers , correct_idx) = shuffled . with_value (| s | s [q] . clone ()) ; view ! { < QuizCard code = code answers = answers correct_idx = correct_idx answered = answered . into () selected = selected . into () on_answer = on_answer /> < div style = \"margin-top:1rem\" > { move || { if answered . get () && current . get () + 1 < total { view ! { < button class = \"pure-button pure-button-primary\" on : click = on_next > \"Next\" </ button > } . into_any () } else { view ! { < span ></ span > } . into_any () } } } </ div > } . into_any () } } } } }",
+    "correct": "Displays a quiz interface that updates and tracks user responses, scores them for correct answers, allows navigation through questions, and shows final results after completion.",
+    "distractors": [
+      "Generates a quiz interface that tracks user answers, updates scores based on correctness and navigates through questions.",
+      "Generates a JSON file from QuizItemJson objects and writes it to the specified path, creating any necessary directories.",
+      "Generates a JSON file from QuizItemJson entries and writes it, creating the directory if necessary."
+    ]
+  },
+  {
+    "code": "{ let seed = answers [0] . bytes () . fold (0u64 , | acc , b | acc . wrapping_mul (31) . wrapping_add (b as u64)) ; let n = answers . len () ; let mut indices : Vec < usize > = (0 .. n) . collect () ; let mut rng = seed ; for i in (1 .. n) . rev () { rng = rng . wrapping_mul (6364136223846793005) . wrapping_add (1442695040888963407) ; let j = (rng >> 33) as usize % (i + 1) ; indices . swap (i , j) ; } let correct_idx = indices . iter () . position (| & x | x == 0) . unwrap () ; let shuffled = indices . into_iter () . map (| i | answers [i] . clone ()) . collect () ; (shuffled , correct_idx) }",
+    "correct": "Generates a pseudo-random permutation of an array and finds the original index of its first zero element.",
+    "distractors": [
+      "The code performs a Fisher-Yates shuffle on an array, returning the randomly permuted list and index of any element that was originally at position zero.",
+      "Generates a quiz interface that tracks user answers, updates scores based on correctness and navigates through questions.",
+      "Displays a quiz interface that updates and tracks user responses, scores them for correct answers, allows navigation through questions, and shows final results after completion."
+    ]
+  }
+]
