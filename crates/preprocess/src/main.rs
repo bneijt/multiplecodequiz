@@ -22,11 +22,11 @@ struct Args {
     db: PathBuf,
 
     /// Output path for quiz_data.json
-    #[arg(long, default_value = "crates/frontend/public/quiz_data.json")]
+    #[arg(long, default_value = "quiz_data.json")]
     output: PathBuf,
 
     /// Minimum number of statements in a function body to include
-    #[arg(long, default_value_t = 5)]
+    #[arg(long, default_value_t = 3)]
     min_stmts: usize,
 
     /// Maximum number of statements in a function body to include
@@ -34,7 +34,7 @@ struct Args {
     max_stmts: usize,
 
     /// Number of diverse chunks to select for the quiz
-    #[arg(long, default_value_t = 100)]
+    #[arg(long, default_value_t = 20)]
     target: usize,
 }
 
@@ -48,11 +48,17 @@ async fn main() -> Result<()> {
         anyhow::bail!("No suitable code chunks found in the repository.");
     }
 
-    println!("\n=== Step 2: Embedding chunks and storing in {:?} ===", args.db);
+    println!(
+        "\n=== Step 2: Embedding chunks and storing in {:?} ===",
+        args.db
+    );
     let conn = embedder::open_db(args.db.to_str().unwrap())?;
     embedder::embed_and_store(&conn, &chunks).await?;
 
-    println!("\n=== Step 3: Selecting {} most diverse chunks ===", args.target);
+    println!(
+        "\n=== Step 3: Selecting {} most diverse chunks ===",
+        args.target
+    );
     diversity::select_diverse(&conn, args.target)?;
 
     println!("\n=== Step 4: Generating descriptions with phi4-mini:3.8b ===");

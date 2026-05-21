@@ -6,15 +6,14 @@
         <title>Code Quiz</title>
         <link
             rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/purecss@3/build/pure-min.css"
-        />
-        <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/purecss@3/build/grids-responsive-min.css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/picocss/2.1.1/pico.violet.min.css"
+            integrity="sha512-1dWybrAczcsDmevcNrcg+jWZOCANKer9zessoX+paKWCH5q03kYo9S1thz1yWdq/VmHstI0GgdUjJ2l0XUXB2Q=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
         />
     </head>
     <body>
         <link data-trunk rel="rust" data-wasm-opt="z" />
-        <link data-trunk rel="copy-dir" href="public" />
+        <link data-trunk rel="copy-file" href="../../quiz_data.json" />
     </body>
 </html>

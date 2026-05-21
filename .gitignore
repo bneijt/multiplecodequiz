@@ -1,1 +1,4 @@
 /target/
+/embeddings.db
+/tmp/
+crates/frontend/dist/

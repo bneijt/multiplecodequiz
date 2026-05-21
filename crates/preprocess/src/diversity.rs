@@ -17,6 +17,9 @@ fn cosine_distance(a: &[f64], b: &[f64]) -> f64 {
 /// Repeatedly picks the chunk whose minimum distance to the already-selected
 /// set is largest (i.e. most dissimilar to all already chosen chunks).
 pub fn select_diverse(conn: &Connection, target: usize) -> Result<()> {
+    // Reset selection
+    conn.execute("UPDATE chunks SET selected = 0")?;
+
     // Load all rows with embeddings
     let mut stmt = conn.prepare("SELECT id, embedding FROM chunks WHERE embedding IS NOT NULL")?;
     let rows: Vec<(i64, Vec<f64>)> = stmt

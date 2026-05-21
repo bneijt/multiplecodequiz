@@ -13,7 +13,7 @@ pub struct QuizItem {
 }
 
 async fn load_quiz_data() -> Vec<QuizItem> {
-    let resp = Request::get("/public/quiz_data.json")
+    let resp = Request::get("quiz_data.json")
         .send()
         .await
         .expect("Failed to fetch quiz_data.json");
@@ -27,19 +27,17 @@ pub fn App() -> impl IntoView {
     let data = LocalResource::new(|| load_quiz_data());
 
     view! {
-        <div class="pure-g" style="max-width:900px;margin:0 auto;padding:1rem">
-            <div class="pure-u-1">
-                <h1>"Code Quiz"</h1>
-                <Suspense fallback=|| view! { <p>"Loading quiz..."</p> }>
-                    {move || {
-                        data.get().map(|items| {
-                            let items: Vec<QuizItem> = (*items).clone();
-                            view! { <Quiz items=items /> }
-                        })
-                    }}
-                </Suspense>
-            </div>
-        </div>
+        <main class="container-fluid">
+            <h1>"Code Quiz"</h1>
+            <Suspense fallback=|| view! { <p>"Loading quiz..."</p> }>
+                {move || {
+                    data.get().map(|items| {
+                        let items: Vec<QuizItem> = (*items).clone();
+                        view! { <Quiz items=items /> }
+                    })
+                }}
+            </Suspense>
+        </main>
     }
 }
 
@@ -100,6 +98,17 @@ fn Quiz(items: Vec<QuizItem>) -> impl IntoView {
                 let code = items.with_value(|it| it[q].code.clone());
                 let (answers, correct_idx) = shuffled.with_value(|s| s[q].clone());
                 view! {
+                    <div style="margin-top:1rem">
+                        {move || {
+                            if answered.get() && current.get() + 1 < total {
+                                view! {
+                                    <button on:click=on_next>"Next"</button>
+                                }.into_any()
+                            } else {
+                                view! { <span></span> }.into_any()
+                            }
+                        }}
+                    </div>
                     <QuizCard
                         code=code
                         answers=answers
@@ -108,19 +117,7 @@ fn Quiz(items: Vec<QuizItem>) -> impl IntoView {
                         selected=selected.into()
                         on_answer=on_answer
                     />
-                    <div style="margin-top:1rem">
-                        {move || {
-                            if answered.get() && current.get() + 1 < total {
-                                view! {
-                                    <button class="pure-button pure-button-primary" on:click=on_next>
-                                        "Next"
-                                    </button>
-                                }.into_any()
-                            } else {
-                                view! { <span></span> }.into_any()
-                            }
-                        }}
-                    </div>
+
                 }.into_any()
             }
         }}

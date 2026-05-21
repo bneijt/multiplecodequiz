@@ -26,9 +26,8 @@ pub fn QuizCard(
                 }
             };
             view! {
-                <div class="pure-u-1" style="padding:0.1rem 0">
+                <div style="padding:0.1rem 0">
                     <button
-                        class="pure-button"
                         style=style
                         on:click=move |_| on_answer(i)
                     >
@@ -40,12 +39,13 @@ pub fn QuizCard(
         .collect();
 
     view! {
-        <div style="margin-top:1rem">
-            <pre class="language-rust">
-                <code>{code}</code>
-            </pre>
-            <p><strong>"What does this code do?"</strong></p>
-            <div class="pure-g">
+        <div class="grid">
+            <div><article>
+            <pre><code>{code}</code></pre>
+            </article>
+            </div>
+            <div>
+                <p style="margin-top:0"><strong>"What does this code do?"</strong></p>
                 {buttons}
             </div>
         </div>
