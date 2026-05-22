@@ -35,6 +35,10 @@ pub async fn embed_and_store(
     for chunk_result in chunks {
         let chunk = chunk_result?;
 
+        if chunk.body.len() > 1000 {
+            continue;
+        }
+
         // Embed this single chunk
         let embeddings = model.embed_texts(vec![chunk.body.clone()]).await?;
         let vec_f32: Vec<f32> = embeddings[0].vec.iter().map(|&v| v as f32).collect();

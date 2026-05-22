@@ -7,23 +7,23 @@ use walkdir::WalkDir;
 /// Format a syn::Block using prettyplease.
 /// Wraps the block in a dummy function, formats the whole file, then
 /// extracts just the body back out.
-fn fmt_block(block: &syn::Block) -> String {
+/// Returns `None` if the block cannot be formatted (e.g. contains unstable
+/// `macro foo() {}` syntax nested inside expressions that prettyplease does
+/// not support — even when deeply nested inside for loops etc).
+fn fmt_block(block: &syn::Block) -> Option<String> {
     let wrapper = quote! { fn __wrapper() #block };
     let Ok(ast) = syn::parse2::<syn::File>(wrapper) else {
-        // Fallback: return raw token stream string
-        return block
-            .stmts
-            .iter()
-            .map(|s| quote!(#s).to_string())
-            .collect::<Vec<_>>()
-            .join("\n");
+        return None;
     };
-    let formatted = prettyplease::unparse(&ast);
+    // prettyplease panics on Item::Verbatim (e.g. `macro foo() {}` syntax).
+    // catch_unwind lets us treat those blocks as unformattable and skip them.
+    let result = std::panic::catch_unwind(|| prettyplease::unparse(&ast));
+    let formatted = result.ok()?;
     // Strip the "fn __wrapper() {\n" prefix and trailing "}\n" suffix
     let start = formatted.find('{').map(|i| i + 1).unwrap_or(0);
     let end = formatted.rfind('}').unwrap_or(formatted.len());
     let inner = &formatted[start..end];
-    dedent(inner).trim().to_string()
+    Some(dedent(inner).trim().to_string())
 }
 
 /// Remove the common leading whitespace from all non-empty lines.
@@ -80,12 +80,13 @@ impl<'ast> Visit<'ast> for ChunkCollector {
     fn visit_impl_item_fn(&mut self, node: &'ast ImplItemFn) {
         if self.accept_block(&node.block) {
             let fn_name = node.sig.ident.to_string();
-            let body = fmt_block(&node.block);
-            self.chunks.push(CodeChunk {
-                file_path: self.file_path.clone(),
-                fn_name,
-                body,
-            });
+            if let Some(body) = fmt_block(&node.block) {
+                self.chunks.push(CodeChunk {
+                    file_path: self.file_path.clone(),
+                    fn_name,
+                    body,
+                });
+            }
         }
         syn::visit::visit_impl_item_fn(self, node);
     }
@@ -93,12 +94,13 @@ impl<'ast> Visit<'ast> for ChunkCollector {
     fn visit_item_fn(&mut self, node: &'ast ItemFn) {
         if self.accept_block(&node.block) {
             let fn_name = node.sig.ident.to_string();
-            let body = fmt_block(&node.block);
-            self.chunks.push(CodeChunk {
-                file_path: self.file_path.clone(),
-                fn_name,
-                body,
-            });
+            if let Some(body) = fmt_block(&node.block) {
+                self.chunks.push(CodeChunk {
+                    file_path: self.file_path.clone(),
+                    fn_name,
+                    body,
+                });
+            }
         }
         syn::visit::visit_item_fn(self, node);
     }

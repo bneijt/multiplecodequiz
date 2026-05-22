@@ -1,110 +1,182 @@
 [
   {
-    "code": "let dot: f32 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();\nlet norm_a: f32 = a.iter().map(|x| x * x).sum::<f32>().sqrt();\nlet norm_b: f32 = b.iter().map(|x| x * x).sum::<f32>().sqrt();\nif norm_a == 0.0 || norm_b == 0.0 {\n    return 1.0;\n}\n1.0 - (dot / (norm_a * norm_b))",
-    "correct": "Calculates the cosine similarity between two vectors a and b, returning zero if either vector's magnitude is zero.",
+    "code": "match item_name {\n    \"rust_eh_personality\" => return item_name.to_owned(),\n    \"__isPlatformVersionAtLeast\" | \"__isOSVersionAtLeast\" => {\n        return item_name.to_owned();\n    }\n    _ => {}\n}\nlet prefix = \"_R\";\nlet mut p: V0SymbolMangler<'_> = V0SymbolMangler {\n    tcx,\n    start_offset: prefix.len(),\n    is_exportable: false,\n    paths: FxHashMap::default(),\n    types: FxHashMap::default(),\n    consts: FxHashMap::default(),\n    binders: vec![],\n    out: String::from(prefix),\n};\np.path_append_ns(\n        |p| {\n            p.push(\"C\");\n            p.push_disambiguator({\n                let mut hasher = StableHasher::new();\n                hasher.write(tcx.sess.cfg_version.as_bytes());\n                let hash: Hash64 = hasher.finish();\n                hash.as_u64()\n            });\n            p.push_ident(\"__rustc\");\n            Ok(())\n        },\n        'v',\n        0,\n        item_name,\n    )\n    .unwrap();\nstd::mem::take(&mut p.out)",
+    "correct": "Generates a mangled symbol name by appending namespace characters and hashing the configuration version.",
     "distractors": [
-      "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz.",
-      "Generates a grid of styled answer buttons based on user selections and correctness, displaying them in a web view.",
-      "Generates a random permutation of an array and identifies the index of its original first element."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let inner = collection.inner();\nlet n = inner.len();\nif n == 0 {\n    anyhow::bail!(\"No chunks found in collection\");\n}\nlet mut rows: Vec<(u64, Vec<f32>, Payload)> = Vec::with_capacity(n);\nfor id in 1..=(n as u64) {\n    if let Some((vec, payload)) = inner.get(id) {\n        rows.push((id, vec, payload));\n    }\n}\nif rows.is_empty() {\n    anyhow::bail!(\"Could not read any entries from the collection\");\n}\nlet actual_n = rows.len();\nlet actual_target = target.min(actual_n);\nprintln!(\n    \"Selecting {} most diverse chunks from {} total...\", actual_target, actual_n\n);\nfor (id, vec, payload) in &rows {\n    let reset_payload = Payload::new()\n        .with_field(\"file_path\", payload.get_str(\"file_path\").unwrap_or(\"\"))\n        .with_field(\"fn_name\", payload.get_str(\"fn_name\").unwrap_or(\"\"))\n        .with_field(\"body\", payload.get_str(\"body\").unwrap_or(\"\"))\n        .with_field(\"selected\", \"0\")\n        .with_field(\"description\", payload.get_str(\"description\").unwrap_or(\"\"));\n    collection.update(*id, vec.clone(), reset_payload).await?;\n}\nlet mut min_dist = vec![f32::MAX; actual_n];\nlet mut selected_indices: Vec<usize> = Vec::with_capacity(actual_target);\nselected_indices.push(0);\nfor i in 0..actual_n {\n    min_dist[i] = cosine_distance(&rows[0].1, &rows[i].1);\n}\nwhile selected_indices.len() < actual_target {\n    let next = (0..actual_n)\n        .filter(|i| !selected_indices.contains(i))\n        .max_by(|&a, &b| min_dist[a].partial_cmp(&min_dist[b]).unwrap())\n        .unwrap();\n    selected_indices.push(next);\n    let new_vec = &rows[next].1;\n    for i in 0..actual_n {\n        let d = cosine_distance(new_vec, &rows[i].1);\n        if d < min_dist[i] {\n            min_dist[i] = d;\n        }\n    }\n    if selected_indices.len() % 10 == 0 {\n        println!(\"  Selected {}/{}\", selected_indices.len(), actual_target);\n    }\n}\nfor idx in &selected_indices {\n    let (id, vec, payload) = &rows[*idx];\n    let updated_payload = Payload::new()\n        .with_field(\"file_path\", payload.get_str(\"file_path\").unwrap_or(\"\"))\n        .with_field(\"fn_name\", payload.get_str(\"fn_name\").unwrap_or(\"\"))\n        .with_field(\"body\", payload.get_str(\"body\").unwrap_or(\"\"))\n        .with_field(\"selected\", \"1\")\n        .with_field(\"description\", payload.get_str(\"description\").unwrap_or(\"\"));\n    collection.update(*id, vec.clone(), updated_payload).await?;\n}\ncollection.flush().await?;\nprintln!(\"Marked {} chunks as selected\", selected_indices.len());\nOk(())",
-    "correct": "The code selects and marks the most diverse subsets of items from a given set.",
+    "code": "self.finalize_pending_component();\nlet _ = write!(self.result, \"17h{hash:016x}E\");\nself.result",
+    "correct": "Finalizes a pending component and writes hexadecimal hash followed by 'E' to result.",
     "distractors": [
-      "Generates quiz questions with selected answers and associated distractors from a dataset.",
-      "Generates and updates a dataset with descriptions for selected chunks of Rust code.",
-      "The code asynchronously processes text data in batches and stores the resulting embeddings along with metadata into a collection."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let config = CollectionConfig::new(EMBEDDING_DIMS, DistanceMetric::Cosine);\nlet collection = AsyncCollection::open_or_create(db_path.to_string(), config).await?;\nOk(collection)",
-    "correct": "Opens an asynchronous database connection and retrieves or creates a collection with specified embedding dimensions and cosine distance metric.",
+    "code": "let linker_with_extension = if cfg!(windows) && linker.extension().is_none() {\n    linker.with_extension(\"exe\")\n} else {\n    linker.to_path_buf()\n};\nfor dir in env::split_paths(&env::var_os(\"PATH\").unwrap_or_default()) {\n    let full_path = dir.join(&linker_with_extension);\n    if full_path.is_file() && !full_path.starts_with(sess.opts.sysroot.path()) {\n        return false;\n    }\n}\ntrue",
+    "correct": "Checks for an executable linker in the system PATH that is not within a specified sysroot directory and returns true if found.",
     "distractors": [
-      "Generates and updates a dataset with descriptions for selected chunks of Rust code.",
-      "The code selects and marks the most diverse subsets of items from a given set.",
-      "The code parses Rust files from a repository and generates an educational dataset with diverse chunks for quizzes."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let client = ollama::Client::new();\nlet model = client.embedding_model(ollama::NOMIC_EMBED_TEXT);\nlet mut count = 0usize;\nfor chunk_result in chunks {\n    let chunk = chunk_result?;\n    let embeddings = model.embed_texts(vec![chunk.body.clone()]).await?;\n    let vec_f32: Vec<f32> = embeddings[0].vec.iter().map(|&v| v as f32).collect();\n    let payload = Payload::new()\n        .with_field(\"file_path\", chunk.file_path.clone())\n        .with_field(\"fn_name\", chunk.fn_name.clone())\n        .with_field(\"body\", chunk.body.clone())\n        .with_field(\"selected\", \"0\")\n        .with_field(\"description\", \"\");\n    collection.insert_auto(vec_f32, payload).await?;\n    count += 1;\n    if count % 10 == 0 {\n        println!(\"  Embedded {} chunks...\", count);\n    }\n}\ncollection.flush().await?;\nOk(count)",
-    "correct": "The code asynchronously processes text data in batches and stores the resulting embeddings along with metadata into a collection.",
+    "code": "self.word(\"/*\");\nself.space();\nself.word(text);\nself.space();\nself.word(\"*/\")",
+    "correct": "Inserts a comment containing 'text' into an XML-like document.",
     "distractors": [
-      "Generates and updates a dataset with descriptions for selected chunks of Rust code.",
-      "The code selects and marks the most diverse subsets of items from a given set.",
-      "The code parses Rust files from a repository and generates an educational dataset with diverse chunks for quizzes."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let wrapper = quote! {\n    fn __wrapper() # block\n};\nlet Ok(ast) = syn::parse2::<syn::File>(wrapper) else {\n    return block\n        .stmts\n        .iter()\n        .map(|s| quote!(# s).to_string())\n        .collect::<Vec<_>>()\n        .join(\"\\n\");\n};\nlet formatted = prettyplease::unparse(&ast);\nlet start = formatted.find('{').map(|i| i + 1).unwrap_or(0);\nlet end = formatted.rfind('}').unwrap_or(formatted.len());\nlet inner = &formatted[start..end];\ndedent(inner).trim().to_string()",
-    "correct": "Generates a quoted block of code from Rust syntax items.",
+    "code": "let sp = cx.with_def_site_ctxt(sp);\nlet s = pprust::tts_to_string(&tts);\nExpandResult::Ready(MacEager::expr(cx.expr_str(sp, Symbol::intern(&s))))",
+    "correct": "The function converts a textual expression into an expanded string representation.",
     "distractors": [
-      "The code parses Rust files from a repository and generates an educational dataset with diverse chunks for quizzes.",
-      "Exports a collection of quiz questions in JSON format and writes them to an output file.",
-      "Generates quiz questions with selected answers and associated distractors from a dataset."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let inner = collection.inner();\nlet n = inner.len();\nlet mut selected: Vec<(u64, Vec<f32>, Payload)> = Vec::new();\nfor id in 1..=(n as u64) {\n    if let Some((vec, payload)) = inner.get(id) {\n        let is_selected = payload.get_str(\"selected\") == Some(\"1\");\n        let has_description = payload\n            .get_str(\"description\")\n            .map(|d: &str| !d.is_empty())\n            .unwrap_or(false);\n        if is_selected && has_description {\n            selected.push((id, vec, payload));\n        }\n    }\n}\nprintln!(\"Building quiz entries with distractors for {} chunks...\", selected.len());\nlet mut entries: Vec<QuizEntry> = Vec::with_capacity(selected.len());\nfor (id, vec, payload) in &selected {\n    let body = payload.get_str(\"body\").unwrap_or(\"\").to_string();\n    let correct = payload.get_str(\"description\").unwrap_or(\"\").to_string();\n    let neighbors: Vec<SearchResult> = collection.search(vec, 5, None).await;\n    let distractors: Vec<String> = neighbors\n        .into_iter()\n        .filter(|r| r.id != *id)\n        .filter_map(|r| {\n            r.payload\n                .and_then(|p: Payload| {\n                    let desc = p.get_str(\"description\")?.to_string();\n                    if desc.is_empty() { None } else { Some(desc) }\n                })\n        })\n        .take(3)\n        .collect();\n    let d0 = distractors.get(0).cloned().unwrap_or_default();\n    let d1 = distractors.get(1).cloned().unwrap_or_default();\n    let d2 = distractors.get(2).cloned().unwrap_or_default();\n    entries\n        .push(QuizEntry {\n            body,\n            correct,\n            distractors: [d0, d1, d2],\n        });\n}\nOk(entries)",
-    "correct": "Generates quiz questions with selected answers and associated distractors from a dataset.",
+    "code": "let predicate = &self.predicates[pos];\nlet span = predicate.span;\nif !predicate.kind.in_where_clause() {\n    return span;\n}\nif pos < self.predicates.len() - 1 {\n    let next_pred = &self.predicates[pos + 1];\n    if next_pred.kind.in_where_clause() {\n        return span.until(next_pred.span);\n    }\n}\nif pos > 0 {\n    let prev_pred = &self.predicates[pos - 1];\n    if prev_pred.kind.in_where_clause() {\n        return prev_pred.span.shrink_to_hi().to(span);\n    }\n}\nself.where_clause_span",
+    "correct": "Determines the range within a SQL WHERE clause based on predicate positions and their inclusion in where clauses.",
     "distractors": [
-      "The code selects and marks the most diverse subsets of items from a given set.",
-      "Generates and updates a dataset with descriptions for selected chunks of Rust code.",
-      "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let items: Vec<QuizItemJson> = entries\n    .iter()\n    .map(|e| QuizItemJson {\n        code: &e.body,\n        correct: &e.correct,\n        distractors: [&e.distractors[0], &e.distractors[1], &e.distractors[2]],\n    })\n    .collect();\nlet json = serde_json::to_string_pretty(&items)?;\nif let Some(parent) = output_path.parent() {\n    std::fs::create_dir_all(parent)?;\n}\nstd::fs::write(output_path, json)?;\nprintln!(\"Exported {} quiz items to {}\", items.len(), output_path.display());\nOk(())",
-    "correct": "Exports a collection of quiz questions in JSON format and writes them to an output file.",
+    "code": "assert_eq!(size_of::< MyIdx > (), 4);\nassert_eq!(size_of::< Option < MyIdx >> (), 4);\nassert_eq!(size_of::< Option < Option < MyIdx >>> (), 4);\nassert_eq!(size_of::< Option < Option < Option < MyIdx >>>> (), 4);\nassert_eq!(size_of::< Option < Option < Option < Option < MyIdx >>>>> (), 4);\nassert_eq!(\n    size_of::< Option < Option < Option < Option < Option < MyIdx >>>>>> (), 4\n);\nassert_eq!(\n    size_of::< Option < Option < Option < Option < Option < Option < MyIdx >>>>>>>\n    (), 8\n);",
+    "correct": "The code checks the memory sizes of nested Option types with and without a custom type in Rust.",
     "distractors": [
-      "The code parses Rust files from a repository and generates an educational dataset with diverse chunks for quizzes.",
-      "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz.",
-      "Generates quiz questions with selected answers and associated distractors from a dataset."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let client = ollama::Client::new();\nlet agent = client.agent(LLM_MODEL).preamble(SYSTEM_PROMPT).build();\nlet inner = collection.inner();\nlet n = inner.len();\nlet mut pending: Vec<(u64, Vec<f32>, Payload)> = Vec::new();\nfor id in 1..=(n as u64) {\n    if let Some((vec, payload)) = inner.get(id) {\n        let is_selected = payload.get_str(\"selected\") == Some(\"1\");\n        let has_description = payload\n            .get_str(\"description\")\n            .map(|d: &str| !d.is_empty())\n            .unwrap_or(false);\n        if is_selected && !has_description {\n            pending.push((id, vec, payload));\n        }\n    }\n}\nlet total = pending.len();\nprintln!(\"Generating descriptions for {} selected chunks...\", total);\nfor (idx, (id, vec, payload)) in pending.into_iter().enumerate() {\n    let body = payload.get_str(\"body\").unwrap_or(\"\").to_string();\n    let prompt = format!(\n        \"Describe what this Rust code does in one sentence:\\n\\n{}\", body\n    );\n    let description: String = match agent.prompt(prompt.as_str()).await {\n        Ok(d) => d.trim().to_string(),\n        Err(e) => {\n            eprintln!(\"  Warning: failed to describe chunk {}: {}\", id, e);\n            continue;\n        }\n    };\n    let updated_payload = Payload::new()\n        .with_field(\"file_path\", payload.get_str(\"file_path\").unwrap_or(\"\"))\n        .with_field(\"fn_name\", payload.get_str(\"fn_name\").unwrap_or(\"\"))\n        .with_field(\"body\", body)\n        .with_field(\"selected\", \"1\")\n        .with_field(\"description\", description);\n    collection.update(id, vec, updated_payload).await?;\n    println!(\"  [{}/{}] described chunk {}\", idx + 1, total, id);\n}\ncollection.flush().await?;\nprintln!(\"Done generating descriptions.\");\nOk(())",
-    "correct": "Generates and updates a dataset with descriptions for selected chunks of Rust code.",
+    "code": "let mut ret = Self {\n    has_multipart_suggestion: false,\n    all_multipart_suggestions: true,\n    has_normal_suggestion: false,\n    all_applicabilities_static: true,\n};\nfor kind in kinds {\n    if let SubdiagnosticKind::MultipartSuggestion { applicability: None, .. }\n    | SubdiagnosticKind::Suggestion { applicability: None, .. } = kind {\n        ret.all_applicabilities_static = false;\n    }\n    if let SubdiagnosticKind::MultipartSuggestion { .. } = kind {\n        ret.has_multipart_suggestion = true;\n    } else {\n        ret.all_multipart_suggestions = false;\n    }\n    if let SubdiagnosticKind::Suggestion { .. } = kind {\n        ret.has_normal_suggestion = true;\n    }\n}\nret",
+    "correct": "Determines the availability of multipart suggestions and normal suggestions based on their applicability.",
     "distractors": [
-      "The code asynchronously processes text data in batches and stores the resulting embeddings along with metadata into a collection.",
-      "Generates quiz questions with selected answers and associated distractors from a dataset.",
-      "The code selects and marks the most diverse subsets of items from a given set."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let args = Args::parse();\nprintln!(\"=== Step 1: Parsing .rs files in {:?} ===\", args.repo);\nlet chunks = parser::iter_chunks_from_repo(\n    &args.repo,\n    args.min_stmts,\n    args.max_stmts,\n);\nprintln!(\"\\n=== Step 2: Embedding chunks and storing in {:?} ===\", args.db);\nlet collection = embedder::open_db(args.db.to_str().unwrap()).await?;\nlet total = embedder::embed_and_store(&collection, chunks).await?;\nif total == 0 {\n    anyhow::bail!(\"No suitable code chunks found in the repository.\");\n}\nprintln!(\"Stored {} embeddings in collection\", total);\nprintln!(\"\\n=== Step 3: Selecting {} most diverse chunks ===\", args.target);\ndiversity::select_diverse(&collection, args.target).await?;\nprintln!(\"\\n=== Step 4: Generating descriptions with phi4-mini:3.8b ===\");\ndescriber::describe_selected_chunks(&collection).await?;\nprintln!(\"\\n=== Step 5: Building quiz entries with distractors ===\");\nlet entries = distractors::build_quiz_entries(&collection).await?;\nprintln!(\"\\n=== Step 6: Exporting to {:?} ===\", args.output);\nexport::export_json(&entries, &args.output)?;\nprintln!(\"\\nDone! Run 'trunk serve' in crates/frontend to start the quiz.\");\nOk(())",
-    "correct": "The code parses Rust files from a repository and generates an educational dataset with diverse chunks for quizzes.",
+    "code": "let in_pat = mem::replace(&mut self.in_pat, false);\nself.live_symbols.insert(c.def_id);\nlet result = intravisit::walk_anon_const(self, c);\nself.in_pat = in_pat;\nresult",
+    "correct": "Checks and updates an anonymous constant visitor's state during symbol analysis.",
     "distractors": [
-      "Exports a collection of quiz questions in JSON format and writes them to an output file.",
-      "Generates quiz questions with selected answers and associated distractors from a dataset.",
-      "The code asynchronously processes text data in batches and stores the resulting embeddings along with metadata into a collection."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let answers = StoredValue::new_local(answers);\nlet buttons: Vec<_> = (0..4)\n    .map(|i| {\n        let answer = answers.with_value(|a| a.get(i).cloned().unwrap_or_default());\n        let style = move || {\n            if !answered.get() {\n                \"margin:0.25rem 0;width:100%\".to_string()\n            } else if i == correct_idx {\n                \"margin:0.25rem 0;width:100%;background:#28a745;color:white\"\n                    .to_string()\n            } else if selected.get() == Some(i) {\n                \"margin:0.25rem 0;width:100%;background:#dc3545;color:white\"\n                    .to_string()\n            } else {\n                \"margin:0.25rem 0;width:100%;opacity:0.6\".to_string()\n            }\n        };\n        view! {\n            < div style = \"padding:0.1rem 0\" > < button style = style on : click =\n            move | _ | on_answer(i) > { answer } </ button > </ div >\n        }\n    })\n    .collect();\nview! {\n    < div class = \"grid\" > < div >< article > < pre >< code > { code } </ code ></\n    pre > </ article > </ div > < div > < p style = \"margin-top:0\" >< strong >\n    \"What does this code do?\" </ strong ></ p > { buttons } </ div > </ div >\n}",
-    "correct": "Generates a grid of styled answer buttons based on user selections and correctness, displaying them in a web view.",
+    "code": "let source_file_index = self.lookup_source_file_idx(sp.lo());\nlet source_file = &self.files()[source_file_index];\nsource_file.is_imported()",
+    "correct": "Checks if a file is imported by looking up its index and retrieving it from files storage",
     "distractors": [
-      "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz.",
-      "Exports a collection of quiz questions in JSON format and writes them to an output file.",
-      "Generates a random permutation of an array and identifies the index of its original first element."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let total = items.len();\nlet current = RwSignal::new(0usize);\nlet score = RwSignal::new(0usize);\nlet answered = RwSignal::new(false);\nlet selected = RwSignal::new(Option::<usize>::None);\nlet shuffled: Vec<(Vec<String>, usize)> = items\n    .iter()\n    .map(|item| {\n        let all = std::iter::once(item.correct.clone())\n            .chain(item.distractors.iter().cloned())\n            .collect::<Vec<_>>();\n        shuffle_answers(all)\n    })\n    .collect();\nlet shuffled = StoredValue::new_local(shuffled);\nlet items = StoredValue::new_local(items);\nlet on_answer = move |idx: usize| {\n    if answered.get() {\n        return;\n    }\n    answered.set(true);\n    selected.set(Some(idx));\n    let q = current.get();\n    let (_, correct_idx) = shuffled.with_value(|s| (s[q].0.clone(), s[q].1));\n    if idx == correct_idx {\n        score.update(|s| *s += 1);\n    }\n};\nlet on_next = move |_| {\n    current.update(|c| *c += 1);\n    answered.set(false);\n    selected.set(None);\n};\nview! {\n    < ScoreBoard score = score.into() total = total current = current.into() /> {\n    move || { let q = current.get(); if q >= total { view! { < div > < h2 >\n    \"Quiz complete!\" </ h2 > < p > \"Final score: \" { score.get() } \" / \" { total } </\n    p > </ div > } .into_any() } else { let code = items.with_value(| it | it[q].code\n    .clone()); let (answers, correct_idx) = shuffled.with_value(| s | s[q].clone());\n    view! { < div class = \"fluid-container\" style = \"text-align: right\" > { move || {\n    if answered.get() && current.get() + 1 < total { view! { < button on : click =\n    on_next > \"Next\" </ button > } .into_any() } else { view! { < span ></ span > }\n    .into_any() } } } </ div > < QuizCard code = code answers = answers correct_idx =\n    correct_idx answered = answered.into() selected = selected.into() on_answer =\n    on_answer /> } .into_any() } } }\n}",
-    "correct": "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz.",
+    "code": "self.buffer_writer.write_all(&self.buffer)?;\nself.buffer.clear();\nOk(())",
+    "correct": "Flushes data to an underlying writer and clears a buffer.",
     "distractors": [
-      "Generates a grid of styled answer buttons based on user selections and correctness, displaying them in a web view.",
-      "Generates quiz questions with selected answers and associated distractors from a dataset.",
-      "Generates a random permutation of an array and identifies the index of its original first element."
+      "",
+      "",
+      ""
     ]
   },
   {
-    "code": "let seed = answers[0]\n    .bytes()\n    .fold(0u64, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u64));\nlet n = answers.len();\nlet mut indices: Vec<usize> = (0..n).collect();\nlet mut rng = seed;\nfor i in (1..n).rev() {\n    rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);\n    let j = (rng >> 33) as usize % (i + 1);\n    indices.swap(i, j);\n}\nlet correct_idx = indices.iter().position(|&x| x == 0).unwrap();\nlet shuffled = indices.into_iter().map(|i| answers[i].clone()).collect();\n(shuffled, correct_idx)",
-    "correct": "Generates a random permutation of an array and identifies the index of its original first element.",
+    "code": "let data = Diagnostic::from_errors_diagnostic(diag, self);\nlet result = self.emit(EmitTyped::Diagnostic(data));\nif let Err(e) = result {\n    panic!(\"failed to print diagnostics: {e:?}\");\n}",
+    "correct": "Parses errors into a diagnostic and emits them as output; panics if emission fails.",
     "distractors": [
-      "Generates a quiz interface that displays questions, tracks user selections and updates scores as they progress through the quiz.",
-      "The code selects and marks the most diverse subsets of items from a given set.",
-      "Generates quiz questions with selected answers and associated distractors from a dataset."
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "code": "let id = self.r.next_node_id();\nlet lt = Lifetime {\n    id,\n    ident: Ident::new(kw::UnderscoreLifetime, span),\n};\nself.record_lifetime_res(\n    anchor_id,\n    LifetimeRes::ElidedAnchor {\n        start: id,\n        end: id + 1,\n    },\n    LifetimeElisionCandidate::Ignore,\n);\nself.resolve_anonymous_lifetime(&lt, anchor_id, true);",
+    "correct": "The code records an elided lifetime for a node in the context of Rust's borrow checker.",
+    "distractors": [
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "code": "let commit_hash_file = self.compute_path(\"libgccjit.version\");\nlet content = fs::read_to_string(&commit_hash_file)\n    .map_err(|_| {\n        format!(\n            \"Failed to read `{}`. Take a look at `Readme.md` to see how to set up the project\",\n            commit_hash_file.display(),\n        )\n    })?;\nlet commit = content.trim();\nif commit.contains('/') || commit.contains('\\\\') {\n    return Err(\n        format!(\"{}: invalid commit hash `{}`\", commit_hash_file.display(), commit,),\n    );\n}\nOk(commit.to_string())",
+    "correct": "Extracts and validates a trimmed Git commit hash from a file, returning an error if the hash is not valid.",
+    "distractors": [
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "code": "let m128i = builder.context.new_vector_type(builder.i64_type, 2);\nlet field1 = builder.context.new_field(None, builder.u32_type, \"field1\");\nlet field2 = builder.context.new_field(None, m128i, \"field2\");\nlet field3 = builder.context.new_field(None, m128i, \"field3\");\nlet field4 = builder.context.new_field(None, m128i, \"field4\");\nlet field5 = builder.context.new_field(None, m128i, \"field5\");\nlet field6 = builder.context.new_field(None, m128i, \"field6\");\nlet field7 = builder.context.new_field(None, m128i, \"field7\");\nlet encode_type = builder\n    .context\n    .new_struct_type(\n        None,\n        \"EncodeKey128Output\",\n        &[field1, field2, field3, field4, field5, field6, field7],\n    );\n#[cfg(feature = \"master\")] encode_type.as_type().set_packed();\n(encode_type.as_type(), field1, field2)",
+    "correct": "Creates a packed struct type with six fields of different types and makes it public if the master feature is enabled.",
+    "distractors": [
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "code": "let result = self.frem(lhs, rhs);\nset_rvalue_location(self, result);\nresult",
+    "correct": "Computes a value by calling an existing function with two arguments and updates its location to be stored at 'self'.",
+    "distractors": [
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "code": "let x: F = x.to_float()?;\nlet res = x.round_to_integral(mode).value;\nlet res = self.adjust_nan(res, &[x]);\ninterp_ok(res.into())",
+    "correct": "Converts a value to float and integral rounding mode, adjusts for NaN values, interprets the result as valid.",
+    "distractors": [
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "code": "self.0.generic_visit_with(visitor);\nself.1.generic_visit_with(visitor);\nself.2.generic_visit_with(visitor);",
+    "correct": "Visits nodes of an expression tree recursively with a provided visitor.",
+    "distractors": [
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "code": "let new = self.new_scopes.start + scope.index();\ntrace!(\"mapping scope `{:?}` to `{:?}`\", scope, new);\nnew",
+    "correct": "Adds an index value to a starting point and traces mapping information for scopes",
+    "distractors": [
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "code": "let head = self.renames.unify(lhs, rhs);\nself.original[head] = self.original[rhs];\nhead",
+    "correct": "The function unifies two elements and updates references accordingly.",
+    "distractors": [
+      "",
+      "",
+      ""
     ]
   }
 ]

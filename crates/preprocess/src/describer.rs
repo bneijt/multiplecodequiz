@@ -56,7 +56,7 @@ pub async fn describe_selected_chunks(collection: &AsyncCollection) -> Result<()
             .with_field("file_path", payload.get_str("file_path").unwrap_or(""))
             .with_field("fn_name", payload.get_str("fn_name").unwrap_or(""))
             .with_field("body", body)
-            .with_field("selected", "1")
+            .with_field("selected", if description.len() > 0 { "1" } else { "0" })
             .with_field("description", description);
 
         collection.update(id, vec, updated_payload).await?;

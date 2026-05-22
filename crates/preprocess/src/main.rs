@@ -30,12 +30,16 @@ struct Args {
     min_stmts: usize,
 
     /// Maximum number of statements in a function body to include
-    #[arg(long, default_value_t = 80)]
+    #[arg(long, default_value_t = 40)]
     max_stmts: usize,
 
     /// Number of diverse chunks to select for the quiz
     #[arg(long, default_value_t = 20)]
     target: usize,
+
+    /// Number of chunks to embed
+    #[arg(long, default_value_t = 1000)]
+    embed: usize,
 }
 
 #[tokio::main]
@@ -50,7 +54,7 @@ async fn main() -> Result<()> {
         args.db
     );
     let collection = embedder::open_db(args.db.to_str().unwrap()).await?;
-    let total = embedder::embed_and_store(&collection, chunks).await?;
+    let total = embedder::embed_and_store(&collection, chunks.take(args.embed)).await?;
     if total == 0 {
         anyhow::bail!("No suitable code chunks found in the repository.");
     }
