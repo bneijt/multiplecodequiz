@@ -1,454 +1,454 @@
 {
-  "title": "Rust code from the rust project",
+  "title": "Explore Tokio's async Rust runtime capabilities.",
   "items": [
     {
-      "code": "let target_os = env::var(\"CARGO_CFG_TARGET_OS\");\nlet target_env = env::var(\"CARGO_CFG_TARGET_ENV\");\nif Ok(\"windows\") == target_os.as_deref() && Ok(\"msvc\") == target_env.as_deref() {\n    set_windows_exe_options();\n} else {\n    println!(\"cargo:rerun-if-changed=build.rs\");\n}",
-      "correct": "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
+      "code": "let t = trybuild::TestCases::new();\n#[cfg(feature = \"full\")] t.compile_fail(\"tests/fail/macros_invalid_input.rs\");\n#[cfg(all(feature = \"rt\", not(feature = \"full\")))]\nt.compile_fail(\"tests/fail/macros_core_no_default.rs\");\ndrop(t);",
+      "correct": "Evaluates different compilation failures based on feature flags.",
       "distractors": [
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
-        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust."
+        "Resets a data structure and its related components to their default states.",
+        "Creates a Guard that holds an optional Context and modifies the shared tasks of a Scheduler upon being dropped. Takes existing Tasks from SharedState and initializes them in Current when called with given arguments.",
+        "Initializes a new threaded processing system with created resources and spawning mechanism."
       ]
     },
     {
-      "code": "a.a += 10;\na.b += 2;\na",
-      "correct": "Increments a by ten and increments b by two.",
+      "code": "self.slab.clear();\nself.expired = Stack::default();\nself.wheel = Wheel::new();\nself.delay = None;",
+      "correct": "Resets a data structure and its related components to their default states.",
       "distractors": [
-        "The code checks the behavior and characteristics of various data types, including unsigned integers (u8, u16, u32, u64, u128), signed integers (i8, i16, i32, i64, i128), a character type char, boolean bool, string str, references to an owned byte slice as well as borrowed ones (&u8, &str) and slices with different lengths ([usize], [u16; 0], [u8; 42]), as well as tuple struct S (with u8 or &[bool]; 8]) and unit type D (with u8 or #[bool]; 8]).",
-        "Increments a variable by each element's value from an array.",
-        "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration."
+        "Checks if types can be sent, unpinned, or statically referenced.",
+        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads).",
+        "Creates an inner unparker from a raw pointer and then unparks it before forgetting about its memory management responsibility."
       ]
     },
     {
-      "code": "let v1 = vec![5, 6, 7];\nlet v1_iter = v1.iter();\nlet total: i32 = v1_iter.sum();\nprintln!(\"{}\", total);\ntotal",
-      "correct": "Calculates and prints out the sum of elements within a vector.",
+      "code": "let size = buffer.capacity();\nif size < INITIAL_CAPACITY {\n    buffer.reserve(INITIAL_CAPACITY - size);\n}\nSelf {\n    buffer,\n    is_readable: size > 0,\n    eof: false,\n}",
+      "correct": "Initializes a new instance with the provided capacity and read status.",
       "distractors": [
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
-        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument."
+        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
+        "Checks a condition and stores it as cached when if it's false.",
+        "Retrieves a cached item, refreshes it if necessary based on initialization comparison, or returns an error."
       ]
     },
     {
-      "code": "let result = pkd.data;\npkd.data = 42;\nresult",
-      "correct": "Assigns a value and then replaces an existing field with another value in mutable structure.",
+      "code": "let error = Some(error.into());\nself.actions.push_back(Action::ReadError(error));\nself",
+      "correct": "The code handles an internal conversion of a potentially missing value into its containing type and records it as an action to read an error if present.",
       "distractors": [
-        "Creates a mutable integer variable with an initial value of three and then assigns it to four after cloning its original state.",
-        "Calculates and prints out the sum of elements within a vector.",
-        "Generates a diagnostic message and emits it as an error if emission fails."
+        "Adds a key-value pair to an entry list and returns whether it was removed after removal from another collection based on the provided unique identifier.",
+        "Checks if there are enough messages to send; sends a message and returns success if not.",
+        "Resets a data structure and its related components to their default states."
       ]
     },
     {
-      "code": "let s8: svint8x3_t;\nlet u8: svuint8x3_t;\nlet s16: svint16x3_t;\nlet u16: svuint16x3_t;\nlet s32: svint32x3_t;\nlet u32: svuint32x3_t;\nlet s64: svint64x3_t;\nlet u64: svuint64x3_t;\nlet f32: svfloat32x3_t;\nlet f64: svfloat64x3_t;",
-      "correct": "Initializes eight 1D arrays of single, unsigned integers and floating-point numbers with three elements each in various bit sizes.",
+      "code": "use tokio::time::{self, Duration};\nlet sleep = time::sleep(Duration::from_millis(50));\ntokio::pin!(sleep);\ntokio::select! {\n    _ = time::sleep(Duration::from_millis(50)), if false => {\n    panic!(\"if condition ignored\") } _ = async { 1u32 } => {}\n}",
+      "correct": "The code snippet sets up a non-blocking sleep timer and selects between two futures: another future that ignores an 'if' clause or panics.",
       "distractors": [
-        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust.",
-        "Generates a floating-point function call for built-in mathematical operations with 16-bit extended precision arguments and returns the results as 16-bit floats.",
-        "The code checks the behavior and characteristics of various data types, including unsigned integers (u8, u16, u32, u64, u128), signed integers (i8, i16, i32, i64, i128), a character type char, boolean bool, string str, references to an owned byte slice as well as borrowed ones (&u8, &str) and slices with different lengths ([usize], [u16; 0], [u8; 42]), as well as tuple struct S (with u8 or &[bool]; 8]) and unit type D (with u8 or #[bool]; 8])."
+        "Calculates and converts a duration since an event started to milliseconds, panicking if it's in the distant past.",
+        "Pauses and then resumes time measurement twice consecutively.",
+        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads)."
       ]
     },
     {
-      "code": "let s = S;\nlet _: &dyn DynCompatible = &s;\nlet dyn_name = S::dyn_name as fn(&S) -> &str;\nlet _unused = dyn_name(&s);\nlet dyn_name_default = S::dyn_name_default as fn(&S) -> &str;\nlet _unused = dyn_name_default(&s);\nlet not_dyn_name = S::not_dyn_name as fn() -> &'static str;\nlet _unused = not_dyn_name();\nlet not_dyn_name_default = S::not_dyn_name_default as fn() -> &'static str;\nlet _unused = not_dyn_name_default();",
-      "correct": "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust.",
+      "code": "time::pause();\ntime::resume();\ntime::resume();",
+      "correct": "Pauses and then resumes time measurement twice consecutively.",
       "distractors": [
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "Evaluates a global function with an argument at runtime using dynamic lookup and context.",
-        "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration."
+        "Calculates and converts a duration since an event started to milliseconds, panicking if it's in the distant past.",
+        "Resets a data structure and its related components to their default states.",
+        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads)."
       ]
     },
     {
-      "code": "let mut n = 0;\nfor e in v {\n    n = *e;\n}\nn",
-      "correct": "Increments a variable by each element's value from an array.",
+      "code": "let (r, _) = split(RW);\nlet (_, w) = split(RW);\nr.unsplit(w);",
+      "correct": "Splits a read-write pair into separate reads and writes.",
       "distractors": [
-        "Updates a data structure with field patterns or wildcards based on an input iterator and formats the updated structure into a string representation.",
-        "Creates a mutable integer variable with an initial value of three and then assigns it to four after cloning its original state.",
-        "Collects and reverses a list of comments from an external source into its own structure."
+        "Creates and initializes two Unix domain datagrams with the given addresses.",
+        "Calculates a new bitmask for packing data with specified width and leading zeros.",
+        "The given Rust code attempts to connect a TCP stream to an available local port on the machine it is running on, wrapping this in future-like behavior with `block_on`."
       ]
     },
     {
-      "code": "let picard = 0;\nlet data = 1;\nlet worf = 2;\nlet enterprise = [picard, data, worf];\nreturn enterprise;",
-      "correct": "Constructs an array containing three integers and returns it.",
+      "code": "use nix::sys::socket::{self, AddressFamily, SockFlag, SockType};\nlet (fd_a, fd_b) = socket::socketpair(\n        AddressFamily::Unix,\n        SockType::Stream,\n        None,\n        SockFlag::empty(),\n    )\n    .expect(\"socketpair\");\nlet fds = (FileDescriptor { fd: fd_a }, FileDescriptor { fd: fd_b });\nset_nonblocking(fds.0.fd);\nset_nonblocking(fds.1.fd);\nfds",
+      "correct": "Establishes a pair of connected UNIX domain sockets and sets them to non-blocking mode.",
       "distractors": [
-        "Runs two separate functions sequentially and then prints zero.",
-        "Generates a diagnostic message and emits it as an error if emission fails.",
-        "Assigns a value and then replaces an existing field with another value in mutable structure."
+        "Checks if types can be sent, unpinned, or statically referenced.",
+        "Creates and initializes two Unix domain datagrams with the given addresses.",
+        "The code initializes a new core driver with child process handling and an orphan queue."
       ]
     },
     {
-      "code": "let no_padding1 = NoPadding1 {\n    x: (0, 1),\n    y: 2,\n    z: (3, 4, 5),\n};\nlet no_padding2 = NoPadding2 {\n    x: (6, 7),\n    y: ((8, 9), 10),\n};\nlet tuple_internal_padding = TupleInternalPadding {\n    x: (11, 12),\n    y: (13, 14),\n};\nlet struct_internal_padding = StructInternalPadding {\n    x: (15, 16),\n    y: (17, 18),\n};\nlet both_internally_padded = BothInternallyPadded {\n    x: (19, 20, 21),\n    y: (22, 23),\n};\nlet single_tuple = SingleTuple { x: (24, 25, 26) };\nlet tuple_padded_at_end = TuplePaddedAtEnd {\n    x: (27, 28),\n    y: (29, 30),\n};\nlet struct_padded_at_end = StructPaddedAtEnd {\n    x: (31, 32),\n    y: (33, 34),\n};\nlet both_padded_at_end = BothPaddedAtEnd {\n    x: (35, 36, 37),\n    y: (38, 39),\n};\nlet mixed_padding = MixedPadding {\n    x: ((40, 41, 42), (43, 44)),\n    y: (45, 46, 47, 48),\n};\nzzz();",
-      "correct": "The code snippet defines various structures with different padding strategies and creates instances of them.",
+      "code": "let (tx, rx) = mpsc::channel(size);\nlet stream = BoundedStream { recv: rx };\n(tx, stream)",
+      "correct": "Sets up a bounded message channel with sender and receiver streams.",
       "distractors": [
-        "The code checks the behavior and characteristics of various data types, including unsigned integers (u8, u16, u32, u64, u128), signed integers (i8, i16, i32, i64, i128), a character type char, boolean bool, string str, references to an owned byte slice as well as borrowed ones (&u8, &str) and slices with different lengths ([usize], [u16; 0], [u8; 42]), as well as tuple struct S (with u8 or &[bool]; 8]) and unit type D (with u8 or #[bool]; 8]).",
-        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust.",
-        "Increments reference counts for various types of references and weak pointers to shared data in Rust."
+        "Adds a key-value pair to an entry list and returns whether it was removed after removal from another collection based on the provided unique identifier.",
+        "The given Rust code attempts to connect a TCP stream to an available local port on the machine it is running on, wrapping this in future-like behavior with `block_on`.",
+        "Splits a read-write pair into separate reads and writes."
       ]
     },
     {
-      "code": "let rc = Rc::new(111);\ninc_ref_count(&rc, 10);\nlet weak_rc = Rc::downgrade(&rc);\nlet arc = Arc::new(222);\ninc_ref_count(&arc, 20);\nlet weak_arc = Arc::downgrade(&arc);\nlet dyn_rc: Rc<dyn Debug> = Rc::new(333);\ninc_ref_count(&dyn_rc, 30);\nlet dyn_rc_weak = Rc::downgrade(&dyn_rc);\nlet slice_rc: Rc<[u32]> = Rc::from(vec![1, 2, 3]);\ninc_ref_count(&slice_rc, 40);\nlet slice_rc_weak = Rc::downgrade(&slice_rc);\nlet dyn_arc: Arc<dyn Debug> = Arc::new(444);\ninc_ref_count(&dyn_arc, 50);\nlet dyn_arc_weak = Arc::downgrade(&dyn_arc);\nlet slice_arc: Arc<[u32]> = Arc::from(vec![4, 5, 6]);\ninc_ref_count(&slice_arc, 60);\nlet slice_arc_weak = Arc::downgrade(&slice_arc);\nzzz();",
-      "correct": "Increments reference counts for various types of references and weak pointers to shared data in Rust.",
+      "code": "{\n    println!(\"current thread runtime\");\n    let rt = new_current_thread();\n    let _enter = rt.enter();\n    f();\n    println!(\"current thread runtime after shutdown\");\n    rt.shutdown_timeout(Duration::from_secs(1000));\n    f();\n}\n{\n    println!(\"multi thread (1 thread) runtime\");\n    let rt = new_multi_thread(1);\n    let _enter = rt.enter();\n    f();\n    println!(\"multi thread runtime after shutdown\");\n    rt.shutdown_timeout(Duration::from_secs(1000));\n    f();\n}\n{\n    println!(\"multi thread (4 threads) runtime\");\n    let rt = new_multi_thread(4);\n    let _enter = rt.enter();\n    f();\n    println!(\"multi thread runtime after shutdown\");\n    rt.shutdown_timeout(Duration::from_secs(1000));\n    f();\n}",
+      "correct": "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads).",
       "distractors": [
-        "The code checks the behavior and characteristics of various data types, including unsigned integers (u8, u16, u32, u64, u128), signed integers (i8, i16, i32, i64, i128), a character type char, boolean bool, string str, references to an owned byte slice as well as borrowed ones (&u8, &str) and slices with different lengths ([usize], [u16; 0], [u8; 42]), as well as tuple struct S (with u8 or &[bool]; 8]) and unit type D (with u8 or #[bool]; 8]).",
-        "All the code snippets are functions that contain loops which will exit immediately upon encountering a `break` or `continue`, with some tests specifically checking for immediate termination.",
-        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust."
+        "Resets a data structure and its related components to their default states.",
+        "Initializes a new threaded processing system with created resources and spawning mechanism.",
+        "The code reads lines from standard input and writes them to standard output until an empty line is encountered."
       ]
     },
     {
-      "code": "let small = [1, 2];\nlet big = [0u8; 33];\nsmall.into_iter();\n[1, 2].into_iter();\nbig.into_iter();\n[0u8; 33].into_iter();\nBox::new(small).into_iter();\nBox::new([1, 2]).into_iter();\nBox::new(big).into_iter();\nBox::new([0u8; 33]).into_iter();\nBox::new(Box::new(small)).into_iter();\nBox::new(Box::new([1, 2])).into_iter();\nBox::new(Box::new(big)).into_iter();\nBox::new(Box::new([0u8; 33])).into_iter();\n(&[1, 2]).into_iter();\n(&small).into_iter();\n(&[0u8; 33]).into_iter();\n(&big).into_iter();\nfor _ in &[1, 2] {}\n(&small as &[_]).into_iter();\nsmall[..].into_iter();\nstd::iter::IntoIterator::into_iter(&[1, 2]);\n#[allow(array_into_iter)] [0, 1].into_iter();",
-      "correct": "The code iterates over various data structures and boxed arrays.",
+      "code": "let mut hosts = net::lookup_host(\"localhost:3000\").await?;\nlet host = hosts.next().unwrap();\nlet expected = if host.is_ipv4() {\n    SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3000)\n} else {\n    SocketAddr::new(IpAddr::V6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1)), 3000)\n};\nassert_eq!(host, expected);\nOk(())",
+      "correct": "The code checks if the host obtained from a local address lookup is IPv4 or IPv6 and asserts it matches an expected SocketAddr.",
       "distractors": [
-        "Updates a data structure with field patterns or wildcards based on an input iterator and formats the updated structure into a string representation.",
-        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position.",
-        "Initializes eight 1D arrays of single, unsigned integers and floating-point numbers with three elements each in various bit sizes."
+        "The code removes a node from the middle of a doubly-linked list and cleans up its pointers.",
+        "Copies the first four bytes of a byte slice into a buffer and checks that it is done correctly.",
+        "Initializes a structure with default starting index and pointers for linked nodes, ready slots count set to zero."
       ]
     },
     {
-      "code": "check::<u8>();\ncheck::<u16>();\ncheck::<u32>();\ncheck::<u64>();\ncheck::<u128>();\ncheck::<i8>();\ncheck::<i16>();\ncheck::<i32>();\ncheck::<i64>();\ncheck::<i128>();\ncheck::<char>();\ncheck::<bool>();\ncheck::<str>();\ncheck::<&u8>();\ncheck::<&str>();\ncheck::<[usize]>();\ncheck::<[u16; 0]>();\ncheck::<[u8; 42]>();\ncheck::<S<u8>>();\ncheck::<S<[&[bool]; 8]>>();\ncheck::<D<u8>>();\ncheck::<D<[&[bool]; 8]>>();\ncheck::<()>();\ncheck::<(i32,)>();\ncheck::<(D<u8>, D<i32>)>();",
-      "correct": "The code checks the behavior and characteristics of various data types, including unsigned integers (u8, u16, u32, u64, u128), signed integers (i8, i16, i32, i64, i128), a character type char, boolean bool, string str, references to an owned byte slice as well as borrowed ones (&u8, &str) and slices with different lengths ([usize], [u16; 0], [u8; 42]), as well as tuple struct S (with u8 or &[bool]; 8]) and unit type D (with u8 or #[bool]; 8]).",
+      "code": "let this = self.project();\nthis.npolls.fetch_add(1, SeqCst);\nthis.s.poll_next(cx)",
+      "correct": "Increments a poll count by 1 using atomic fetch-add operation and then polls for an event with context handling.",
       "distractors": [
-        "Increments reference counts for various types of references and weak pointers to shared data in Rust.",
-        "Increments a by ten and increments b by two.",
-        "All the code snippets are functions that contain loops which will exit immediately upon encountering a `break` or `continue`, with some tests specifically checking for immediate termination."
+        "Checks if a future is ready and pins it using an external crate function.",
+        "Sets position and capacity of an object to zero.",
+        "Checks if there was an error in the last write attempt and returns it; updates state based on operation type, handles pinning for busy reading or writes result back to sender. Adjusts internal buffer accordingly. Returns appropriate readiness status after handling read/write/seek operations."
       ]
     },
     {
-      "code": "let this = self;\nlet a = 1;\nthis.x",
-      "correct": "Assigns an integer to a field and then assigns that instance of another struct to itself.",
+      "code": "let srv = TcpListener::bind(\"127.0.0.1:0\").unwrap();\nlet addr = srv.local_addr().unwrap();\nblock_on(TcpStream::connect(&addr)).unwrap();",
+      "correct": "The given Rust code attempts to connect a TCP stream to an available local port on the machine it is running on, wrapping this in future-like behavior with `block_on`.",
       "distractors": [
-        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position.",
-        "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances.",
-        "Creates a new instance of `Droppable`, calls an unnamed external function with a result from invoking another non-specified method on it, and then drops (manually deallocates) the resulting value."
+        "The code reads lines from standard input and writes them to standard output until an empty line is encountered.",
+        "Creates an inner unparker from a raw pointer and then unparks it before forgetting about its memory management responsibility.",
+        "Resets a data structure and its related components to their default states."
       ]
     },
     {
-      "code": "let mut x: isize = 3;\nx.clone();\nx = 4;",
-      "correct": "Creates a mutable integer variable with an initial value of three and then assigns it to four after cloning its original state.",
+      "code": "let mut buf = [0; 6];\nlet rd: &[u8] = b\"hello world\";\nlet mut rd = rd.take(4);\nlet n = assert_ok!(rd.read(& mut buf). await);\nassert_eq!(n, 4);\nassert_eq!(& buf, & b\"hell\\0\\0\"[..]);",
+      "correct": "Copies the first four bytes of a byte slice into a buffer and checks that it is done correctly.",
       "distractors": [
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "Replaces an implementation of a trait for a struct and then calls another function with the updated structure.",
-        "Assigns a value and then replaces an existing field with another value in mutable structure."
+        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
+        "Attempts to acquire both a reader and writer lock on an existing waiter using mutex locking mechanism.",
+        "Initializes a structure with default starting index and pointers for linked nodes, ready slots count set to zero."
       ]
     },
     {
-      "code": "'test_1: while break 'test_1 {}\nwhile break {}\n'test_2: while let true = break 'test_2 {}\nwhile let true = break {}\nloop {\n    'test_3: while break 'test_3 {}\n}\nloop {\n    while break {}\n}\nloop {\n    'test_4: while break 'test_4 {}\n    break;\n}\nloop {\n    while break {}\n    break;\n}\n'test_5: while continue 'test_5 {}\nwhile continue {}\n'test_6: while let true = continue 'test_6 {}\nwhile let true = continue {}\nloop {\n    'test_7: while continue 'test_7 {}\n}\nloop {\n    while continue {}\n}\nloop {\n    'test_8: while continue 'test_8 {}\n    continue;\n}\nloop {\n    while continue {}\n    continue;\n}\n'test_9: loop {\n    break while continue 'test_9 {};\n}\nloop {\n    break while continue {};\n}",
-      "correct": "All the code snippets are functions that contain loops which will exit immediately upon encountering a `break` or `continue`, with some tests specifically checking for immediate termination.",
+      "code": "let true_when = self.true_when();\nself.driver_state.0.cached_when.store(true_when, Ordering::Relaxed);\ntrue_when",
+      "correct": "Checks a condition and stores it as cached when if it's false.",
       "distractors": [
-        "Adjusts the span of a predicate based on its kind's bounds and updates it accordingly.",
-        "Calculates and prints out the sum of elements within a vector.",
-        "Increments reference counts for various types of references and weak pointers to shared data in Rust."
+        "Calculates and converts a duration since an event started to milliseconds, panicking if it's in the distant past.",
+        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
+        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete."
       ]
     },
     {
-      "code": "let x = Droppable;\nreturn complex();\ndrop(x);",
-      "correct": "Creates a new instance of `Droppable`, calls an unnamed external function with a result from invoking another non-specified method on it, and then drops (manually deallocates) the resulting value.",
+      "code": "let dur: Duration = t\n    .checked_duration_since(self.start_time)\n    .unwrap_or_else(|| Duration::from_secs(0));\nlet ms = dur.as_millis();\nms.try_into().expect(\"Duration too far into the future\")",
+      "correct": "Calculates and converts a duration since an event started to milliseconds, panicking if it's in the distant past.",
       "distractors": [
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "Generates a nested constant definition within an annotation structure.",
-        "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances."
+        "Pauses and then resumes time measurement twice consecutively.",
+        "The code snippet sets up a non-blocking sleep timer and selects between two futures: another future that ignores an 'if' clause or panics.",
+        "Checks a condition and stores it as cached when if it's false."
       ]
     },
     {
-      "code": "foo();\nfoobar();\n0",
-      "correct": "Runs two separate functions sequentially and then prints zero.",
+      "code": "let sigchild = signal_with_handle(SignalKind::child(), park.handle())?;\nlet inner = CoreDriver {\n    sigchild,\n    orphan_queue: GlobalOrphanQueue,\n};\nOk(Self { park, inner })",
+      "correct": "The code initializes a new core driver with child process handling and an orphan queue.",
       "distractors": [
-        "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
-        "Constructs an array containing three integers and returns it.",
-        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result."
+        "Establishes a pair of connected UNIX domain sockets and sets them to non-blocking mode.",
+        "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None.",
+        "Checks if a semaphore is closed and returns early if it is, then waits for an event notification to complete."
       ]
     },
     {
-      "code": "self.finalize_pending_component();\nlet _ = write!(self.result, \"17h{hash:016x}E\");\nself.result",
-      "correct": "Updates a component's status and writes an encoded hash value to result with hex format",
+      "code": "let page_idx = addr.page();\nlet slot_idx = self.pages[page_idx].slot(addr);\nif self.cached[page_idx].init <= slot_idx {\n    self.cached[page_idx].refresh(&self.pages[page_idx]);\n}\nif self.cached[page_idx].init <= slot_idx {\n    return None;\n}\nSome(self.cached[page_idx].get(slot_idx))",
+      "correct": "Retrieves a cached item, refreshes it if necessary based on initialization comparison, or returns an error.",
       "distractors": [
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "Calculates and prints out the sum of elements within a vector.",
-        "Executes a lookup for the result of an active database transaction's cached value or retrieves it from disk if poisoned and handles errors related to cycles."
+        "Initializes a structure with default starting index and pointers for linked nodes, ready slots count set to zero.",
+        "Checks if a FIFO search is ongoing, parks or unparks workers based on their state.",
+        "The code initializes a new core driver with child process handling and an orphan queue."
       ]
     },
     {
-      "code": "let flow_inits = self.flow_inits();\nlet state = flow_inits.get();\nif state.contains(mpi) {\n    return true;\n}\nlet move_paths = &flow_inits.analysis().move_data().move_paths;\nmove_paths[mpi].find_descendant(move_paths, |mpi| state.contains(mpi)).is_some()",
-      "correct": "Checks if a specific item exists within two nested data structures and returns false if it is found.",
+      "code": "let page = unsafe { Arc::from_raw(self.page) };\npage.release(self as *const _);\npage",
+      "correct": "Transfers ownership of a Page from an owned to a shared pointer and then releases it back to raw memory after casting.",
       "distractors": [
-        "Sets eligibility and related attributes for a provider's hooks, queries, and IDs based on given parameters",
-        "Creates a mutable integer variable with an initial value of three and then assigns it to four after cloning its original state.",
-        "Registers a local variable in the current scope with its corresponding visibility and namespace."
+        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
+        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
+        "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer."
       ]
     },
     {
-      "code": "let variances = self.cx().variances_of(def_id);\nrelate_args_with_variances(self, variances, a_args, b_args)?;\nOk(a_ty)",
-      "correct": "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances.",
+      "code": "let shift = pointer_width() - self.mask.leading_zeros();\nlet mask = mask_for(width) << shift;\nPack { mask, shift }",
+      "correct": "Calculates a new bitmask for packing data with specified width and leading zeros.",
       "distractors": [
-        "Evaluates a global function with an argument at runtime using dynamic lookup and context.",
-        "Creates a new instance of `Droppable`, calls an unnamed external function with a result from invoking another non-specified method on it, and then drops (manually deallocates) the resulting value.",
-        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result."
+        "Resets a data structure and its related components to their default states.",
+        "Splits a read-write pair into separate reads and writes.",
+        "Reallocates a byte array to fit the remaining bytes and updates position. If at end, resets buffer."
       ]
     },
     {
-      "code": "let config = &self.tcx.sess.config;\ndebug!(\"check_config(config={:?}, value={:?})\", config, value);\nif config.iter().any(|&(name, _)| name == value) {\n    debug!(\"check_config: matched\");\n    return true;\n}\ndebug!(\"check_config: no match found\");\nfalse",
-      "correct": "Checks if a given configuration matches any item in the list and returns true on finding a match.",
+      "code": "if let Some(prev) = L::pointers(node).as_ref().get_prev() {\n    debug_assert_eq!(L::pointers(prev).as_ref().get_next(), Some(node));\n    L::pointers(prev).as_mut().set_next(L::pointers(node).as_ref().get_next());\n} else {\n    if self.head != Some(node) {\n        return None;\n    }\n    self.head = L::pointers(node).as_ref().get_next();\n}\nif let Some(next) = L::pointers(node).as_ref().get_next() {\n    debug_assert_eq!(L::pointers(next).as_ref().get_prev(), Some(node));\n    L::pointers(next).as_mut().set_prev(L::pointers(node).as_ref().get_prev());\n} else {\n    if self.tail != Some(node) {\n        return None;\n    }\n    self.tail = L::pointers(node).as_ref().get_prev();\n}\nL::pointers(node).as_mut().set_next(None);\nL::pointers(node).as_mut().set_prev(None);\nSome(L::from_raw(node))",
+      "correct": "The code removes a node from the middle of a doubly-linked list and cleans up its pointers.",
       "distractors": [
-        "Executes a lookup for the result of an active database transaction's cached value or retrieves it from disk if poisoned and handles errors related to cycles.",
-        "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
-        "Generates a floating-point function call for built-in mathematical operations with 16-bit extended precision arguments and returns the results as 16-bit floats."
+        "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10.",
+        "The code checks if the host obtained from a local address lookup is IPv4 or IPv6 and asserts it matches an expected SocketAddr.",
+        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete."
       ]
     },
     {
-      "code": "let (coordinator_send, coordinator_receive) = channel();\nlet no_builtins = find_attr!(tcx, crate, NoBuiltins);\nlet regular_config = ModuleConfig::new(ModuleKind::Regular, tcx, no_builtins);\nlet allocator_config = ModuleConfig::new(ModuleKind::Allocator, tcx, no_builtins);\nlet (shared_emitter, shared_emitter_main) = SharedEmitter::new();\nlet (codegen_worker_send, codegen_worker_receive) = channel();\nlet coordinator_thread = start_executing_work(\n    backend.clone(),\n    tcx,\n    shared_emitter,\n    codegen_worker_send,\n    coordinator_receive,\n    Arc::new(regular_config),\n    Arc::new(allocator_config),\n    allocator_module,\n    coordinator_send.clone(),\n);\nOngoingCodegen {\n    backend,\n    codegen_worker_receive,\n    shared_emitter_main,\n    coordinator: Coordinator {\n        sender: coordinator_send,\n        future: Some(coordinator_thread),\n        phantom: PhantomData,\n    },\n    output_filenames: Arc::clone(tcx.output_filenames(())),\n}",
-      "correct": "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules.",
+      "code": "let (a, b) = mio::net::UnixDatagram::pair()?;\nlet a = UnixDatagram::new(a)?;\nlet b = UnixDatagram::new(b)?;\nOk((a, b))",
+      "correct": "Creates and initializes two Unix domain datagrams with the given addresses.",
       "distractors": [
-        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust."
+        "Checks if types can be sent, unpinned, or statically referenced.",
+        "Splits a read-write pair into separate reads and writes.",
+        "Establishes a pair of connected UNIX domain sockets and sets them to non-blocking mode."
       ]
     },
     {
-      "code": "let mut comments = gather_comments(sm, filename, input);\ncomments.reverse();\nComments {\n    sm,\n    reversed_comments: comments,\n}",
-      "correct": "Collects and reverses a list of comments from an external source into its own structure.",
+      "code": "let unparker = Inner::from_raw(raw);\nunparker.unpark();\nmem::forget(unparker);",
+      "correct": "Creates an inner unparker from a raw pointer and then unparks it before forgetting about its memory management responsibility.",
       "distractors": [
-        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result.",
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "Updates a data structure with field patterns or wildcards based on an input iterator and formats the updated structure into a string representation."
+        "Acquires a read lock, retrieves shared state and associated immutable pointer from another instance, discards the original owner's reference.",
+        "The given Rust code attempts to connect a TCP stream to an available local port on the machine it is running on, wrapping this in future-like behavior with `block_on`.",
+        "Resets a data structure and its related components to their default states."
       ]
     },
     {
-      "code": "let mut parser = cx.new_parser_from_tts(stream);\nlet ty = parser.parse_ty()?;\nparser.expect_keyword(exp!(Is))?;\nlet start = parser.token.span;\nlet pat = if parser.eat(exp!(Bang)) {\n    parser.expect_keyword(exp!(Null))?;\n    ty_pat(TyPatKind::NotNull, start.to(parser.token.span))\n} else {\n    pat_to_ty_pat(\n        cx,\n        parser\n            .parse_pat_no_top_guard(\n                None,\n                RecoverComma::No,\n                RecoverColon::No,\n                CommaRecoveryMode::EitherTupleOrPipe,\n            )?,\n    )\n};\nif parser.token != token::Eof {\n    parser.unexpected()?;\n}\nOk((ty, Box::new(pat)))",
-      "correct": "Parses a type and pattern from input stream, handling optional negation and error checking.",
+      "code": "let dst_tail = unsafe { dst.inner.tail.unsync_load() };\nlet (steal, _) = unpack(dst.inner.head.load(Acquire));\nif dst_tail.wrapping_sub(steal) > LOCAL_QUEUE_CAPACITY as u16 / 2 {\n    return None;\n}\nlet mut n = self.steal_into2(dst, dst_tail);\nif n == 0 {\n    return None;\n}\nn -= 1;\nlet ret_pos = dst_tail.wrapping_add(n);\nlet ret_idx = ret_pos as usize & MASK;\nlet ret = dst\n    .inner\n    .buffer[ret_idx]\n    .with(|ptr| unsafe { ptr::read((*ptr).as_ptr()) });\nif n == 0 {\n    return Some(ret);\n}\ndst.inner.tail.store(dst_tail.wrapping_add(n), Release);\nSome(ret)",
+      "correct": "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer.",
       "distractors": [
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "Executes a lookup for the result of an active database transaction's cached value or retrieves it from disk if poisoned and handles errors related to cycles.",
-        "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules."
+        "Extracts upper and lower parts of a 32-bit integer from the given input number.",
+        "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None.",
+        "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10."
       ]
     },
     {
-      "code": "let span = cx.with_def_site_ctxt(span);\nlet path = cx.std_path(&[sym::intrinsics, intrinsic]);\ncx.expr_call_global(span, path, args)",
-      "correct": "Evaluates a global function with an argument at runtime using dynamic lookup and context.",
+      "code": "let real = n & u16::max_value() as u32;\nlet steal = n >> 16;\n(steal as u16, real as u16)",
+      "correct": "Extracts upper and lower parts of a 32-bit integer from the given input number.",
       "distractors": [
-        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust."
+        "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer.",
+        "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None.",
+        "Reduces a byte vector to its UTF-8 readable content based on the number of bytes read, ensuring it remains valid UTF-8."
       ]
     },
     {
-      "code": "let dir = dir.as_ref();\n#[cfg(windows)]\nfor wait in 1..11 {\n    match self.builder.tempdir_in(dir) {\n        Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {}\n        t => return t,\n    }\n    std::thread::sleep(std::time::Duration::from_millis(1 << wait));\n}\nself.builder.tempdir_in(dir)",
-      "correct": "Attempts to create a temporary directory repeatedly at increasing intervals until success or permission is denied.",
+      "code": "struct Guard<'a, P: Park> {\n    context: Option<Context>,\n    scheduler: &'a mut Inner<P>,\n}\nimpl<P: Park> Drop for Guard<'_, P> {\n    fn drop(&mut self) {\n        let Context { tasks, .. } = self.context.take().expect(\"context missing\");\n        self.scheduler.tasks = Some(tasks.into_inner());\n    }\n}\nlet tasks = scheduler.tasks.take().expect(\"invalid state\");\nlet guard = Guard {\n    context: Some(Context {\n        shared: scheduler.spawner.shared.clone(),\n        tasks: RefCell::new(tasks),\n    }),\n    scheduler,\n};\nlet context = guard.context.as_ref().unwrap();\nlet scheduler = &mut *guard.scheduler;\nCURRENT.set(context, || f(scheduler, context))",
+      "correct": "Creates a Guard that holds an optional Context and modifies the shared tasks of a Scheduler upon being dropped. Takes existing Tasks from SharedState and initializes them in Current when called with given arguments.",
       "distractors": [
-        "Registers a local variable in the current scope with its corresponding visibility and namespace.",
-        "Checks if a given configuration matches any item in the list and returns true on finding a match.",
-        "Executes a lookup for the result of an active database transaction's cached value or retrieves it from disk if poisoned and handles errors related to cycles."
+        "Reserves a parking spot for the current thread, notifies if there is work in queue after reservation, and releases resources.",
+        "Checks if types can be sent, unpinned, or statically referenced.",
+        "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10."
       ]
     },
     {
-      "code": "let predicate = &self.predicates[predicate_pos];\nlet bounds = predicate.kind.bounds();\nif bounds.len() == 1 {\n    return self.span_for_predicate_removal(predicate_pos);\n}\nlet bound_span = bounds[bound_pos].span();\nif bound_pos < bounds.len() - 1 {\n    bound_span.to(bounds[bound_pos + 1].span().shrink_to_lo())\n} else {\n    bound_span.with_lo(bounds[bound_pos - 1].span().hi())\n}",
-      "correct": "Adjusts the span of a predicate based on its kind's bounds and updates it accordingly.",
+      "code": "let mut dec = 1 << UNPARK_SHIFT;\nif is_searching {\n    dec += 1;\n}\nlet prev = State(cell.fetch_sub(dec, SeqCst));\nis_searching && prev.num_searching() == 1",
+      "correct": "Decrements the value at a specific memory location and checks if it was previously set to one.",
       "distractors": [
-        "All the code snippets are functions that contain loops which will exit immediately upon encountering a `break` or `continue`, with some tests specifically checking for immediate termination.",
-        "Registers a local variable in the current scope with its corresponding visibility and namespace.",
-        "Parses a type and pattern from input stream, handling optional negation and error checking."
+        "Checks if there are enough messages to send; sends a message and returns success if not.",
+        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
+        "Checks if there was an error in the last write attempt and returns it; updates state based on operation type, handles pinning for busy reading or writes result back to sender. Adjusts internal buffer accordingly. Returns appropriate readiness status after handling read/write/seek operations."
       ]
     },
     {
-      "code": "let mut fields: Vec<_> = (0..self.arity).map(|_| PatOrWild::Wild).collect();\nfor ipat in self.iter_fields() {\n    fields[ipat.idx] = PatOrWild::Pat(&ipat.pat);\n}\nself.ctor().fmt_fields(f, self.ty(), fields.into_iter())",
-      "correct": "Updates a data structure with field patterns or wildcards based on an input iterator and formats the updated structure into a string representation.",
+      "code": "let mut park = core.park.take().expect(\"park missing\");\n*self.core.borrow_mut() = Some(core);\nif let Some(timeout) = duration {\n    park.park_timeout(timeout).expect(\"park failed\");\n} else {\n    park.park().expect(\"park failed\");\n}\ncore = self.core.borrow_mut().take().expect(\"core missing\");\ncore.park = Some(park);\nif core.run_queue.is_stealable() {\n    self.worker.shared.notify_parked();\n}\ncore",
+      "correct": "Reserves a parking spot for the current thread, notifies if there is work in queue after reservation, and releases resources.",
       "distractors": [
-        "Collects and reverses a list of comments from an external source into its own structure.",
-        "Increments a variable by each element's value from an array.",
-        "Performs an indirect array access through a series of indexes and returns the final memory address."
+        "Creates a Guard that holds an optional Context and modifies the shared tasks of a Scheduler upon being dropped. Takes existing Tasks from SharedState and initializes them in Current when called with given arguments.",
+        "Checks if a FIFO search is ongoing, parks or unparks workers based on their state.",
+        "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer."
       ]
     },
     {
-      "code": "let words_per_row = num_words(self.num_columns);\nlet start = row.index() * words_per_row;\n(start, start + words_per_row)",
-      "correct": "Calculates and returns a range of indices for slicing an array based on column count and starting position.",
+      "code": "if self.lifo_slot.is_some() {\n    worker.shared.idle.unpark_worker_by_id(worker.index);\n    self.is_searching = true;\n    return true;\n}\nif worker.shared.idle.is_parked(worker.index) {\n    return false;\n}\nself.is_searching = true;\ntrue",
+      "correct": "Checks if a FIFO search is ongoing, parks or unparks workers based on their state.",
       "distractors": [
-        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position.",
-        "Concatenates encoded metadata and full data into a byte stream for transmission or storage.",
-        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result."
+        "Reserves a parking spot for the current thread, notifies if there is work in queue after reservation, and releases resources.",
+        "Checks if a 'flavor' field is set more than once and returns an error; parses the given string into a 'RuntimeFlavor', sets it as one of many flavors.",
+        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it."
       ]
     },
     {
-      "code": "let snapshot = self.start_snapshot();\nlet r = f(&snapshot);\nself.rollback_to(snapshot);\nr",
-      "correct": "Executes a closure with an initialized resource and rolls back to its previous state after execution",
+      "code": "let (shared, launch) = worker::create(size, parker);\nlet spawner = Spawner { shared };\nlet thread_pool = ThreadPool { spawner };\n(thread_pool, launch)",
+      "correct": "Initializes a new threaded processing system with created resources and spawning mechanism.",
       "distractors": [
-        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result.",
-        "Collects and reverses a list of comments from an external source into its own structure.",
-        "Replaces an implementation of a trait for a struct and then calls another function with the updated structure."
+        "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10.",
+        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads).",
+        "Reserves a parking spot for the current thread, notifies if there is work in queue after reservation, and releases resources."
       ]
     },
     {
-      "code": "let u = self.universe.get().next_universe();\ndebug!(\"create_next_universe {u:?}\");\nself.universe.set(u);\nu",
-      "correct": "Generates a new universe and updates to it as current universe.",
+      "code": "assert!(snapshot.is_join_interested());\nassert!(! snapshot.has_join_waker());\nunsafe {\n    trailer.set_waker(Some(waker));\n}\nlet res = header.state.set_join_waker();\nif res.is_err() {\n    unsafe {\n        trailer.set_waker(None);\n    }\n}\nres",
+      "correct": "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
       "distractors": [
-        "Performs an indirect array access through a series of indexes and returns the final memory address.",
-        "Aligns a pointer to an even address and updates its header with new alignment information.",
-        "Generates a unique identifier for an anonymous lifetime elision candidate and records it with specified bounds."
+        "Copies the first four bytes of a byte slice into a buffer and checks that it is done correctly.",
+        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
+        "Transfers ownership of a Page from an owned to a shared pointer and then releases it back to raw memory after casting."
       ]
     },
     {
-      "code": "let old = mem::replace(&mut self.outer_trait_or_trait_impl, in_trait_or_impl);\nf(self);\nself.outer_trait_or_trait_impl = old;",
-      "correct": "Replaces an implementation of a trait for a struct and then calls another function with the updated structure.",
+      "code": "const DELTA: usize = RUNNING | COMPLETE;\nlet prev = Snapshot(self.val.fetch_xor(DELTA, AcqRel));\nassert!(prev.is_running());\nassert!(! prev.is_complete());\nSnapshot(prev.0 ^ DELTA)",
+      "correct": "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
       "distractors": [
-        "Creates a mutable integer variable with an initial value of three and then assigns it to four after cloning its original state.",
-        "Executes a closure with an initialized resource and rolls back to its previous state after execution",
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input."
+        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
+        "Acquires a read lock, retrieves shared state and associated immutable pointer from another instance, discards the original owner's reference.",
+        "Checks if a 'flavor' field is set more than once and returns an error; parses the given string into a 'RuntimeFlavor', sets it as one of many flavors."
       ]
     },
     {
-      "code": "let normalized_source_len = RelativeBytePos::from_u32(normalized_source_len);\nlet source_file = SourceFile {\n    name: filename,\n    src: None,\n    src_hash,\n    checksum_hash,\n    external_src: FreezeLock::new(ExternalSource::Foreign {\n        kind: ExternalSourceKind::AbsentOk,\n        metadata_index,\n    }),\n    start_pos: BytePos(0),\n    normalized_source_len,\n    unnormalized_source_len,\n    lines: file_local_lines,\n    multibyte_chars,\n    normalized_pos,\n    stable_id,\n    cnum,\n};\nself.register_source_file(stable_id, source_file)\n    .expect(\"not enough address space for imported source file\")",
-      "correct": "Registers an external foreign source file with its properties after normalization and checks available address space.",
+      "code": "let globals = globals();\nglobals.record_event(ty as EventId);\nif globals.broadcast() { TRUE } else { FALSE }",
+      "correct": "Sets a global variable and records an event based on its type; then conditionally executes further logic depending on whether broadcasting occurs or not.",
       "distractors": [
-        "Registers a local variable in the current scope with its corresponding visibility and namespace.",
-        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
-        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust."
+        "Checks if there are enough messages to send; sends a message and returns success if not.",
+        "Checks if types can be sent, unpinned, or statically referenced.",
+        "The code initializes a new core driver with child process handling and an orphan queue."
       ]
     },
     {
-      "code": "let data = Diagnostic::from_errors_diagnostic(diag, self);\nlet result = self.emit(EmitTyped::Diagnostic(data));\nif let Err(e) = result {\n    panic!(\"failed to print diagnostics: {e:?}\");\n}",
-      "correct": "Generates a diagnostic message and emits it as an error if emission fails.",
+      "code": "let mut waiters = self.waiters.lock();\nwaiters.reader.take();\nwaiters.writer.take();",
+      "correct": "Attempts to acquire both a reader and writer lock on an existing waiter using mutex locking mechanism.",
       "distractors": [
-        "The code asserts properties of a function that checks if strings are in uppercase camel case and converts them to upper Camel Case, comparing its results against expected outcomes.",
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result."
+        "Creates a file at 'path' with content from 'contents'.",
+        "The code reads lines from standard input and writes them to standard output until an empty line is encountered.",
+        "Copies the first four bytes of a byte slice into a buffer and checks that it is done correctly."
       ]
     },
     {
-      "code": "let local_def_id = feed.key();\nlet def_id = local_def_id.to_def_id();\nlet ns = match item.kind {\n    ForeignItemKind::Fn(..) => ValueNS,\n    ForeignItemKind::Static(..) => ValueNS,\n    ForeignItemKind::TyAlias(..) => TypeNS,\n    ForeignItemKind::MacCall(..) => unreachable!(),\n};\nlet parent = self.parent_scope.module.expect_local();\nlet expansion = self.parent_scope.expansion;\nlet vis = self.resolve_visibility(&item.vis);\nself.r.define_local(parent, ident, ns, self.res(def_id), vis, item.span, expansion);\nself.r.feed_visibility(feed, vis);",
-      "correct": "Registers a local variable in the current scope with its corresponding visibility and namespace.",
+      "code": "let me = self.project();\n*me.pos = 0;\n*me.cap = 0;",
+      "correct": "Sets position and capacity of an object to zero.",
       "distractors": [
-        "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules.",
-        "Executes a visit action with different visitors on two separate nodes and directly visits another node with an additional visitor.",
-        "Adjusts the span of a predicate based on its kind's bounds and updates it accordingly."
+        "Increments a poll count by 1 using atomic fetch-add operation and then polls for an event with context handling.",
+        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
+        "Reallocates a byte array to fit the remaining bytes and updates position. If at end, resets buffer."
       ]
     },
     {
-      "code": "let id = self.r.next_node_id();\nlet lt = Lifetime {\n    id,\n    ident: Ident::new(kw::UnderscoreLifetime, span),\n};\nself.record_lifetime_res(\n    anchor_id,\n    LifetimeRes::ElidedAnchor {\n        start: id,\n        end: id + 1,\n    },\n    LifetimeElisionCandidate::Ignore,\n);\nself.resolve_anonymous_lifetime(&lt, anchor_id, true);",
-      "correct": "Generates a unique identifier for an anonymous lifetime elision candidate and records it with specified bounds.",
+      "code": "let original_len = vector.len() - num_bytes_read;\nvector.truncate(original_len);\n*output = String::from_utf8(vector).expect(\"The original data must be valid utf-8.\");",
+      "correct": "Reduces a byte vector to its UTF-8 readable content based on the number of bytes read, ensuring it remains valid UTF-8.",
       "distractors": [
-        "Executes a closure with an initialized resource and rolls back to its previous state after execution",
-        "Generates a nested constant definition within an annotation structure.",
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input."
+        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
+        "Calculates a new bitmask for packing data with specified width and leading zeros.",
+        "Extracts upper and lower parts of a 32-bit integer from the given input number."
       ]
     },
     {
-      "code": "let ib = self.ibox(INDENT_UNIT);\nself.word_space(\"const\");\nself.ann.nested(self, Nested::Body(constant.body));\nself.end(ib)",
-      "correct": "Generates a nested constant definition within an annotation structure.",
+      "code": "let n = cmp::min(self.len(), dst.remaining());\ndst.put_slice(&self.bytes()[..n]);\nself.pos += n;\nif self.pos == self.buf.len() {\n    self.buf.truncate(0);\n    self.pos = 0;\n}\nn",
+      "correct": "Reallocates a byte array to fit the remaining bytes and updates position. If at end, resets buffer.",
       "distractors": [
-        "Creates a new instance of `Droppable`, calls an unnamed external function with a result from invoking another non-specified method on it, and then drops (manually deallocates) the resulting value.",
-        "Adjusts the span of a predicate based on its kind's bounds and updates it accordingly.",
-        "Aligns a pointer to an even address and updates its header with new alignment information."
+        "Calculates a new bitmask for packing data with specified width and leading zeros.",
+        "Sets position and capacity of an object to zero.",
+        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads)."
       ]
     },
     {
-      "code": "assert!(! is_upper_camel_case(\"userData\"));\nassert_eq!(to_upper_camel_case(\"userData\"), \"UserData\");\nassert!(is_upper_camel_case(\"X86_64\"));\nassert!(! is_upper_camel_case(\"X86__64\"));\nassert_eq!(to_upper_camel_case(\"X86__64\"), \"X86_64\");\nassert!(! is_upper_camel_case(\"Abc_123\"));\nassert_eq!(to_upper_camel_case(\"Abc_123\"), \"Abc123\");\nassert!(! is_upper_camel_case(\"A1_b2_c3\"));\nassert_eq!(to_upper_camel_case(\"A1_b2_c3\"), \"A1B2C3\");\nassert!(! is_upper_camel_case(\"ONE_TWO_THREE\"));\nassert_eq!(to_upper_camel_case(\"ONE_TWO_THREE\"), \"OneTwoThree\");\nassert!(! is_upper_camel_case(\"ǇǊaaaǄooo\"));\nassert_eq!(to_upper_camel_case(\"ǇǊaaǈǊaǄooo\"), \"ǈǌaaǈǋaǅooo\");\nassert!(! is_upper_camel_case(\"ΦΙΛΟΣ_ΦΙΛΟΣ\"));\nassert_eq!(to_upper_camel_case(\"ΦΙΛΟΣ_ΦΙΛΟΣ\"), \"ΦιλοςΦιλος\");\nassert!(is_upper_camel_case(\"ΦιλοσΦιλοσ\"));",
-      "correct": "The code asserts properties of a function that checks if strings are in uppercase camel case and converts them to upper Camel Case, comparing its results against expected outcomes.",
+      "code": "let fd = self.inner.as_ref().map(AsRawFd::as_raw_fd);\nif let Some(fd) = fd {\n    let _ = self.registration.deregister(&mut SourceFd(&fd));\n}\nself.inner.take()",
+      "correct": "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None.",
       "distractors": [
-        "Generates a diagnostic message and emits it as an error if emission fails.",
-        "Sets eligibility and related attributes for a provider's hooks, queries, and IDs based on given parameters",
-        "Adjusts the span of a predicate based on its kind's bounds and updates it accordingly."
+        "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer.",
+        "Creates a file at 'path' with content from 'contents'.",
+        "The code initializes a new core driver with child process handling and an orphan queue."
       ]
     },
     {
-      "code": "self.stub_metadata.encode(s);\nlet slice = self.full();\nslice.encode(s)",
-      "correct": "Concatenates encoded metadata and full data into a byte stream for transmission or storage.",
+      "code": "if !self.inc_num_messages() {\n    return Err(SendError(message));\n}\nself.chan.send(message);\nOk(())",
+      "correct": "Checks if there are enough messages to send; sends a message and returns success if not.",
       "distractors": [
-        "Calculates and returns a range of indices for slicing an array based on column count and starting position.",
-        "Registers a local variable in the current scope with its corresponding visibility and namespace.",
-        "Generates a nested constant definition within an annotation structure."
+        "Decrements the value at a specific memory location and checks if it was previously set to one.",
+        "Checks if types can be sent, unpinned, or statically referenced.",
+        "Checks if a 'flavor' field is set more than once and returns an error; parses the given string into a 'RuntimeFlavor', sets it as one of many flavors."
       ]
     },
     {
-      "code": "let commit_hash_file = self.compute_path(\"libgccjit.version\");\nlet content = fs::read_to_string(&commit_hash_file)\n    .map_err(|_| {\n        format!(\n            \"Failed to read `{}`. Take a look at `Readme.md` to see how to set up the project\",\n            commit_hash_file.display(),\n        )\n    })?;\nlet commit = content.trim();\nif commit.contains('/') || commit.contains('\\\\') {\n    return Err(\n        format!(\"{}: invalid commit hash `{}`\", commit_hash_file.display(), commit,),\n    );\n}\nOk(commit.to_string())",
-      "correct": "Parses and validates a Git commit hash from the file, returning an error if it is not valid.",
+      "code": "let notified = self.inner.notify_rx_closed.notified();\nif self.inner.semaphore.is_closed() {\n    return;\n}\nnotified.await;",
+      "correct": "Checks if a semaphore is closed and returns early if it is, then waits for an event notification to complete.",
       "distractors": [
-        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules."
+        "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10.",
+        "Checks if a future is ready and pins it using an external crate function.",
+        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it."
       ]
     },
     {
-      "code": "let aligned = ptr.add(align - (ptr as usize & (align - 1)));\n*get_header(aligned) = Header(ptr);\naligned",
-      "correct": "Aligns a pointer to an even address and updates its header with new alignment information.",
+      "code": "self.start_index = 0;\nself.next = AtomicPtr::new(ptr::null_mut());\nself.ready_slots = AtomicUsize::new(0);",
+      "correct": "Initializes a structure with default starting index and pointers for linked nodes, ready slots count set to zero.",
       "distractors": [
-        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust.",
-        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position."
+        "Checks if a future is ready and pins it using an external crate function.",
+        "Resets a data structure and its related components to their default states.",
+        "Calculates and converts a duration since an event started to milliseconds, panicking if it's in the distant past."
       ]
     },
     {
-      "code": "let f32_type = cx.type_f32();\nlet builtin_name = match name {\n    sym::ceilf16 => \"__builtin_ceilf\",\n    sym::copysignf16 => \"__builtin_copysignf\",\n    sym::expf16 => \"expf\",\n    sym::exp2f16 => \"exp2f\",\n    sym::fabs => \"fabsf\",\n    sym::floorf16 => \"__builtin_floorf\",\n    sym::fmaf16 => \"fmaf\",\n    sym::logf16 => \"logf\",\n    sym::log2f16 => \"log2f\",\n    sym::log10f16 => \"log10f\",\n    sym::powf16 => \"__builtin_powf\",\n    sym::roundf16 => \"__builtin_roundf\",\n    sym::round_ties_even_f16 => \"__builtin_rintf\",\n    sym::sqrtf16 => \"__builtin_sqrtf\",\n    sym::truncf16 => \"__builtin_truncf\",\n    _ => unreachable!(),\n};\nlet func = cx.context.get_builtin_function(builtin_name);\nlet args: Vec<_> = args\n    .iter()\n    .map(|arg| cx.context.new_cast(None, arg.immediate(), f32_type))\n    .collect();\nlet result = cx.context.new_call(None, func, &args);\ncx.context.new_cast(None, result, cx.type_f16())",
-      "correct": "Generates a floating-point function call for built-in mathematical operations with 16-bit extended precision arguments and returns the results as 16-bit floats.",
+      "code": "let fut = self.get_mut().tx.closed();\ncrate::pin!(fut);\nReady(fut.poll(cx).is_ready())",
+      "correct": "Checks if a future is ready and pins it using an external crate function.",
       "distractors": [
-        "Initializes eight 1D arrays of single, unsigned integers and floating-point numbers with three elements each in various bit sizes.",
-        "Checks if a given configuration matches any item in the list and returns true on finding a match.",
-        "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules."
+        "Increments a poll count by 1 using atomic fetch-add operation and then polls for an event with context handling.",
+        "Initializes a structure with default starting index and pointers for linked nodes, ready slots count set to zero.",
+        "Checks if a semaphore is closed and returns early if it is, then waits for an event notification to complete."
       ]
     },
     {
-      "code": "let typ = a.get_type().to_signed(self);\nlet b = self.gcc_int_cast(b, typ);\nself.assign_to_var(self.gcc_sdiv(a, b))",
-      "correct": "Performs integer division and assigns result to variable 'b' after converting type of numerator.",
+      "code": "let mut b = loom::model::Builder::new();\nb.preemption_bound = Some(1);\nb.check(|| {\n    let semaphore = Arc::new(Semaphore::new(10));\n    let active = Arc::new(AtomicUsize::new(0));\n    let mut ths = vec![];\n    for _ in 0..2 {\n        let semaphore = semaphore.clone();\n        let active = active.clone();\n        ths.push(\n            thread::spawn(move || {\n                for n in &[4, 10, 8] {\n                    block_on(semaphore.acquire(*n)).unwrap();\n                    active.fetch_add(*n as usize, SeqCst);\n                    let num_active = active.load(SeqCst);\n                    assert!(num_active <= 10);\n                    thread::yield_now();\n                    active.fetch_sub(*n as usize, SeqCst);\n                    semaphore.release(*n as usize);\n                }\n            }),\n        );\n    }\n    for th in ths.into_iter() {\n        th.join().unwrap();\n    }\n    assert_eq!(10, semaphore.available_permits());\n});",
+      "correct": "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10.",
       "distractors": [
-        "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances.",
-        "Parses and validates a Git commit hash from the file, returning an error if it is not valid.",
-        "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules."
+        "Initializes a new threaded processing system with created resources and spawning mechanism.",
+        "Checks if a semaphore is closed and returns early if it is, then waits for an event notification to complete.",
+        "The code removes a node from the middle of a doubly-linked list and cleans up its pointers."
       ]
     },
     {
-      "code": "let result = self.frem(lhs, rhs);\nset_rvalue_location(self, result);\nresult",
-      "correct": "Calculates a value and updates an object's location attribute with that calculated value",
+      "code": "let data = f(&*this) as *const U;\nlet s = this.s;\nmem::forget(this);\nRwLockReadGuard {\n    s,\n    data,\n    marker: marker::PhantomData,\n}",
+      "correct": "Acquires a read lock, retrieves shared state and associated immutable pointer from another instance, discards the original owner's reference.",
       "distractors": [
-        "Performs an indirect array access through a series of indexes and returns the final memory address.",
-        "Executes a visit action with different visitors on two separate nodes and directly visits another node with an additional visitor.",
-        "Executes a closure with an initialized resource and rolls back to its previous state after execution"
+        "Creates an inner unparker from a raw pointer and then unparks it before forgetting about its memory management responsibility.",
+        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
+        "Creates a Guard that holds an optional Context and modifies the shared tasks of a Scheduler upon being dropped. Takes existing Tasks from SharedState and initializes them in Current when called with given arguments."
       ]
     },
     {
-      "code": "let ptr = self.context.new_cast(self.location, ptr, typ.make_pointer());\nlet mut indices = indices.iter();\nlet index = indices.next().expect(\"first index in inbounds_gep\");\nlet mut result = self.context.new_array_access(self.location, ptr, *index);\nfor index in indices {\n    result = self.context.new_array_access(self.location, result, *index);\n}\nresult.get_address(self.location)",
-      "correct": "Performs an indirect array access through a series of indexes and returns the final memory address.",
+      "code": "fn check_send<T: Send>() {}\nfn check_unpin<T: Unpin>() {}\nfn check_send_sync_val<T: Send + Sync>(_t: T) {}\nfn check_send_sync<T: Send + Sync>() {}\nfn check_static<T: 'static>() {}\nfn check_static_val<T: 'static>(_t: T) {}\ncheck_send::<MutexGuard<'_, u32>>();\ncheck_send::<OwnedMutexGuard<u32>>();\ncheck_unpin::<Mutex<u32>>();\ncheck_send_sync::<Mutex<u32>>();\ncheck_static::<OwnedMutexGuard<u32>>();\nlet mutex = Mutex::new(1);\ncheck_send_sync_val(mutex.lock());\nlet arc_mutex = Arc::new(Mutex::new(1));\ncheck_send_sync_val(arc_mutex.clone().lock_owned());\ncheck_static_val(arc_mutex.lock_owned());",
+      "correct": "Checks if types can be sent, unpinned, or statically referenced.",
       "distractors": [
-        "Calculates a value and updates an object's location attribute with that calculated value",
-        "Updates a data structure with field patterns or wildcards based on an input iterator and formats the updated structure into a string representation.",
-        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position."
+        "Creates and initializes two Unix domain datagrams with the given addresses.",
+        "Establishes a pair of connected UNIX domain sockets and sets them to non-blocking mode.",
+        "Resets a data structure and its related components to their default states."
       ]
     },
     {
-      "code": "let query_blocked_prof_timer = tcx.prof.query_blocked();\nlet result = latch.wait_on(tcx, current, span);\nmatch result {\n    Ok(()) => {\n        let Some((v, index)) = query.cache.lookup(&key) else {\n            outline(|| {\n                let shard = query.state.active.lock_shard_by_hash(key_hash);\n                match shard.find(key_hash, equivalent_key(key)) {\n                    Some((_, ActiveKeyStatus::Poisoned)) => FatalError.raise(),\n                    _ => {\n                        panic!(\n                            \"query '{}' result must be in the cache or the query must be poisoned after a wait\",\n                            query.name\n                        )\n                    }\n                }\n            })\n        };\n        tcx.prof.query_cache_hit(index.into());\n        query_blocked_prof_timer.finish_with_query_invocation_id(index.into());\n        (v, Some(index))\n    }\n    Err(cycle) => (handle_cycle(query, tcx, key, cycle), None),\n}",
-      "correct": "Executes a lookup for the result of an active database transaction's cached value or retrieves it from disk if poisoned and handles errors related to cycles.",
+      "code": "if let Some(e) = self.last_write_err.take() {\n    return Ready(Err(e.into()));\n}\nlet (op, buf) = match self.state {\n    Idle(_) => return Ready(Ok(())),\n    Busy(ref mut rx) => ready!(Pin::new(rx).poll(cx))?,\n};\nself.state = Idle(Some(buf));\nmatch op {\n    Operation::Read(_) => Ready(Ok(())),\n    Operation::Write(res) => Ready(res),\n    Operation::Seek(_) => Ready(Ok(())),\n}",
+      "correct": "Checks if there was an error in the last write attempt and returns it; updates state based on operation type, handles pinning for busy reading or writes result back to sender. Adjusts internal buffer accordingly. Returns appropriate readiness status after handling read/write/seek operations.",
       "distractors": [
-        "Parses a type and pattern from input stream, handling optional negation and error checking.",
-        "Checks if a given configuration matches any item in the list and returns true on finding a match.",
-        "Updates a component's status and writes an encoded hash value to result with hex format"
+        "Checks if types can be sent, unpinned, or statically referenced.",
+        "Decrements the value at a specific memory location and checks if it was previously set to one.",
+        "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None."
       ]
     },
     {
-      "code": "let res = self.float_round::<F>(self.read_scalar(&args[0])?, mode)?;\nself.write_scalar(res, dest)?;\ninterp_ok(())",
-      "correct": "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result.",
+      "code": "let path = path.as_ref().to_owned();\nlet contents = contents.as_ref().to_owned();\nasyncify(move || std::fs::write(path, contents)).await",
+      "correct": "Creates a file at 'path' with content from 'contents'.",
       "distractors": [
-        "Collects and reverses a list of comments from an external source into its own structure.",
-        "Executes a closure with an initialized resource and rolls back to its previous state after execution",
-        "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances."
+        "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None.",
+        "Attempts to acquire both a reader and writer lock on an existing waiter using mutex locking mechanism.",
+        "Transfers ownership of a Page from an owned to a shared pointer and then releases it back to raw memory after casting."
       ]
     },
     {
-      "code": "try_visit!(self.0.visit_with(visitor));\ntry_visit!(self.1.visit_with(visitor));\nself.2.visit_with(visitor)",
-      "correct": "Executes a visit action with different visitors on two separate nodes and directly visits another node with an additional visitor.",
+      "code": "if self.flavor.is_some() {\n    return Err(syn::Error::new(span, \"`flavor` set multiple times.\"));\n}\nlet runtime_str = parse_string(runtime, span, \"flavor\")?;\nlet runtime = RuntimeFlavor::from_str(&runtime_str)\n    .map_err(|err| syn::Error::new(span, err))?;\nself.flavor = Some(runtime);\nOk(())",
+      "correct": "Checks if a 'flavor' field is set more than once and returns an error; parses the given string into a 'RuntimeFlavor', sets it as one of many flavors.",
       "distractors": [
-        "Registers a local variable in the current scope with its corresponding visibility and namespace.",
-        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position.",
-        "Executes a closure with an initialized resource and rolls back to its previous state after execution"
+        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
+        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
+        "Checks if there are enough messages to send; sends a message and returns success if not."
       ]
     },
     {
-      "code": "let index = self.insert_unique(ty, Value::Opaque);\nself.evaluated[index] = Some(None);\nindex",
-      "correct": "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position.",
+      "code": "let ret = self.remove(&k);\nself.entries.push((k, stream));\nret",
+      "correct": "Adds a key-value pair to an entry list and returns whether it was removed after removal from another collection based on the provided unique identifier.",
       "distractors": [
-        "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances.",
-        "Calculates and returns a range of indices for slicing an array based on column count and starting position.",
-        "Executes a visit action with different visitors on two separate nodes and directly visits another node with an additional visitor."
+        "Sets up a bounded message channel with sender and receiver streams.",
+        "The code handles an internal conversion of a potentially missing value into its containing type and records it as an action to read an error if present.",
+        "Splits a read-write pair into separate reads and writes."
       ]
     },
     {
-      "code": "providers.hooks.is_eligible_for_coverage = is_eligible_for_coverage;\nproviders.queries.coverage_attr_on = coverage_attr_on;\nproviders.queries.coverage_ids_info = coverage_ids_info;",
-      "correct": "Sets eligibility and related attributes for a provider's hooks, queries, and IDs based on given parameters",
+      "code": "let stdin = io::stdin();\nlet mut stdout = io::stdout();\nlet mut line = String::new();\nloop {\n    line.clear();\n    stdin.read_line(&mut line).unwrap();\n    if line.is_empty() {\n        break;\n    }\n    stdout.write_all(line.as_bytes()).unwrap();\n}\nstdout.flush().unwrap();",
+      "correct": "The code reads lines from standard input and writes them to standard output until an empty line is encountered.",
       "distractors": [
-        "Checks if a specific item exists within two nested data structures and returns false if it is found.",
-        "The code asserts properties of a function that checks if strings are in uppercase camel case and converts them to upper Camel Case, comparing its results against expected outcomes.",
-        "Concatenates encoded metadata and full data into a byte stream for transmission or storage."
+        "The given Rust code attempts to connect a TCP stream to an available local port on the machine it is running on, wrapping this in future-like behavior with `block_on`.",
+        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads).",
+        "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer."
       ]
     }
   ]
