@@ -1,454 +1,454 @@
 {
-  "title": "Explore Tokio's async Rust runtime capabilities.",
+  "title": "Try installing and running Zed on your device using package managers.",
   "items": [
     {
-      "code": "let t = trybuild::TestCases::new();\n#[cfg(feature = \"full\")] t.compile_fail(\"tests/fail/macros_invalid_input.rs\");\n#[cfg(all(feature = \"rt\", not(feature = \"full\")))]\nt.compile_fail(\"tests/fail/macros_core_no_default.rs\");\ndrop(t);",
-      "correct": "Evaluates different compilation failures based on feature flags.",
+      "code": "let server_path = if let Some(path) = worktree.which(BINARY_NAME) {\n    return Ok(zed::Command {\n        command: path,\n        args: vec![\"--stdio\".to_string()],\n        env: Default::default(),\n    });\n} else {\n    let server_path = self.server_script_path(language_server_id)?;\n    env::current_dir().unwrap().join(&server_path).to_string_lossy().to_string()\n};\nself.cached_binary_path = Some(server_path.clone());\nOk(zed::Command {\n    command: zed::node_binary_path()?,\n    args: vec![server_path, \"--stdio\".to_string()],\n    env: Default::default(),\n})",
+      "correct": "Checks for the presence of a binary in worktree and either returns its path or constructs an environment variable to run another script with language server ID. Then caches this new binary's path and creates command using it.",
       "distractors": [
-        "Resets a data structure and its related components to their default states.",
-        "Creates a Guard that holds an optional Context and modifies the shared tasks of a Scheduler upon being dropped. Takes existing Tasks from SharedState and initializes them in Current when called with given arguments.",
-        "Initializes a new threaded processing system with created resources and spawning mechanism."
+        "Generates a Git command to find the previous commit hash of a specified tag and outputs it for further processing.",
+        "Prepares and returns a session task or an error if loading sessions are unsupported.",
+        "Creates a JSON object from parsed keys and values along the specified path, handling nulls and nested structures."
       ]
     },
     {
-      "code": "self.slab.clear();\nself.expired = Stack::default();\nself.wheel = Wheel::new();\nself.delay = None;",
-      "correct": "Resets a data structure and its related components to their default states.",
+      "code": "let without_newlines = detail\n    .replace(\"->\\n  \", \"-> \")\n    .replace(\"\\n  \", \"\")\n    .replace(\",\\n\", \"\");\nlet comma_delimited_parts = without_newlines.split(',');\ncomma_delimited_parts.map(|part| part.trim()).collect::<Vec<_>>().join(\", \")",
+      "correct": "Converts multi-line string to a single line, removing certain characters and joining trimmed parts with commas.",
       "distractors": [
-        "Checks if types can be sent, unpinned, or statically referenced.",
-        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads).",
-        "Creates an inner unparker from a raw pointer and then unparks it before forgetting about its memory management responsibility."
+        "Formats a string representing the range from `start` to `end`, adding one for Rust's zero-indexing.",
+        "Updates the function body to print \"world\" instead of \"hello\".",
+        "Extracts the outline structure of JavaScript functions in provided text."
       ]
     },
     {
-      "code": "let size = buffer.capacity();\nif size < INITIAL_CAPACITY {\n    buffer.reserve(INITIAL_CAPACITY - size);\n}\nSelf {\n    buffer,\n    is_readable: size > 0,\n    eof: false,\n}",
-      "correct": "Initializes a new instance with the provided capacity and read status.",
+      "code": "let os = match std::env::consts::OS {\n    \"macos\" => \"mac\",\n    \"linux\" => \"linux\",\n    \"windows\" => \"win\",\n    other => bail!(\"unsupported host OS: {other}\"),\n};\nlet arch = match std::env::consts::ARCH {\n    \"aarch64\" => \"arm64\",\n    \"x86_64\" => \"x64\",\n    other => bail!(\"unsupported host arch: {other}\"),\n};\nOk(format!(\"{os}-{arch}-release\"))",
+      "correct": "Generates a string representing the OS and architecture combination in release format.",
       "distractors": [
-        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
-        "Checks a condition and stores it as cached when if it's false.",
-        "Retrieves a cached item, refreshes it if necessary based on initialization comparison, or returns an error."
+        "Resets the title bar visibility of a window on macOS version 10.14 or later to be transparent by using an OS-level API call in Rust.",
+        "Checks for the presence of a binary in worktree and either returns its path or constructs an environment variable to run another script with language server ID. Then caches this new binary's path and creates command using it.",
+        "Generates a Git command to find the previous commit hash of a specified tag and outputs it for further processing."
       ]
     },
     {
-      "code": "let error = Some(error.into());\nself.actions.push_back(Action::ReadError(error));\nself",
-      "correct": "The code handles an internal conversion of a potentially missing value into its containing type and records it as an action to read an error if present.",
+      "code": "let step = named::bash(\n        formatdoc! {\n            r#\"\n        PREV_COMMIT=$(git rev-parse \"{ROLLOUT_TAG_NAME}^{{commit}}\" 2>/dev/null || echo \"\")\n        if [ -z \"$PREV_COMMIT\" ]; then\n            echo \"::error::No previous rollout tag '{ROLLOUT_TAG_NAME}' found. Cannot determine file changes.\"\n            exit 1\n        fi\n        echo \"Found previous rollout at commit: $PREV_COMMIT\"\n        echo \"prev_commit=$PREV_COMMIT\" >> \"$GITHUB_OUTPUT\"\n    \"#\n        },\n    )\n    .id(\"prev-tag\");\nlet step_output = StepOutput::new(&step, \"prev_commit\");\n(step, step_output)",
+      "correct": "Generates a Git command to find the previous commit hash of a specified tag and outputs it for further processing.",
       "distractors": [
-        "Adds a key-value pair to an entry list and returns whether it was removed after removal from another collection based on the provided unique identifier.",
-        "Checks if there are enough messages to send; sends a message and returns success if not.",
-        "Resets a data structure and its related components to their default states."
+        "Determines microphone muting state and notifies listeners, playing mute or unmute sound accordingly.",
+        "Checks for the presence of a binary in worktree and either returns its path or constructs an environment variable to run another script with language server ID. Then caches this new binary's path and creates command using it.",
+        "Generates a string representing the OS and architecture combination in release format."
       ]
     },
     {
-      "code": "use tokio::time::{self, Duration};\nlet sleep = time::sleep(Duration::from_millis(50));\ntokio::pin!(sleep);\ntokio::select! {\n    _ = time::sleep(Duration::from_millis(50)), if false => {\n    panic!(\"if condition ignored\") } _ = async { 1u32 } => {}\n}",
-      "correct": "The code snippet sets up a non-blocking sleep timer and selects between two futures: another future that ignores an 'if' clause or panics.",
+      "code": "let query = graph_ql::build_commit_metadata_query(\n    repo.owner.as_ref(),\n    repo.name.as_ref(),\n    commit_shas.iter().copied(),\n);\nlet query = serde_json::json!({ \"query\" : query });\nself.graphql::<graph_ql::CommitMetadataResponse>(&query)\n    .await\n    .map(|response| response.repository)",
+      "correct": "Executes a GraphQL request to retrieve metadata for commits in the given repository and parses the JSON-encoded results into Rust data structures.",
       "distractors": [
-        "Calculates and converts a duration since an event started to milliseconds, panicking if it's in the distant past.",
-        "Pauses and then resumes time measurement twice consecutively.",
-        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads)."
+        "Executes an asynchronous web search with the provided parameters in a background task.",
+        "Generates and encodes a JWT token with provided claims if the room_join grant is present but identity is missing.",
+        "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters."
       ]
     },
     {
-      "code": "time::pause();\ntime::resume();\ntime::resume();",
-      "correct": "Pauses and then resumes time measurement twice consecutively.",
+      "code": "let line = format!(\n    \"abc123{d}Author Name{d}author@email.com{d}Some title\", d =\n    CommitDetails::FIELD_DELIMITER\n);\nlet body = indoc! {\n    \"\n        Co-authored-by: Alice Smith <alice@example.com>\n        Co-authored-by: Bob Jones <bob@example.com>\n    \"\n};\nlet commit = CommitDetails::parse(&line, body).unwrap();\nlet co_authors = commit.co_authors().unwrap();\nassert_eq!(co_authors.len(), 2);\nassert_eq!(co_authors[0], Committer::new(\"Alice Smith\", \"alice@example.com\"));\nassert_eq!(co_authors[1], Committer::new(\"Bob Jones\", \"bob@example.com\"));",
+      "correct": "Extracts and validates co-authors from a formatted commit line.",
       "distractors": [
-        "Calculates and converts a duration since an event started to milliseconds, panicking if it's in the distant past.",
-        "Resets a data structure and its related components to their default states.",
-        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads)."
+        "Initializes and sets up a global tracer with Tracy-specific configuration.",
+        "Updates the function body to print \"world\" instead of \"hello\".",
+        "Formats a string representing the range from `start` to `end`, adding one for Rust's zero-indexing."
       ]
     },
     {
-      "code": "let (r, _) = split(RW);\nlet (_, w) = split(RW);\nr.unsplit(w);",
-      "correct": "Splits a read-write pair into separate reads and writes.",
+      "code": "let comments = self\n    .github_client\n    .get_pull_request_comments(&Repository::ZED, pull_request.number)\n    .await?;\nlet qualifying_comments = comments\n    .into_iter()\n    .filter(|comment| Self::is_qualifying_approval(comment, pull_request))\n    .collect_vec();\nOk(\n    qualifying_comments\n        .is_empty()\n        .not()\n        .then_some(ReviewSuccess::ApprovingComment(qualifying_comments)),\n)",
+      "correct": "Determines if a GitHub pull request contains any approving comments and returns success status based on that.",
       "distractors": [
-        "Creates and initializes two Unix domain datagrams with the given addresses.",
-        "Calculates a new bitmask for packing data with specified width and leading zeros.",
-        "The given Rust code attempts to connect a TCP stream to an available local port on the machine it is running on, wrapping this in future-like behavior with `block_on`."
+        "Prepares and returns a session task or an error if loading sessions are unsupported.",
+        "Converts a string to Windows PowerShell format with appropriate quoting and escaping.",
+        "Updates the current message phase, converts it to a string if not None and returns an empty vector when there are no reasons for reasoning."
       ]
     },
     {
-      "code": "use nix::sys::socket::{self, AddressFamily, SockFlag, SockType};\nlet (fd_a, fd_b) = socket::socketpair(\n        AddressFamily::Unix,\n        SockType::Stream,\n        None,\n        SockFlag::empty(),\n    )\n    .expect(\"socketpair\");\nlet fds = (FileDescriptor { fd: fd_a }, FileDescriptor { fd: fd_b });\nset_nonblocking(fds.0.fd);\nset_nonblocking(fds.1.fd);\nfds",
-      "correct": "Establishes a pair of connected UNIX domain sockets and sets them to non-blocking mode.",
+      "code": "self.pages.clear();\nself.navbar_entries.clear();\nself.navbar_focus_subscriptions.clear();\nself.content_handles.clear();\nself.build_ui(window, cx);\nself.build_search_index();",
+      "correct": "Resets navigation and UI components and updates user interface.",
       "distractors": [
-        "Checks if types can be sent, unpinned, or statically referenced.",
-        "Creates and initializes two Unix domain datagrams with the given addresses.",
-        "The code initializes a new core driver with child process handling and an orphan queue."
+        "The function selects a new channel's leading peer for following and unfollows the current leader from it.",
+        "Sets a selected cell's index and optionally jumps to that cell if specified by the user.",
+        "Executes an asynchronous web search with the provided parameters in a background task."
       ]
     },
     {
-      "code": "let (tx, rx) = mpsc::channel(size);\nlet stream = BoundedStream { recv: rx };\n(tx, stream)",
-      "correct": "Sets up a bounded message channel with sender and receiver streams.",
+      "code": "let mut id = id.trim();\nif id.starts_with(\"0x\") || id.starts_with(\"0X\") {\n    id = &id[2..];\n}\nlet is_hex_string = id.chars().all(|c| c.is_ascii_hexdigit());\nlet is_4_chars = id.len() == 4;\nanyhow::ensure!(\n    is_4_chars && is_hex_string, \"Expected a 4 digit PCI ID in hexadecimal format\"\n);\nu32::from_str_radix(id, 16).context(\"parsing PCI ID as hex\")",
+      "correct": "Parses and validates that the provided string meets specific criteria to represent a four-character-long hexadecimal identifier.",
       "distractors": [
-        "Adds a key-value pair to an entry list and returns whether it was removed after removal from another collection based on the provided unique identifier.",
-        "The given Rust code attempts to connect a TCP stream to an available local port on the machine it is running on, wrapping this in future-like behavior with `block_on`.",
-        "Splits a read-write pair into separate reads and writes."
+        "Terminates a process with its PID using SIGKILL signal.",
+        "Parses an HTML string into a DOM structure with specified parsing options.",
+        "Generates a PNG image with solid colors based on the x and y coordinates."
       ]
     },
     {
-      "code": "{\n    println!(\"current thread runtime\");\n    let rt = new_current_thread();\n    let _enter = rt.enter();\n    f();\n    println!(\"current thread runtime after shutdown\");\n    rt.shutdown_timeout(Duration::from_secs(1000));\n    f();\n}\n{\n    println!(\"multi thread (1 thread) runtime\");\n    let rt = new_multi_thread(1);\n    let _enter = rt.enter();\n    f();\n    println!(\"multi thread runtime after shutdown\");\n    rt.shutdown_timeout(Duration::from_secs(1000));\n    f();\n}\n{\n    println!(\"multi thread (4 threads) runtime\");\n    let rt = new_multi_thread(4);\n    let _enter = rt.enter();\n    f();\n    println!(\"multi thread runtime after shutdown\");\n    rt.shutdown_timeout(Duration::from_secs(1000));\n    f();\n}",
-      "correct": "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads).",
+      "code": "let tex_info = self.atlas.get_texture_info(texture_id);\nlet data = unsafe { Self::instance_bytes(sprites) };\nself.draw_instances_with_texture(\n    data,\n    sprites.len() as u32,\n    &tex_info.view,\n    &self.resources().pipelines.mono_sprites,\n    instance_offset,\n    pass,\n)",
+      "correct": "Executes drawing of sprite instances using a specific texture and resources.",
       "distractors": [
-        "Resets a data structure and its related components to their default states.",
-        "Initializes a new threaded processing system with created resources and spawning mechanism.",
-        "The code reads lines from standard input and writes them to standard output until an empty line is encountered."
+        "Checks if an action belongs to a hidden type or namespace and returns true if it does, otherwise checks for shown types before returning early.",
+        "Terminates a process with its PID using SIGKILL signal.",
+        "Resets the title bar visibility of a window on macOS version 10.14 or later to be transparent by using an OS-level API call in Rust."
       ]
     },
     {
-      "code": "let mut hosts = net::lookup_host(\"localhost:3000\").await?;\nlet host = hosts.next().unwrap();\nlet expected = if host.is_ipv4() {\n    SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3000)\n} else {\n    SocketAddr::new(IpAddr::V6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1)), 3000)\n};\nassert_eq!(host, expected);\nOk(())",
-      "correct": "The code checks if the host obtained from a local address lookup is IPv4 or IPv6 and asserts it matches an expected SocketAddr.",
+      "code": "let candidate_properties = candidates\n    .iter()\n    .map(|font_id| {\n        let database_id = state.loaded_font(*font_id).font.id();\n        let face_info = state\n            .font_system\n            .db()\n            .face(database_id)\n            .context(\"font face not found in database\")?;\n        Ok(face_info_into_properties(face_info))\n    })\n    .collect::<Result<SmallVec<[_; 4]>>>()?;\nlet ix = font_kit::matching::find_best_match(\n        &candidate_properties,\n        &font_into_properties(font),\n    )\n    .context(\n        \"requested font family contains no font matching the other parameters\",\n    )?;\nOk(ix)",
+      "correct": "The code attempts to match a requested font with available candidates based on certain criteria and returns an index of the best-matching candidate.",
       "distractors": [
-        "The code removes a node from the middle of a doubly-linked list and cleans up its pointers.",
-        "Copies the first four bytes of a byte slice into a buffer and checks that it is done correctly.",
-        "Initializes a structure with default starting index and pointers for linked nodes, ready slots count set to zero."
+        "Returns the temperature from a matched global settings object or returns None if no match is found.",
+        "The code searches for a specific file path within two project directories and asserts the found paths match expected Unix-style relative paths.",
+        "Compares the computed maximum column width against an expected value and asserts they are nearly equal."
       ]
     },
     {
-      "code": "let this = self.project();\nthis.npolls.fetch_add(1, SeqCst);\nthis.s.poll_next(cx)",
-      "correct": "Increments a poll count by 1 using atomic fetch-add operation and then polls for an event with context handling.",
+      "code": "self.signoff_enabled = value;\nself.serialize(cx);\ncx.notify();",
+      "correct": "Sets a flag and serializes an object before notifying another component about it.",
       "distractors": [
-        "Checks if a future is ready and pins it using an external crate function.",
-        "Sets position and capacity of an object to zero.",
-        "Checks if there was an error in the last write attempt and returns it; updates state based on operation type, handles pinning for busy reading or writes result back to sender. Adjusts internal buffer accordingly. Returns appropriate readiness status after handling read/write/seek operations."
+        "Sets a selected cell's index and optionally jumps to that cell if specified by the user.",
+        "Determines microphone muting state and notifies listeners, playing mute or unmute sound accordingly.",
+        "Sets a new global application theme and refreshes all windows to apply it."
       ]
     },
     {
-      "code": "let srv = TcpListener::bind(\"127.0.0.1:0\").unwrap();\nlet addr = srv.local_addr().unwrap();\nblock_on(TcpStream::connect(&addr)).unwrap();",
-      "correct": "The given Rust code attempts to connect a TCP stream to an available local port on the machine it is running on, wrapping this in future-like behavior with `block_on`.",
+      "code": "let old = *self;\nself.0 = self.0.saturating_add(1);\nold",
+      "correct": "Increments a borrowable field by 1 using saturating addition and stores it back in place of an original variable.",
       "distractors": [
-        "The code reads lines from standard input and writes them to standard output until an empty line is encountered.",
-        "Creates an inner unparker from a raw pointer and then unparks it before forgetting about its memory management responsibility.",
-        "Resets a data structure and its related components to their default states."
+        "Reverses a string and stores its characters in reverse order using an internal collection.",
+        "Updates the current message phase, converts it to a string if not None and returns an empty vector when there are no reasons for reasoning.",
+        "Calculates a seek aggregation for an output based on provided end position and returns it as part of a state machine's internal processing flow."
       ]
     },
     {
-      "code": "let mut buf = [0; 6];\nlet rd: &[u8] = b\"hello world\";\nlet mut rd = rd.take(4);\nlet n = assert_ok!(rd.read(& mut buf). await);\nassert_eq!(n, 4);\nassert_eq!(& buf, & b\"hell\\0\\0\"[..]);",
-      "correct": "Copies the first four bytes of a byte slice into a buffer and checks that it is done correctly.",
+      "code": "self.stop().log_err();\nstd::mem::forget(self.display_link.take());\nself.frame_requests.cancel();",
+      "correct": "Cancels a frame request and logs an error after stopping another operation.",
       "distractors": [
-        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
-        "Attempts to acquire both a reader and writer lock on an existing waiter using mutex locking mechanism.",
-        "Initializes a structure with default starting index and pointers for linked nodes, ready slots count set to zero."
+        "Prepares and returns a session task or an error if loading sessions are unsupported.",
+        "Updates the current message phase, converts it to a string if not None and returns an empty vector when there are no reasons for reasoning.",
+        "Sets a flag and serializes an object before notifying another component about it."
       ]
     },
     {
-      "code": "let true_when = self.true_when();\nself.driver_state.0.cached_when.store(true_when, Ordering::Relaxed);\ntrue_when",
-      "correct": "Checks a condition and stores it as cached when if it's false.",
+      "code": "let window_state = unsafe { get_window_state(this) };\nlet mut lock = window_state.as_ref().lock();\nlock.fullscreen_restore_bounds = lock.bounds();\nlet min_version = NSOperatingSystemVersion::new(15, 3, 0);\nif is_macos_version_at_least(min_version) {\n    unsafe {\n        lock.native_window.setTitlebarAppearsTransparent_(NO);\n    }\n}",
+      "correct": "Resets the title bar visibility of a window on macOS version 10.14 or later to be transparent by using an OS-level API call in Rust.",
       "distractors": [
-        "Calculates and converts a duration since an event started to milliseconds, panicking if it's in the distant past.",
-        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
-        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete."
+        "Generates a string representing the OS and architecture combination in release format.",
+        "Checks if an action belongs to a hidden type or namespace and returns true if it does, otherwise checks for shown types before returning early.",
+        "Parses an HTML string into a DOM structure with specified parsing options."
       ]
     },
     {
-      "code": "let dur: Duration = t\n    .checked_duration_since(self.start_time)\n    .unwrap_or_else(|| Duration::from_secs(0));\nlet ms = dur.as_millis();\nms.try_into().expect(\"Duration too far into the future\")",
-      "correct": "Calculates and converts a duration since an event started to milliseconds, panicking if it's in the distant past.",
+      "code": "let timestamp = create_offset_datetime(1990, 4, 12, 9, 30, 0);\nassert_eq!(format_timestamp_naive_time(timestamp, true), \"9:30 AM\");\nassert_eq!(format_timestamp_naive_time(timestamp, false), \"09:30\");\nlet timestamp_pm = create_offset_datetime(1990, 4, 12, 15, 45, 0);\nassert_eq!(format_timestamp_naive_time(timestamp_pm, true), \"3:45 PM\");\nassert_eq!(format_timestamp_naive_time(timestamp_pm, false), \"15:45\");",
+      "correct": "The code tests the formatting of datetime objects to strings in both AM/PM and 24-hour formats.",
       "distractors": [
-        "Pauses and then resumes time measurement twice consecutively.",
-        "The code snippet sets up a non-blocking sleep timer and selects between two futures: another future that ignores an 'if' clause or panics.",
-        "Checks a condition and stores it as cached when if it's false."
+        "Parses port-forward specifications and validates the parsed details against expected values for each case.",
+        "Extracts and validates co-authors from a formatted commit line.",
+        "Parses and validates that the provided string meets specific criteria to represent a four-character-long hexadecimal identifier."
       ]
     },
     {
-      "code": "let sigchild = signal_with_handle(SignalKind::child(), park.handle())?;\nlet inner = CoreDriver {\n    sigchild,\n    orphan_queue: GlobalOrphanQueue,\n};\nOk(Self { park, inner })",
-      "correct": "The code initializes a new core driver with child process handling and an orphan queue.",
+      "code": "let base = \"fn main() {\\n    println!(\\\"hello\\\");\\n}\\n\";\nlet patch = \"@@ -1,3 +1,3 @@\\n fn main() {\\n-    println!(\\\"hello\\\");\\n+    println!(\\\"world\\\");\\n }\\n\";\nlet actual = apply_patch_to_excerpt(base, patch, 0).unwrap();\nassert_eq!(actual, \"fn main() {\\n    println!(\\\"world\\\");\\n}\\n\");",
+      "correct": "Updates the function body to print \"world\" instead of \"hello\".",
       "distractors": [
-        "Establishes a pair of connected UNIX domain sockets and sets them to non-blocking mode.",
-        "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None.",
-        "Checks if a semaphore is closed and returns early if it is, then waits for an event notification to complete."
+        "Formats a string representing the range from `start` to `end`, adding one for Rust's zero-indexing.",
+        "Extracts and validates co-authors from a formatted commit line.",
+        "Converts multi-line string to a single line, removing certain characters and joining trimmed parts with commas."
       ]
     },
     {
-      "code": "let page_idx = addr.page();\nlet slot_idx = self.pages[page_idx].slot(addr);\nif self.cached[page_idx].init <= slot_idx {\n    self.cached[page_idx].refresh(&self.pages[page_idx]);\n}\nif self.cached[page_idx].init <= slot_idx {\n    return None;\n}\nSome(self.cached[page_idx].get(slot_idx))",
-      "correct": "Retrieves a cached item, refreshes it if necessary based on initialization comparison, or returns an error.",
+      "code": "use image::{ImageBuffer, Rgba};\nuse std::hash::{Hash, Hasher};\nlet img = ImageBuffer::from_fn(\n    width,\n    height,\n    |x, y| {\n        let mut hasher = std::hash::DefaultHasher::new();\n        (x, y, width, height).hash(&mut hasher);\n        let h = hasher.finish();\n        Rgba([h as u8, (h >> 8) as u8, (h >> 16) as u8, 255])\n    },\n);\nlet mut buf = Cursor::new(Vec::new());\nimg.write_with_encoder(PngEncoder::new(&mut buf)).expect(\"encode\");\nbuf.into_inner()",
+      "correct": "Generates a PNG image with solid colors based on the x and y coordinates.",
       "distractors": [
-        "Initializes a structure with default starting index and pointers for linked nodes, ready slots count set to zero.",
-        "Checks if a FIFO search is ongoing, parks or unparks workers based on their state.",
-        "The code initializes a new core driver with child process handling and an orphan queue."
+        "Converts a byte slice into either big-endian or little-endian u16 based on the specified endianness.",
+        "Parses and validates that the provided string meets specific criteria to represent a four-character-long hexadecimal identifier.",
+        "Reverses a string and stores its characters in reverse order using an internal collection."
       ]
     },
     {
-      "code": "let page = unsafe { Arc::from_raw(self.page) };\npage.release(self as *const _);\npage",
-      "correct": "Transfers ownership of a Page from an owned to a shared pointer and then releases it back to raw memory after casting.",
+      "code": "let state = self.state.read(cx);\nlet client = state.client.clone();\nlet llm_api_token = state.llm_api_token.clone();\nlet organization_id = state\n    .user_store\n    .read(cx)\n    .current_organization()\n    .map(|organization| organization.id.clone());\nlet body = WebSearchBody { query };\ncx.background_spawn(async move {\n    perform_web_search(client, llm_api_token, organization_id, body).await\n})",
+      "correct": "Executes an asynchronous web search with the provided parameters in a background task.",
       "distractors": [
-        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
-        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
-        "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer."
+        "Updates the current message phase, converts it to a string if not None and returns an empty vector when there are no reasons for reasoning.",
+        "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters.",
+        "The function selects a new channel's leading peer for following and unfollows the current leader from it."
       ]
     },
     {
-      "code": "let shift = pointer_width() - self.mask.leading_zeros();\nlet mask = mask_for(width) << shift;\nPack { mask, shift }",
-      "correct": "Calculates a new bitmask for packing data with specified width and leading zeros.",
+      "code": "let array_ix = query.capture_index_for_name(\"array\")?;\nlet action_name_ix = query.capture_index_for_name(\"action_name\")?;\nlet argument_key_ix = query.capture_index_for_name(\"argument_key\")?;\nlet argument_value_ix = query.capture_index_for_name(\"argument_value\")?;\nlet action_name = contents\n    .get(mat.nodes_for_capture_index(action_name_ix).next()?.byte_range())?;\nlet argument_key = contents\n    .get(mat.nodes_for_capture_index(argument_key_ix).next()?.byte_range())?;\nlet argument_value = contents\n    .get(mat.nodes_for_capture_index(argument_value_ix).next()?.byte_range())?;\nlet new_action_name = UNWRAP_OBJECTS.get(&action_name)?.get(&argument_key)?;\nlet range_to_replace = mat.nodes_for_capture_index(array_ix).next()?.byte_range();\nlet replacement = format!(\"[\\\"{}\\\", {}]\", new_action_name, argument_value);\nSome((range_to_replace, replacement))",
+      "correct": "Replaces a placeholder in an array with the result of applying a function to another element.",
       "distractors": [
-        "Resets a data structure and its related components to their default states.",
-        "Splits a read-write pair into separate reads and writes.",
-        "Reallocates a byte array to fit the remaining bytes and updates position. If at end, resets buffer."
+        "Formats a string representing the range from `start` to `end`, adding one for Rust's zero-indexing.",
+        "Sets a selected cell's index and optionally jumps to that cell if specified by the user.",
+        "Updates the current message phase, converts it to a string if not None and returns an empty vector when there are no reasons for reasoning."
       ]
     },
     {
-      "code": "if let Some(prev) = L::pointers(node).as_ref().get_prev() {\n    debug_assert_eq!(L::pointers(prev).as_ref().get_next(), Some(node));\n    L::pointers(prev).as_mut().set_next(L::pointers(node).as_ref().get_next());\n} else {\n    if self.head != Some(node) {\n        return None;\n    }\n    self.head = L::pointers(node).as_ref().get_next();\n}\nif let Some(next) = L::pointers(node).as_ref().get_next() {\n    debug_assert_eq!(L::pointers(next).as_ref().get_prev(), Some(node));\n    L::pointers(next).as_mut().set_prev(L::pointers(node).as_ref().get_prev());\n} else {\n    if self.tail != Some(node) {\n        return None;\n    }\n    self.tail = L::pointers(node).as_ref().get_prev();\n}\nL::pointers(node).as_mut().set_next(None);\nL::pointers(node).as_mut().set_prev(None);\nSome(L::from_raw(node))",
-      "correct": "The code removes a node from the middle of a doubly-linked list and cleans up its pointers.",
+      "code": "let name = action.name();\nlet namespace = name.split(\"::\").next().unwrap_or(\"malformed action name\");\nif self.shown_action_types.contains(&action.type_id()) {\n    return false;\n}\nself.hidden_namespaces.contains(namespace)\n    || self.hidden_action_types.contains(&action.type_id())",
+      "correct": "Checks if an action belongs to a hidden type or namespace and returns true if it does, otherwise checks for shown types before returning early.",
       "distractors": [
-        "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10.",
-        "The code checks if the host obtained from a local address lookup is IPv4 or IPv6 and asserts it matches an expected SocketAddr.",
-        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete."
+        "Generates and encodes a JWT token with provided claims if the room_join grant is present but identity is missing.",
+        "Executes drawing of sprite instances using a specific texture and resources.",
+        "Resets the title bar visibility of a window on macOS version 10.14 or later to be transparent by using an OS-level API call in Rust."
       ]
     },
     {
-      "code": "let (a, b) = mio::net::UnixDatagram::pair()?;\nlet a = UnixDatagram::new(a)?;\nlet b = UnixDatagram::new(b)?;\nOk((a, b))",
-      "correct": "Creates and initializes two Unix domain datagrams with the given addresses.",
+      "code": "let mut request = ::http_client::Request::builder()\n    .method(::http_client::Method::from(extension_request.method))\n    .uri(&extension_request.url)\n    .follow_redirects(\n        match extension_request.redirect_policy {\n            http_client::RedirectPolicy::NoFollow => {\n                ::http_client::RedirectPolicy::NoFollow\n            }\n            http_client::RedirectPolicy::FollowLimit(limit) => {\n                ::http_client::RedirectPolicy::FollowLimit(limit)\n            }\n            http_client::RedirectPolicy::FollowAll => {\n                ::http_client::RedirectPolicy::FollowAll\n            }\n        },\n    );\nfor (key, value) in &extension_request.headers {\n    request = request.header(key, value);\n}\nlet body = extension_request.body.clone().map(AsyncBody::from).unwrap_or_default();\nrequest.body(body).map_err(anyhow::Error::from)",
+      "correct": "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters.",
       "distractors": [
-        "Checks if types can be sent, unpinned, or statically referenced.",
-        "Splits a read-write pair into separate reads and writes.",
-        "Establishes a pair of connected UNIX domain sockets and sets them to non-blocking mode."
+        "Initializes and sets up a global tracer with Tracy-specific configuration.",
+        "Executes an asynchronous web search with the provided parameters in a background task.",
+        "Extracts the outline structure of JavaScript functions in provided text."
       ]
     },
     {
-      "code": "let unparker = Inner::from_raw(raw);\nunparker.unpark();\nmem::forget(unparker);",
-      "correct": "Creates an inner unparker from a raw pointer and then unparks it before forgetting about its memory management responsibility.",
+      "code": "use tracing_subscriber::fmt::format::DefaultFields;\nuse tracing_subscriber::prelude::*;\n#[derive(Default)]\nstruct TracyLayerConfig {\n    fmt: DefaultFields,\n}\nimpl tracing_tracy::Config for TracyLayerConfig {\n    type Formatter = DefaultFields;\n    fn formatter(&self) -> &Self::Formatter {\n        &self.fmt\n    }\n    fn stack_depth(&self, _: &tracing::Metadata) -> u16 {\n        MAX_CALLSTACK_DEPTH\n    }\n    fn format_fields_in_zone_name(&self) -> bool {\n        true\n    }\n    fn on_error(&self, client: &tracy_client::Client, error: &'static str) {\n        client.color_message(error, 0xFF000000, 0);\n    }\n}\nzlog::info!(\"Starting tracy subscriber, you can now connect the profiler\");\ntracing::subscriber::set_global_default(\n        tracing_subscriber::registry()\n            .with(tracing_tracy::TracyLayer::new(TracyLayerConfig::default())),\n    )\n    .expect(\"setup tracy layer\");",
+      "correct": "Initializes and sets up a global tracer with Tracy-specific configuration.",
       "distractors": [
-        "Acquires a read lock, retrieves shared state and associated immutable pointer from another instance, discards the original owner's reference.",
-        "The given Rust code attempts to connect a TCP stream to an available local port on the machine it is running on, wrapping this in future-like behavior with `block_on`.",
-        "Resets a data structure and its related components to their default states."
+        "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters.",
+        "Updates the current message phase, converts it to a string if not None and returns an empty vector when there are no reasons for reasoning.",
+        "Returns the temperature from a matched global settings object or returns None if no match is found."
       ]
     },
     {
-      "code": "let dst_tail = unsafe { dst.inner.tail.unsync_load() };\nlet (steal, _) = unpack(dst.inner.head.load(Acquire));\nif dst_tail.wrapping_sub(steal) > LOCAL_QUEUE_CAPACITY as u16 / 2 {\n    return None;\n}\nlet mut n = self.steal_into2(dst, dst_tail);\nif n == 0 {\n    return None;\n}\nn -= 1;\nlet ret_pos = dst_tail.wrapping_add(n);\nlet ret_idx = ret_pos as usize & MASK;\nlet ret = dst\n    .inner\n    .buffer[ret_idx]\n    .with(|ptr| unsafe { ptr::read((*ptr).as_ptr()) });\nif n == 0 {\n    return Some(ret);\n}\ndst.inner.tail.store(dst_tail.wrapping_add(n), Release);\nSome(ret)",
-      "correct": "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer.",
+      "code": "let buffer = futures::io::Cursor::new(Vec::new());\nlet mut builder = async_tar::Builder::new(buffer);\nfor (file_name, content) in content {\n    if content.is_empty() {\n        let mut header = async_tar::Header::new_gnu();\n        header.set_size(0);\n        header.set_mode(0o755);\n        header.set_entry_type(async_tar::EntryType::Directory);\n        header.set_cksum();\n        builder.append_data(&mut header, file_name, &[] as &[u8]).await.unwrap();\n    } else {\n        let data = content.as_bytes();\n        let mut header = async_tar::Header::new_gnu();\n        header.set_size(data.len() as u64);\n        header.set_mode(0o755);\n        header.set_entry_type(async_tar::EntryType::Regular);\n        header.set_cksum();\n        builder.append_data(&mut header, file_name, data).await.unwrap();\n    }\n}\nlet buffer = builder.into_inner().await.unwrap();\nbuffer.into_inner()",
+      "correct": "Creates an empty tar archive with custom entries for each provided key-value pair in the content HashMap.",
       "distractors": [
-        "Extracts upper and lower parts of a 32-bit integer from the given input number.",
-        "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None.",
-        "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10."
+        "Creates a JSON object from parsed keys and values along the specified path, handling nulls and nested structures.",
+        "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters.",
+        "Updates the current message phase, converts it to a string if not None and returns an empty vector when there are no reasons for reasoning."
       ]
     },
     {
-      "code": "let real = n & u16::max_value() as u32;\nlet steal = n >> 16;\n(steal as u16, real as u16)",
-      "correct": "Extracts upper and lower parts of a 32-bit integer from the given input number.",
+      "code": "let result_a = search(\n    &[\"project-a/pyproject.toml\", \"project-b/pyproject.toml\"],\n    \"project-a/src/main.py\",\n);\nassert_eq!(result_a.as_deref(), RelPath::unix(\"project-a\").ok());\nlet result_b = search(\n    &[\"project-a/pyproject.toml\", \"project-b/pyproject.toml\"],\n    \"project-b/src/main.py\",\n);\nassert_eq!(result_b.as_deref(), RelPath::unix(\"project-b\").ok());",
+      "correct": "The code searches for a specific file path within two project directories and asserts the found paths match expected Unix-style relative paths.",
       "distractors": [
-        "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer.",
-        "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None.",
-        "Reduces a byte vector to its UTF-8 readable content based on the number of bytes read, ensuring it remains valid UTF-8."
+        "Converts a string to Windows PowerShell format with appropriate quoting and escaping.",
+        "Parses port-forward specifications and validates the parsed details against expected values for each case.",
+        "The code attempts to match a requested font with available candidates based on certain criteria and returns an index of the best-matching candidate."
       ]
     },
     {
-      "code": "struct Guard<'a, P: Park> {\n    context: Option<Context>,\n    scheduler: &'a mut Inner<P>,\n}\nimpl<P: Park> Drop for Guard<'_, P> {\n    fn drop(&mut self) {\n        let Context { tasks, .. } = self.context.take().expect(\"context missing\");\n        self.scheduler.tasks = Some(tasks.into_inner());\n    }\n}\nlet tasks = scheduler.tasks.take().expect(\"invalid state\");\nlet guard = Guard {\n    context: Some(Context {\n        shared: scheduler.spawner.shared.clone(),\n        tasks: RefCell::new(tasks),\n    }),\n    scheduler,\n};\nlet context = guard.context.as_ref().unwrap();\nlet scheduler = &mut *guard.scheduler;\nCURRENT.set(context, || f(scheduler, context))",
-      "correct": "Creates a Guard that holds an optional Context and modifies the shared tasks of a Scheduler upon being dropped. Takes existing Tasks from SharedState and initializes them in Current when called with given arguments.",
+      "code": "if user_layout.agent_dock.is_none() {\n    settings.agent.get_or_insert_default().dock = self.agent_dock;\n}\nif user_layout.project_panel_dock.is_none() {\n    settings.project_panel.get_or_insert_default().dock = self.project_panel_dock;\n}\nif user_layout.outline_panel_dock.is_none() {\n    settings.outline_panel.get_or_insert_default().dock = self.outline_panel_dock;\n}\nif user_layout.collaboration_panel_dock.is_none() {\n    settings.collaboration_panel.get_or_insert_default().dock = self\n        .collaboration_panel_dock;\n}\nif user_layout.git_panel_dock.is_none() {\n    settings.git_panel.get_or_insert_default().dock = self.git_panel_dock;\n}",
+      "correct": "Ensures that default dock values for various UI panels are set if not already present in the user's layout settings.",
       "distractors": [
-        "Reserves a parking spot for the current thread, notifies if there is work in queue after reservation, and releases resources.",
-        "Checks if types can be sent, unpinned, or statically referenced.",
-        "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10."
+        "Initializes and sets up a global tracer with Tracy-specific configuration.",
+        "Parses an HTML string into a DOM structure with specified parsing options.",
+        "The code attempts to match a requested font with available candidates based on certain criteria and returns an index of the best-matching candidate."
       ]
     },
     {
-      "code": "let mut dec = 1 << UNPARK_SHIFT;\nif is_searching {\n    dec += 1;\n}\nlet prev = State(cell.fetch_sub(dec, SeqCst));\nis_searching && prev.num_searching() == 1",
-      "correct": "Decrements the value at a specific memory location and checks if it was previously set to one.",
+      "code": "let settings = Self::get_global(cx);\nfor setting in settings.model_parameters.iter().rev() {\n    if let Some(provider) = &setting.provider && provider.0 != model.provider_id().0\n    {\n        continue;\n    }\n    if let Some(setting_model) = &setting.model && *setting_model != model.id().0 {\n        continue;\n    }\n    return setting.temperature;\n}\nreturn None;",
+      "correct": "Returns the temperature from a matched global settings object or returns None if no match is found.",
       "distractors": [
-        "Checks if there are enough messages to send; sends a message and returns success if not.",
-        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
-        "Checks if there was an error in the last write attempt and returns it; updates state based on operation type, handles pinning for busy reading or writes result back to sender. Adjusts internal buffer accordingly. Returns appropriate readiness status after handling read/write/seek operations."
+        "Sets a new global application theme and refreshes all windows to apply it.",
+        "Initializes and sets up a global tracer with Tracy-specific configuration.",
+        "The code attempts to match a requested font with available candidates based on certain criteria and returns an index of the best-matching candidate."
       ]
     },
     {
-      "code": "let mut park = core.park.take().expect(\"park missing\");\n*self.core.borrow_mut() = Some(core);\nif let Some(timeout) = duration {\n    park.park_timeout(timeout).expect(\"park failed\");\n} else {\n    park.park().expect(\"park failed\");\n}\ncore = self.core.borrow_mut().take().expect(\"core missing\");\ncore.park = Some(park);\nif core.run_queue.is_stealable() {\n    self.worker.shared.notify_parked();\n}\ncore",
-      "correct": "Reserves a parking spot for the current thread, notifies if there is work in queue after reservation, and releases resources.",
+      "code": "self.current_message_phase = message\n    .phase\n    .as_deref()\n    .and_then(normalize_response_message_phase)\n    .map(str::to_string);\nif self.current_message_phase.is_none() && self.reasoning_items.is_empty() {\n    return Vec::new();\n}\nself.emit_response_message_metadata()",
+      "correct": "Updates the current message phase, converts it to a string if not None and returns an empty vector when there are no reasons for reasoning.",
       "distractors": [
-        "Creates a Guard that holds an optional Context and modifies the shared tasks of a Scheduler upon being dropped. Takes existing Tasks from SharedState and initializes them in Current when called with given arguments.",
-        "Checks if a FIFO search is ongoing, parks or unparks workers based on their state.",
-        "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer."
+        "Executes an asynchronous web search with the provided parameters in a background task.",
+        "Initializes and sets up a global tracer with Tracy-specific configuration.",
+        "Determines if a GitHub pull request contains any approving comments and returns success status based on that."
       ]
     },
     {
-      "code": "if self.lifo_slot.is_some() {\n    worker.shared.idle.unpark_worker_by_id(worker.index);\n    self.is_searching = true;\n    return true;\n}\nif worker.shared.idle.is_parked(worker.index) {\n    return false;\n}\nself.is_searching = true;\ntrue",
-      "correct": "Checks if a FIFO search is ongoing, parks or unparks workers based on their state.",
+      "code": "let cx = init_test(cx);\nlet columns = 5;\nlet (result, expected) = cx\n    .update(|window, cx| {\n        let text_style = text_style(window, cx);\n        let text_system = window.text_system();\n        let font_pixels = text_style.font_size.to_pixels(window.rem_size());\n        let font_id = text_system.resolve_font(&text_style.font());\n        let cell_width = text_system\n            .advance(font_id, font_pixels, 'w')\n            .map(|advance| advance.width)\n            .unwrap_or(gpui::Pixels::ZERO);\n        let result = max_width_for_columns(columns, window, cx);\n        (result, cell_width * columns as f32)\n    });\nlet Some(result) = result else {\n    panic!(\"expected max width for columns {columns}\");\n};\nlet result_f32: f32 = result.into();\nlet expected_f32: f32 = expected.into();\nassert!((result_f32 - expected_f32).abs() < 0.01);",
+      "correct": "Compares the computed maximum column width against an expected value and asserts they are nearly equal.",
       "distractors": [
-        "Reserves a parking spot for the current thread, notifies if there is work in queue after reservation, and releases resources.",
-        "Checks if a 'flavor' field is set more than once and returns an error; parses the given string into a 'RuntimeFlavor', sets it as one of many flavors.",
-        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it."
+        "Sets a selected cell's index and optionally jumps to that cell if specified by the user.",
+        "The code attempts to match a requested font with available candidates based on certain criteria and returns an index of the best-matching candidate.",
+        "Calculates and aggregates network statistics such as minimum RTT, maximum jitter, total packets received/received loss percentage from a collection of metrics and represents them in computed form."
       ]
     },
     {
-      "code": "let (shared, launch) = worker::create(size, parker);\nlet spawner = Spawner { shared };\nlet thread_pool = ThreadPool { spawner };\n(thread_pool, launch)",
-      "correct": "Initializes a new threaded processing system with created resources and spawning mechanism.",
+      "code": "self.selected_cell_index = index;\nlet current_index = self.selected_cell_index;\nif jump_to_index {\n    self.jump_to_cell(current_index, window, cx);\n}",
+      "correct": "Sets a selected cell's index and optionally jumps to that cell if specified by the user.",
       "distractors": [
-        "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10.",
-        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads).",
-        "Reserves a parking spot for the current thread, notifies if there is work in queue after reservation, and releases resources."
+        "Sets a flag and serializes an object before notifying another component about it.",
+        "Replaces a placeholder in an array with the result of applying a function to another element.",
+        "Executes an asynchronous web search with the provided parameters in a background task."
       ]
     },
     {
-      "code": "assert!(snapshot.is_join_interested());\nassert!(! snapshot.has_join_waker());\nunsafe {\n    trailer.set_waker(Some(waker));\n}\nlet res = header.state.set_join_waker();\nif res.is_err() {\n    unsafe {\n        trailer.set_waker(None);\n    }\n}\nres",
-      "correct": "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
+      "code": "let mut new_value = serde_json::to_value(\n        new_value.unwrap_or(&serde_json::Value::Null),\n    )\n    .unwrap();\nfor key in key_path.iter().rev() {\n    if parse_index_key(key.as_ref()).is_some() {\n        new_value = serde_json::json!([new_value]);\n    } else {\n        new_value = serde_json::json!({ key.as_ref().to_string() : new_value });\n    }\n}\nreturn new_value;",
+      "correct": "Creates a JSON object from parsed keys and values along the specified path, handling nulls and nested structures.",
       "distractors": [
-        "Copies the first four bytes of a byte slice into a buffer and checks that it is done correctly.",
-        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
-        "Transfers ownership of a Page from an owned to a shared pointer and then releases it back to raw memory after casting."
+        "Checks for the presence of a binary in worktree and either returns its path or constructs an environment variable to run another script with language server ID. Then caches this new binary's path and creates command using it.",
+        "Creates an empty tar archive with custom entries for each provided key-value pair in the content HashMap.",
+        "Replaces a placeholder in an array with the result of applying a function to another element."
       ]
     },
     {
-      "code": "const DELTA: usize = RUNNING | COMPLETE;\nlet prev = Snapshot(self.val.fetch_xor(DELTA, AcqRel));\nassert!(prev.is_running());\nassert!(! prev.is_complete());\nSnapshot(prev.0 ^ DELTA)",
-      "correct": "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
+      "code": "if video_grant.room_join.is_some() && identity.is_none() {\n    anyhow::bail!(\"identity is required for room_join grant, but it is none\");\n}\nlet now = SystemTime::now();\nlet claims = ClaimGrants {\n    iss: Cow::Borrowed(api_key),\n    sub: identity.map(Cow::Borrowed),\n    iat: now.duration_since(UNIX_EPOCH).unwrap().as_secs(),\n    exp: now.add(DEFAULT_TTL).duration_since(UNIX_EPOCH).unwrap().as_secs(),\n    nbf: 0,\n    jwtid: identity.map(Cow::Borrowed),\n    video: video_grant,\n};\nOk(\n    jsonwebtoken::encode(\n        &Header::default(),\n        &claims,\n        &EncodingKey::from_secret(secret_key.as_ref()),\n    )?,\n)",
+      "correct": "Generates and encodes a JWT token with provided claims if the room_join grant is present but identity is missing.",
       "distractors": [
-        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
-        "Acquires a read lock, retrieves shared state and associated immutable pointer from another instance, discards the original owner's reference.",
-        "Checks if a 'flavor' field is set more than once and returns an error; parses the given string into a 'RuntimeFlavor', sets it as one of many flavors."
+        "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters.",
+        "Checks if an action belongs to a hidden type or namespace and returns true if it does, otherwise checks for shown types before returning early.",
+        "Initializes and sets up a global tracer with Tracy-specific configuration."
       ]
     },
     {
-      "code": "let globals = globals();\nglobals.record_event(ty as EventId);\nif globals.broadcast() { TRUE } else { FALSE }",
-      "correct": "Sets a global variable and records an event based on its type; then conditionally executes further logic depending on whether broadcasting occurs or not.",
+      "code": "let theme = configured_theme(cx);\nGlobalTheme::update_theme(cx, theme);\ncx.refresh_windows();",
+      "correct": "Sets a new global application theme and refreshes all windows to apply it.",
       "distractors": [
-        "Checks if there are enough messages to send; sends a message and returns success if not.",
-        "Checks if types can be sent, unpinned, or statically referenced.",
-        "The code initializes a new core driver with child process handling and an orphan queue."
+        "Returns the temperature from a matched global settings object or returns None if no match is found.",
+        "Sets a flag and serializes an object before notifying another component about it.",
+        "Converts a string to Windows PowerShell format with appropriate quoting and escaping."
       ]
     },
     {
-      "code": "let mut waiters = self.waiters.lock();\nwaiters.reader.take();\nwaiters.writer.take();",
-      "correct": "Attempts to acquire both a reader and writer lock on an existing waiter using mutex locking mechanism.",
+      "code": "let ps_will_quote = Self::need_quotes_powershell(arg);\nlet crt_quoted = Self::quote_windows(arg, !ps_will_quote);\nif !Self::needs_quoting_powershell(arg) {\n    return crt_quoted;\n}\nCow::Owned(Self::escape_powershell_quotes(&crt_quoted))",
+      "correct": "Converts a string to Windows PowerShell format with appropriate quoting and escaping.",
       "distractors": [
-        "Creates a file at 'path' with content from 'contents'.",
-        "The code reads lines from standard input and writes them to standard output until an empty line is encountered.",
-        "Copies the first four bytes of a byte slice into a buffer and checks that it is done correctly."
+        "Determines microphone muting state and notifies listeners, playing mute or unmute sound accordingly.",
+        "The code searches for a specific file path within two project directories and asserts the found paths match expected Unix-style relative paths.",
+        "Determines if a GitHub pull request contains any approving comments and returns success status based on that."
       ]
     },
     {
-      "code": "let me = self.project();\n*me.pos = 0;\n*me.cap = 0;",
-      "correct": "Sets position and capacity of an object to zero.",
+      "code": "let pid = self.process.id();\nunsafe {\n    libc::killpg(pid as i32, libc::SIGKILL);\n}\nOk(())",
+      "correct": "Terminates a process with its PID using SIGKILL signal.",
       "distractors": [
-        "Increments a poll count by 1 using atomic fetch-add operation and then polls for an event with context handling.",
-        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
-        "Reallocates a byte array to fit the remaining bytes and updates position. If at end, resets buffer."
+        "Parses and validates that the provided string meets specific criteria to represent a four-character-long hexadecimal identifier.",
+        "Prepares and returns a session task or an error if loading sessions are unsupported.",
+        "Executes drawing of sprite instances using a specific texture and resources."
       ]
     },
     {
-      "code": "let original_len = vector.len() - num_bytes_read;\nvector.truncate(original_len);\n*output = String::from_utf8(vector).expect(\"The original data must be valid utf-8.\");",
-      "correct": "Reduces a byte vector to its UTF-8 readable content based on the number of bytes read, ensuring it remains valid UTF-8.",
+      "code": "let mut bag = Self(0);\nfor c in s.chars() {\n    bag.insert(c);\n}\nbag",
+      "correct": "Reverses a string and stores its characters in reverse order using an internal collection.",
       "distractors": [
-        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
-        "Calculates a new bitmask for packing data with specified width and leading zeros.",
-        "Extracts upper and lower parts of a 32-bit integer from the given input number."
+        "Generates a PNG image with solid colors based on the x and y coordinates.",
+        "Calculates a seek aggregation for an output based on provided end position and returns it as part of a state machine's internal processing flow.",
+        "Increments a borrowable field by 1 using saturating addition and stores it back in place of an original variable."
       ]
     },
     {
-      "code": "let n = cmp::min(self.len(), dst.remaining());\ndst.put_slice(&self.bytes()[..n]);\nself.pos += n;\nif self.pos == self.buf.len() {\n    self.buf.truncate(0);\n    self.pos = 0;\n}\nn",
-      "correct": "Reallocates a byte array to fit the remaining bytes and updates position. If at end, resets buffer.",
+      "code": "let mut summary = SummarySeekAggregate(Output::zero(self.cx));\nself.seek_internal(end, bias, &mut summary);\nsummary.0",
+      "correct": "Calculates a seek aggregation for an output based on provided end position and returns it as part of a state machine's internal processing flow.",
       "distractors": [
-        "Calculates a new bitmask for packing data with specified width and leading zeros.",
-        "Sets position and capacity of an object to zero.",
-        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads)."
+        "Determines microphone muting state and notifies listeners, playing mute or unmute sound accordingly.",
+        "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters.",
+        "Calculates and aggregates network statistics such as minimum RTT, maximum jitter, total packets received/received loss percentage from a collection of metrics and represents them in computed form."
       ]
     },
     {
-      "code": "let fd = self.inner.as_ref().map(AsRawFd::as_raw_fd);\nif let Some(fd) = fd {\n    let _ = self.registration.deregister(&mut SourceFd(&fd));\n}\nself.inner.take()",
-      "correct": "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None.",
+      "code": "let parse_options = ParseOpts {\n    tree_builder: TreeBuilderOpts {\n        drop_doctype: true,\n        ..Default::default()\n    },\n    ..Default::default()\n};\nlet dom = parse_document(RcDom::default(), parse_options)\n    .from_utf8()\n    .read_from(&mut html)\n    .context(\"failed to parse HTML document\")?;\nOk(dom)",
+      "correct": "Parses an HTML string into a DOM structure with specified parsing options.",
       "distractors": [
-        "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer.",
-        "Creates a file at 'path' with content from 'contents'.",
-        "The code initializes a new core driver with child process handling and an orphan queue."
+        "Parses and validates that the provided string meets specific criteria to represent a four-character-long hexadecimal identifier.",
+        "Checks for the presence of a binary in worktree and either returns its path or constructs an environment variable to run another script with language server ID. Then caches this new binary's path and creates command using it.",
+        "Checks if an action belongs to a hidden type or namespace and returns true if it does, otherwise checks for shown types before returning early."
       ]
     },
     {
-      "code": "if !self.inc_num_messages() {\n    return Err(SendError(message));\n}\nself.chan.send(message);\nOk(())",
-      "correct": "Checks if there are enough messages to send; sends a message and returns success if not.",
+      "code": "envelope.ack_id = Some(self.max_received.load(SeqCst));\nself.outgoing_tx.lock().unbounded_send(envelope).ok();\nOk(())",
+      "correct": "The function sends an envelope with a possibly updated acknowledgment ID to any subscribers and returns success.",
       "distractors": [
-        "Decrements the value at a specific memory location and checks if it was previously set to one.",
-        "Checks if types can be sent, unpinned, or statically referenced.",
-        "Checks if a 'flavor' field is set more than once and returns an error; parses the given string into a 'RuntimeFlavor', sets it as one of many flavors."
+        "Sets a flag and serializes an object before notifying another component about it.",
+        "Updates the current message phase, converts it to a string if not None and returns an empty vector when there are no reasons for reasoning.",
+        "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters."
       ]
     },
     {
-      "code": "let notified = self.inner.notify_rx_closed.notified();\nif self.inner.semaphore.is_closed() {\n    return;\n}\nnotified.await;",
-      "correct": "Checks if a semaphore is closed and returns early if it is, then waits for an event notification to complete.",
+      "code": "let pf = parse_port_forward_spec(\"[::1]:8080:[::1]:80\")?;\nassert_eq!(pf.local_host, Some(\"::1\".to_string()));\nassert_eq!(pf.local_port, 8080);\nassert_eq!(pf.remote_host, Some(\"::1\".to_string()));\nassert_eq!(pf.remote_port, 80);\nlet pf = parse_port_forward_spec(\"8080:[::1]:80\")?;\nassert_eq!(pf.local_host, None);\nassert_eq!(pf.local_port, 8080);\nassert_eq!(pf.remote_host, Some(\"::1\".to_string()));\nassert_eq!(pf.remote_port, 80);\nlet pf = parse_port_forward_spec(\"[2001:db8::1]:3000:[fe80::1]:4000\")?;\nassert_eq!(pf.local_host, Some(\"2001:db8::1\".to_string()));\nassert_eq!(pf.local_port, 3000);\nassert_eq!(pf.remote_host, Some(\"fe80::1\".to_string()));\nassert_eq!(pf.remote_port, 4000);\nlet pf = parse_port_forward_spec(\"127.0.0.1:8080:localhost:80\")?;\nassert_eq!(pf.local_host, Some(\"127.0.0.1\".to_string()));\nassert_eq!(pf.local_port, 8080);\nassert_eq!(pf.remote_host, Some(\"localhost\".to_string()));\nassert_eq!(pf.remote_port, 80);\nOk(())",
+      "correct": "Parses port-forward specifications and validates the parsed details against expected values for each case.",
       "distractors": [
-        "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10.",
-        "Checks if a future is ready and pins it using an external crate function.",
-        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it."
+        "The code searches for a specific file path within two project directories and asserts the found paths match expected Unix-style relative paths.",
+        "The code tests the formatting of datetime objects to strings in both AM/PM and 24-hour formats.",
+        "Generates a string representing the OS and architecture combination in release format."
       ]
     },
     {
-      "code": "self.start_index = 0;\nself.next = AtomicPtr::new(ptr::null_mut());\nself.ready_slots = AtomicUsize::new(0);",
-      "correct": "Initializes a structure with default starting index and pointers for linked nodes, ready slots count set to zero.",
+      "code": "let repeated_old = \"foo + foo + foo + foo + foo\\n\".repeat(token_repetitions);\nlet repeated_predicted = \"foo + foo + prediction_token + foo + foo\\n\"\n    .repeat(token_repetitions);\nlet repeated_final = \"foo + foo + kept_token + foo + foo\\n\"\n    .repeat(token_repetitions);\n(repeated_old, repeated_predicted, repeated_final)",
+      "correct": "Generates three identical strings with a repeating pattern.",
       "distractors": [
-        "Checks if a future is ready and pins it using an external crate function.",
-        "Resets a data structure and its related components to their default states.",
-        "Calculates and converts a duration since an event started to milliseconds, panicking if it's in the distant past."
+        "Formats a string representing the range from `start` to `end`, adding one for Rust's zero-indexing.",
+        "Updates the function body to print \"world\" instead of \"hello\".",
+        "Increments a borrowable field by 1 using saturating addition and stores it back in place of an original variable."
       ]
     },
     {
-      "code": "let fut = self.get_mut().tx.closed();\ncrate::pin!(fut);\nReady(fut.poll(cx).is_ready())",
-      "correct": "Checks if a future is ready and pins it using an external crate function.",
+      "code": "let mut source = json_source(object_count);\nreplace_nth_occurrences(\n    &mut source,\n    \"      \\\"enabled\\\": true,\\n\",\n    \"      \\\"enabled\\\": ,\\n\",\n    23,\n    64,\n);\nsource",
+      "correct": "Replaces the nth occurrence of a specific JSON object property value with an empty string.",
       "distractors": [
-        "Increments a poll count by 1 using atomic fetch-add operation and then polls for an event with context handling.",
-        "Initializes a structure with default starting index and pointers for linked nodes, ready slots count set to zero.",
-        "Checks if a semaphore is closed and returns early if it is, then waits for an event notification to complete."
+        "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters.",
+        "Calculates and aggregates network statistics such as minimum RTT, maximum jitter, total packets received/received loss percentage from a collection of metrics and represents them in computed form.",
+        "Updates the current message phase, converts it to a string if not None and returns an empty vector when there are no reasons for reasoning."
       ]
     },
     {
-      "code": "let mut b = loom::model::Builder::new();\nb.preemption_bound = Some(1);\nb.check(|| {\n    let semaphore = Arc::new(Semaphore::new(10));\n    let active = Arc::new(AtomicUsize::new(0));\n    let mut ths = vec![];\n    for _ in 0..2 {\n        let semaphore = semaphore.clone();\n        let active = active.clone();\n        ths.push(\n            thread::spawn(move || {\n                for n in &[4, 10, 8] {\n                    block_on(semaphore.acquire(*n)).unwrap();\n                    active.fetch_add(*n as usize, SeqCst);\n                    let num_active = active.load(SeqCst);\n                    assert!(num_active <= 10);\n                    thread::yield_now();\n                    active.fetch_sub(*n as usize, SeqCst);\n                    semaphore.release(*n as usize);\n                }\n            }),\n        );\n    }\n    for th in ths.into_iter() {\n        th.join().unwrap();\n    }\n    assert_eq!(10, semaphore.available_permits());\n});",
-      "correct": "The code spawns threads that acquire and release a semaphore with varying counts while ensuring the total number of active semaphores does not exceed 10.",
+      "code": "let start = node.start_position();\nlet end = node.end_position();\nformat!(\n    \"[{}:{} - {}:{}]\", start.row + 1, start.column + 1, end.row + 1, end.column + 1,\n)",
+      "correct": "Formats a string representing the range from `start` to `end`, adding one for Rust's zero-indexing.",
       "distractors": [
-        "Initializes a new threaded processing system with created resources and spawning mechanism.",
-        "Checks if a semaphore is closed and returns early if it is, then waits for an event notification to complete.",
-        "The code removes a node from the middle of a doubly-linked list and cleans up its pointers."
+        "Replaces a placeholder in an array with the result of applying a function to another element.",
+        "Updates the function body to print \"world\" instead of \"hello\".",
+        "Updates a range or interval by merging overlapping intervals with another."
       ]
     },
     {
-      "code": "let data = f(&*this) as *const U;\nlet s = this.s;\nmem::forget(this);\nRwLockReadGuard {\n    s,\n    data,\n    marker: marker::PhantomData,\n}",
-      "correct": "Acquires a read lock, retrieves shared state and associated immutable pointer from another instance, discards the original owner's reference.",
+      "code": "let mut min_rtt: Option<f64> = None;\nlet mut max_jitter: Option<f64> = None;\nlet mut total_packets_received: u64 = 0;\nlet mut total_packets_lost: i64 = 0;\nlet all_stats = stats.publisher_stats.iter().chain(stats.subscriber_stats.iter());\nfor stat in all_stats {\n    extract_metrics(\n        stat,\n        &mut min_rtt,\n        &mut max_jitter,\n        &mut total_packets_received,\n        &mut total_packets_lost,\n    );\n}\nlet total_expected = total_packets_received as i64 + total_packets_lost;\nlet packet_loss_pct = if total_expected > 0 {\n    Some((total_packets_lost as f64 / total_expected as f64) * 100.0)\n} else {\n    None\n};\nComputedNetworkStats {\n    latency_ms: min_rtt.map(|rtt| rtt * 1000.0),\n    jitter_ms: max_jitter.map(|j| j * 1000.0),\n    packet_loss_pct,\n}",
+      "correct": "Calculates and aggregates network statistics such as minimum RTT, maximum jitter, total packets received/received loss percentage from a collection of metrics and represents them in computed form.",
       "distractors": [
-        "Creates an inner unparker from a raw pointer and then unparks it before forgetting about its memory management responsibility.",
-        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
-        "Creates a Guard that holds an optional Context and modifies the shared tasks of a Scheduler upon being dropped. Takes existing Tasks from SharedState and initializes them in Current when called with given arguments."
+        "Determines microphone muting state and notifies listeners, playing mute or unmute sound accordingly.",
+        "Updates a range or interval by merging overlapping intervals with another.",
+        "Calculates a seek aggregation for an output based on provided end position and returns it as part of a state machine's internal processing flow."
       ]
     },
     {
-      "code": "fn check_send<T: Send>() {}\nfn check_unpin<T: Unpin>() {}\nfn check_send_sync_val<T: Send + Sync>(_t: T) {}\nfn check_send_sync<T: Send + Sync>() {}\nfn check_static<T: 'static>() {}\nfn check_static_val<T: 'static>(_t: T) {}\ncheck_send::<MutexGuard<'_, u32>>();\ncheck_send::<OwnedMutexGuard<u32>>();\ncheck_unpin::<Mutex<u32>>();\ncheck_send_sync::<Mutex<u32>>();\ncheck_static::<OwnedMutexGuard<u32>>();\nlet mutex = Mutex::new(1);\ncheck_send_sync_val(mutex.lock());\nlet arc_mutex = Arc::new(Mutex::new(1));\ncheck_send_sync_val(arc_mutex.clone().lock_owned());\ncheck_static_val(arc_mutex.lock_owned());",
-      "correct": "Checks if types can be sent, unpinned, or statically referenced.",
+      "code": "let live_kit = self.live_kit.as_mut()?;\ncx.notify();\nif should_mute {\n    Audio::play_sound(Sound::Mute, cx);\n} else {\n    Audio::play_sound(Sound::Unmute, cx);\n}\nmatch &mut live_kit.microphone_track {\n    LocalTrack::None => {\n        if should_mute { None } else { Some(self.share_microphone(cx)) }\n    }\n    LocalTrack::Pending { .. } => None,\n    LocalTrack::Published { track_publication, .. } => {\n        let guard = Tokio::handle(cx);\n        if should_mute {\n            track_publication.mute(cx)\n        } else {\n            track_publication.unmute(cx)\n        }\n        drop(guard);\n        None\n    }\n}",
+      "correct": "Determines microphone muting state and notifies listeners, playing mute or unmute sound accordingly.",
       "distractors": [
-        "Creates and initializes two Unix domain datagrams with the given addresses.",
-        "Establishes a pair of connected UNIX domain sockets and sets them to non-blocking mode.",
-        "Resets a data structure and its related components to their default states."
+        "Generates a Git command to find the previous commit hash of a specified tag and outputs it for further processing.",
+        "Converts a string to Windows PowerShell format with appropriate quoting and escaping.",
+        "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters."
       ]
     },
     {
-      "code": "if let Some(e) = self.last_write_err.take() {\n    return Ready(Err(e.into()));\n}\nlet (op, buf) = match self.state {\n    Idle(_) => return Ready(Ok(())),\n    Busy(ref mut rx) => ready!(Pin::new(rx).poll(cx))?,\n};\nself.state = Idle(Some(buf));\nmatch op {\n    Operation::Read(_) => Ready(Ok(())),\n    Operation::Write(res) => Ready(res),\n    Operation::Seek(_) => Ready(Ok(())),\n}",
-      "correct": "Checks if there was an error in the last write attempt and returns it; updates state based on operation type, handles pinning for busy reading or writes result back to sender. Adjusts internal buffer accordingly. Returns appropriate readiness status after handling read/write/seek operations.",
+      "code": "let language = javascript_lang()\n    .with_outline_query(\n        r#\"\n        (function_declaration\n            \"function\" @context\n            name: (_) @name\n            parameters: (formal_parameters\n                \"(\" @context.extra\n                \")\" @context.extra)) @item\n        \"#,\n    )\n    .unwrap();\nlet text = r#\"\n    function a() {}\n    function b(c) {}\n\"#.unindent();\nlet buffer = cx\n    .new(|cx| Buffer::local(text, cx).with_language(Arc::new(language), cx));\nlet snapshot = buffer.update(cx, |buffer, _| buffer.snapshot());\nlet outline = snapshot.outline(None);\nassert_eq!(\n    outline.items.iter().map(| item | (item.text.as_str(), item.depth)).collect::<\n    Vec < _ >> (), & [(\"function a()\", 0), (\"function b( )\", 0),]\n);\nlet symbols = snapshot.symbols_containing(3, None);\nassert_eq!(\n    symbols.iter().map(| item | (item.text.as_str(), item.depth)).collect::< Vec < _\n    >> (), & [(\"function a\", 0)]\n);",
+      "correct": "Extracts the outline structure of JavaScript functions in provided text.",
       "distractors": [
-        "Checks if types can be sent, unpinned, or statically referenced.",
-        "Decrements the value at a specific memory location and checks if it was previously set to one.",
-        "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None."
+        "Constructs an HTTP GET or POST request with specified headers and follows redirect policy based on input parameters.",
+        "Formats a string representing the range from `start` to `end`, adding one for Rust's zero-indexing.",
+        "Initializes and sets up a global tracer with Tracy-specific configuration."
       ]
     },
     {
-      "code": "let path = path.as_ref().to_owned();\nlet contents = contents.as_ref().to_owned();\nasyncify(move || std::fs::write(path, contents)).await",
-      "correct": "Creates a file at 'path' with content from 'contents'.",
+      "code": "let pair = [*bytes.get(offset)?, *bytes.get(offset + 1)?];\nif little_endian {\n    return Some(u16::from_le_bytes(pair));\n}\nSome(u16::from_be_bytes(pair))",
+      "correct": "Converts a byte slice into either big-endian or little-endian u16 based on the specified endianness.",
       "distractors": [
-        "Checks if an inner value is present, deregisters the associated file descriptor from a source, and then replaces the internal state with None.",
-        "Attempts to acquire both a reader and writer lock on an existing waiter using mutex locking mechanism.",
-        "Transfers ownership of a Page from an owned to a shared pointer and then releases it back to raw memory after casting."
+        "Updates a range or interval by merging overlapping intervals with another.",
+        "Generates a PNG image with solid colors based on the x and y coordinates.",
+        "Checks for the presence of a binary in worktree and either returns its path or constructs an environment variable to run another script with language server ID. Then caches this new binary's path and creates command using it."
       ]
     },
     {
-      "code": "if self.flavor.is_some() {\n    return Err(syn::Error::new(span, \"`flavor` set multiple times.\"));\n}\nlet runtime_str = parse_string(runtime, span, \"flavor\")?;\nlet runtime = RuntimeFlavor::from_str(&runtime_str)\n    .map_err(|err| syn::Error::new(span, err))?;\nself.flavor = Some(runtime);\nOk(())",
-      "correct": "Checks if a 'flavor' field is set more than once and returns an error; parses the given string into a 'RuntimeFlavor', sets it as one of many flavors.",
+      "code": "if other.min_start.cmp(&self.min_start, buffer).is_lt() {\n    self.min_start = other.min_start;\n}\nif other.max_end.cmp(&self.max_end, buffer).is_gt() {\n    self.max_end = other.max_end;\n}\nself.start = other.start;\nself.end = other.end;\nself.count += other.count;",
+      "correct": "Updates a range or interval by merging overlapping intervals with another.",
       "distractors": [
-        "Compares a running snapshot with the next expected value in an atomic sequence and asserts its status as still running but not complete.",
-        "Checks if a join is interested and not already having a waker set, sets the first available waker on an object state after attempting to update it.",
-        "Checks if there are enough messages to send; sends a message and returns success if not."
+        "Converts a byte slice into either big-endian or little-endian u16 based on the specified endianness.",
+        "Formats a string representing the range from `start` to `end`, adding one for Rust's zero-indexing.",
+        "Calculates and aggregates network statistics such as minimum RTT, maximum jitter, total packets received/received loss percentage from a collection of metrics and represents them in computed form."
       ]
     },
     {
-      "code": "let ret = self.remove(&k);\nself.entries.push((k, stream));\nret",
-      "correct": "Adds a key-value pair to an entry list and returns whether it was removed after removal from another collection based on the provided unique identifier.",
+      "code": "if !self.supports_load_session {\n    return Task::ready(Err(anyhow::Error::msg(\"Loading sessions is not supported\")));\n}\nlet thread = self.create_session(session_id, project, work_dirs, title, cx);\nTask::ready(Ok(thread))",
+      "correct": "Prepares and returns a session task or an error if loading sessions are unsupported.",
       "distractors": [
-        "Sets up a bounded message channel with sender and receiver streams.",
-        "The code handles an internal conversion of a potentially missing value into its containing type and records it as an action to read an error if present.",
-        "Splits a read-write pair into separate reads and writes."
+        "Checks for the presence of a binary in worktree and either returns its path or constructs an environment variable to run another script with language server ID. Then caches this new binary's path and creates command using it.",
+        "Determines if a GitHub pull request contains any approving comments and returns success status based on that.",
+        "Cancels a frame request and logs an error after stopping another operation."
       ]
     },
     {
-      "code": "let stdin = io::stdin();\nlet mut stdout = io::stdout();\nlet mut line = String::new();\nloop {\n    line.clear();\n    stdin.read_line(&mut line).unwrap();\n    if line.is_empty() {\n        break;\n    }\n    stdout.write_all(line.as_bytes()).unwrap();\n}\nstdout.flush().unwrap();",
-      "correct": "The code reads lines from standard input and writes them to standard output until an empty line is encountered.",
+      "code": "let leader_id = self.leader_for_pane(pane)?;\nself.unfollow(leader_id, window, cx);\nSome(leader_id)",
+      "correct": "The function selects a new channel's leading peer for following and unfollows the current leader from it.",
       "distractors": [
-        "The given Rust code attempts to connect a TCP stream to an available local port on the machine it is running on, wrapping this in future-like behavior with `block_on`.",
-        "Measures and prints the execution time of a function `f()` in different threading contexts (single-threaded, multi-threaded with 1, multiple threads).",
-        "Checks if the requested amount can fit into a local queue and retrieves data from an internal buffer."
+        "Executes an asynchronous web search with the provided parameters in a background task.",
+        "Resets navigation and UI components and updates user interface.",
+        "Checks for the presence of a binary in worktree and either returns its path or constructs an environment variable to run another script with language server ID. Then caches this new binary's path and creates command using it."
       ]
     }
   ]
