@@ -12,12 +12,18 @@ pub struct QuizItem {
     pub distractors: [String; 3],
 }
 
-async fn load_quiz_data() -> Vec<QuizItem> {
+#[derive(Debug, Clone, Deserialize)]
+struct QuizData {
+    title: String,
+    items: Vec<QuizItem>,
+}
+
+async fn load_quiz_data() -> QuizData {
     let resp = Request::get("quiz_data.json")
         .send()
         .await
         .expect("Failed to fetch quiz_data.json");
-    resp.json::<Vec<QuizItem>>()
+    resp.json::<QuizData>()
         .await
         .expect("Failed to parse quiz_data.json")
 }
@@ -31,9 +37,16 @@ pub fn App() -> impl IntoView {
             <h1>"Code Quiz"</h1>
             <Suspense fallback=|| view! { <p>"Loading quiz..."</p> }>
                 {move || {
-                    data.get().map(|items| {
-                        let items: Vec<QuizItem> = (*items).clone();
-                        view! { <Quiz items=items /> }
+                    data.get().map(|quiz| {
+                        let quiz: QuizData = (*quiz).clone();
+                        view! {
+                            {if !quiz.title.is_empty() {
+                                view! { <p><em>{quiz.title.clone()}</em></p> }.into_any()
+                            } else {
+                                view! { <span></span> }.into_any()
+                            }}
+                            <Quiz items=quiz.items />
+                        }
                     })
                 }}
             </Suspense>
@@ -117,7 +130,6 @@ fn Quiz(items: Vec<QuizItem>) -> impl IntoView {
                         selected=selected.into()
                         on_answer=on_answer
                     />
-
                 }.into_any()
             }
         }}

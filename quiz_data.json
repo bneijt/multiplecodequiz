@@ -1,29 +1,455 @@
-[
-  {
-    "code": "let target_os = env::var(\"CARGO_CFG_TARGET_OS\");\nlet target_env = env::var(\"CARGO_CFG_TARGET_ENV\");\nif Ok(\"windows\") == target_os.as_deref() && Ok(\"msvc\") == target_env.as_deref() {\n    set_windows_exe_options();\n} else {\n    println!(\"cargo:rerun-if-changed=build.rs\");\n}",
-    "correct": "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
-    "distractors": [
-      "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-      "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
-      ""
-    ]
-  },
-  {
-    "code": "let stem = path::PathBuf::from(\"rustc_main_resource\");\nlet file_description = \"rustc\";\nlet res_file = compile_windows_resource_file(\n    &stem,\n    file_description,\n    VersionInfoFileType::App,\n);\nprintln!(\"cargo:rustc-link-arg={}\", res_file.display());",
-    "correct": "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
-    "distractors": [
-      "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-      "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
-      ""
-    ]
-  },
-  {
-    "code": "static WINDOWS_MANIFEST_FILE: &str = \"Windows Manifest.xml\";\nlet mut manifest = env::current_dir().unwrap();\nmanifest.push(WINDOWS_MANIFEST_FILE);\nprintln!(\"cargo:rerun-if-changed={WINDOWS_MANIFEST_FILE}\");\nprintln!(\"cargo:rustc-link-arg-bin=rustc-main=/MANIFEST:EMBED\");\nprintln!(\n    \"cargo:rustc-link-arg-bin=rustc-main=/MANIFESTINPUT:{}\", manifest.to_str()\n    .unwrap()\n);\nprintln!(\"cargo:rustc-link-arg-bin=rustc-main=/WX\");",
-    "correct": "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
-    "distractors": [
-      "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
-      "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
-      ""
-    ]
-  }
-]
+{
+  "title": "",
+  "items": [
+    {
+      "code": "let target_os = env::var(\"CARGO_CFG_TARGET_OS\");\nlet target_env = env::var(\"CARGO_CFG_TARGET_ENV\");\nif Ok(\"windows\") == target_os.as_deref() && Ok(\"msvc\") == target_env.as_deref() {\n    set_windows_exe_options();\n} else {\n    println!(\"cargo:rerun-if-changed=build.rs\");\n}",
+      "correct": "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
+      "distractors": [
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
+        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust."
+      ]
+    },
+    {
+      "code": "a.a += 10;\na.b += 2;\na",
+      "correct": "Increments a by ten and increments b by two.",
+      "distractors": [
+        "The code checks the behavior and characteristics of various data types, including unsigned integers (u8, u16, u32, u64, u128), signed integers (i8, i16, i32, i64, i128), a character type char, boolean bool, string str, references to an owned byte slice as well as borrowed ones (&u8, &str) and slices with different lengths ([usize], [u16; 0], [u8; 42]), as well as tuple struct S (with u8 or &[bool]; 8]) and unit type D (with u8 or #[bool]; 8]).",
+        "Increments a variable by each element's value from an array.",
+        "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration."
+      ]
+    },
+    {
+      "code": "let v1 = vec![5, 6, 7];\nlet v1_iter = v1.iter();\nlet total: i32 = v1_iter.sum();\nprintln!(\"{}\", total);\ntotal",
+      "correct": "Calculates and prints out the sum of elements within a vector.",
+      "distractors": [
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
+        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument."
+      ]
+    },
+    {
+      "code": "let result = pkd.data;\npkd.data = 42;\nresult",
+      "correct": "Assigns a value and then replaces an existing field with another value in mutable structure.",
+      "distractors": [
+        "Creates a mutable integer variable with an initial value of three and then assigns it to four after cloning its original state.",
+        "Calculates and prints out the sum of elements within a vector.",
+        "Generates a diagnostic message and emits it as an error if emission fails."
+      ]
+    },
+    {
+      "code": "let s8: svint8x3_t;\nlet u8: svuint8x3_t;\nlet s16: svint16x3_t;\nlet u16: svuint16x3_t;\nlet s32: svint32x3_t;\nlet u32: svuint32x3_t;\nlet s64: svint64x3_t;\nlet u64: svuint64x3_t;\nlet f32: svfloat32x3_t;\nlet f64: svfloat64x3_t;",
+      "correct": "Initializes eight 1D arrays of single, unsigned integers and floating-point numbers with three elements each in various bit sizes.",
+      "distractors": [
+        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust.",
+        "Generates a floating-point function call for built-in mathematical operations with 16-bit extended precision arguments and returns the results as 16-bit floats.",
+        "The code checks the behavior and characteristics of various data types, including unsigned integers (u8, u16, u32, u64, u128), signed integers (i8, i16, i32, i64, i128), a character type char, boolean bool, string str, references to an owned byte slice as well as borrowed ones (&u8, &str) and slices with different lengths ([usize], [u16; 0], [u8; 42]), as well as tuple struct S (with u8 or &[bool]; 8]) and unit type D (with u8 or #[bool]; 8])."
+      ]
+    },
+    {
+      "code": "let s = S;\nlet _: &dyn DynCompatible = &s;\nlet dyn_name = S::dyn_name as fn(&S) -> &str;\nlet _unused = dyn_name(&s);\nlet dyn_name_default = S::dyn_name_default as fn(&S) -> &str;\nlet _unused = dyn_name_default(&s);\nlet not_dyn_name = S::not_dyn_name as fn() -> &'static str;\nlet _unused = not_dyn_name();\nlet not_dyn_name_default = S::not_dyn_name_default as fn() -> &'static str;\nlet _unused = not_dyn_name_default();",
+      "correct": "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust.",
+      "distractors": [
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "Evaluates a global function with an argument at runtime using dynamic lookup and context.",
+        "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration."
+      ]
+    },
+    {
+      "code": "let mut n = 0;\nfor e in v {\n    n = *e;\n}\nn",
+      "correct": "Increments a variable by each element's value from an array.",
+      "distractors": [
+        "Updates a data structure with field patterns or wildcards based on an input iterator and formats the updated structure into a string representation.",
+        "Creates a mutable integer variable with an initial value of three and then assigns it to four after cloning its original state.",
+        "Collects and reverses a list of comments from an external source into its own structure."
+      ]
+    },
+    {
+      "code": "let picard = 0;\nlet data = 1;\nlet worf = 2;\nlet enterprise = [picard, data, worf];\nreturn enterprise;",
+      "correct": "Constructs an array containing three integers and returns it.",
+      "distractors": [
+        "Runs two separate functions sequentially and then prints zero.",
+        "Generates a diagnostic message and emits it as an error if emission fails.",
+        "Assigns a value and then replaces an existing field with another value in mutable structure."
+      ]
+    },
+    {
+      "code": "let no_padding1 = NoPadding1 {\n    x: (0, 1),\n    y: 2,\n    z: (3, 4, 5),\n};\nlet no_padding2 = NoPadding2 {\n    x: (6, 7),\n    y: ((8, 9), 10),\n};\nlet tuple_internal_padding = TupleInternalPadding {\n    x: (11, 12),\n    y: (13, 14),\n};\nlet struct_internal_padding = StructInternalPadding {\n    x: (15, 16),\n    y: (17, 18),\n};\nlet both_internally_padded = BothInternallyPadded {\n    x: (19, 20, 21),\n    y: (22, 23),\n};\nlet single_tuple = SingleTuple { x: (24, 25, 26) };\nlet tuple_padded_at_end = TuplePaddedAtEnd {\n    x: (27, 28),\n    y: (29, 30),\n};\nlet struct_padded_at_end = StructPaddedAtEnd {\n    x: (31, 32),\n    y: (33, 34),\n};\nlet both_padded_at_end = BothPaddedAtEnd {\n    x: (35, 36, 37),\n    y: (38, 39),\n};\nlet mixed_padding = MixedPadding {\n    x: ((40, 41, 42), (43, 44)),\n    y: (45, 46, 47, 48),\n};\nzzz();",
+      "correct": "The code snippet defines various structures with different padding strategies and creates instances of them.",
+      "distractors": [
+        "The code checks the behavior and characteristics of various data types, including unsigned integers (u8, u16, u32, u64, u128), signed integers (i8, i16, i32, i64, i128), a character type char, boolean bool, string str, references to an owned byte slice as well as borrowed ones (&u8, &str) and slices with different lengths ([usize], [u16; 0], [u8; 42]), as well as tuple struct S (with u8 or &[bool]; 8]) and unit type D (with u8 or #[bool]; 8]).",
+        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust.",
+        "Increments reference counts for various types of references and weak pointers to shared data in Rust."
+      ]
+    },
+    {
+      "code": "let rc = Rc::new(111);\ninc_ref_count(&rc, 10);\nlet weak_rc = Rc::downgrade(&rc);\nlet arc = Arc::new(222);\ninc_ref_count(&arc, 20);\nlet weak_arc = Arc::downgrade(&arc);\nlet dyn_rc: Rc<dyn Debug> = Rc::new(333);\ninc_ref_count(&dyn_rc, 30);\nlet dyn_rc_weak = Rc::downgrade(&dyn_rc);\nlet slice_rc: Rc<[u32]> = Rc::from(vec![1, 2, 3]);\ninc_ref_count(&slice_rc, 40);\nlet slice_rc_weak = Rc::downgrade(&slice_rc);\nlet dyn_arc: Arc<dyn Debug> = Arc::new(444);\ninc_ref_count(&dyn_arc, 50);\nlet dyn_arc_weak = Arc::downgrade(&dyn_arc);\nlet slice_arc: Arc<[u32]> = Arc::from(vec![4, 5, 6]);\ninc_ref_count(&slice_arc, 60);\nlet slice_arc_weak = Arc::downgrade(&slice_arc);\nzzz();",
+      "correct": "Increments reference counts for various types of references and weak pointers to shared data in Rust.",
+      "distractors": [
+        "The code checks the behavior and characteristics of various data types, including unsigned integers (u8, u16, u32, u64, u128), signed integers (i8, i16, i32, i64, i128), a character type char, boolean bool, string str, references to an owned byte slice as well as borrowed ones (&u8, &str) and slices with different lengths ([usize], [u16; 0], [u8; 42]), as well as tuple struct S (with u8 or &[bool]; 8]) and unit type D (with u8 or #[bool]; 8]).",
+        "All the code snippets are functions that contain loops which will exit immediately upon encountering a `break` or `continue`, with some tests specifically checking for immediate termination.",
+        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust."
+      ]
+    },
+    {
+      "code": "let small = [1, 2];\nlet big = [0u8; 33];\nsmall.into_iter();\n[1, 2].into_iter();\nbig.into_iter();\n[0u8; 33].into_iter();\nBox::new(small).into_iter();\nBox::new([1, 2]).into_iter();\nBox::new(big).into_iter();\nBox::new([0u8; 33]).into_iter();\nBox::new(Box::new(small)).into_iter();\nBox::new(Box::new([1, 2])).into_iter();\nBox::new(Box::new(big)).into_iter();\nBox::new(Box::new([0u8; 33])).into_iter();\n(&[1, 2]).into_iter();\n(&small).into_iter();\n(&[0u8; 33]).into_iter();\n(&big).into_iter();\nfor _ in &[1, 2] {}\n(&small as &[_]).into_iter();\nsmall[..].into_iter();\nstd::iter::IntoIterator::into_iter(&[1, 2]);\n#[allow(array_into_iter)] [0, 1].into_iter();",
+      "correct": "The code iterates over various data structures and boxed arrays.",
+      "distractors": [
+        "Updates a data structure with field patterns or wildcards based on an input iterator and formats the updated structure into a string representation.",
+        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position.",
+        "Initializes eight 1D arrays of single, unsigned integers and floating-point numbers with three elements each in various bit sizes."
+      ]
+    },
+    {
+      "code": "check::<u8>();\ncheck::<u16>();\ncheck::<u32>();\ncheck::<u64>();\ncheck::<u128>();\ncheck::<i8>();\ncheck::<i16>();\ncheck::<i32>();\ncheck::<i64>();\ncheck::<i128>();\ncheck::<char>();\ncheck::<bool>();\ncheck::<str>();\ncheck::<&u8>();\ncheck::<&str>();\ncheck::<[usize]>();\ncheck::<[u16; 0]>();\ncheck::<[u8; 42]>();\ncheck::<S<u8>>();\ncheck::<S<[&[bool]; 8]>>();\ncheck::<D<u8>>();\ncheck::<D<[&[bool]; 8]>>();\ncheck::<()>();\ncheck::<(i32,)>();\ncheck::<(D<u8>, D<i32>)>();",
+      "correct": "The code checks the behavior and characteristics of various data types, including unsigned integers (u8, u16, u32, u64, u128), signed integers (i8, i16, i32, i64, i128), a character type char, boolean bool, string str, references to an owned byte slice as well as borrowed ones (&u8, &str) and slices with different lengths ([usize], [u16; 0], [u8; 42]), as well as tuple struct S (with u8 or &[bool]; 8]) and unit type D (with u8 or #[bool]; 8]).",
+      "distractors": [
+        "Increments reference counts for various types of references and weak pointers to shared data in Rust.",
+        "Increments a by ten and increments b by two.",
+        "All the code snippets are functions that contain loops which will exit immediately upon encountering a `break` or `continue`, with some tests specifically checking for immediate termination."
+      ]
+    },
+    {
+      "code": "let this = self;\nlet a = 1;\nthis.x",
+      "correct": "Assigns an integer to a field and then assigns that instance of another struct to itself.",
+      "distractors": [
+        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position.",
+        "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances.",
+        "Creates a new instance of `Droppable`, calls an unnamed external function with a result from invoking another non-specified method on it, and then drops (manually deallocates) the resulting value."
+      ]
+    },
+    {
+      "code": "let mut x: isize = 3;\nx.clone();\nx = 4;",
+      "correct": "Creates a mutable integer variable with an initial value of three and then assigns it to four after cloning its original state.",
+      "distractors": [
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "Replaces an implementation of a trait for a struct and then calls another function with the updated structure.",
+        "Assigns a value and then replaces an existing field with another value in mutable structure."
+      ]
+    },
+    {
+      "code": "'test_1: while break 'test_1 {}\nwhile break {}\n'test_2: while let true = break 'test_2 {}\nwhile let true = break {}\nloop {\n    'test_3: while break 'test_3 {}\n}\nloop {\n    while break {}\n}\nloop {\n    'test_4: while break 'test_4 {}\n    break;\n}\nloop {\n    while break {}\n    break;\n}\n'test_5: while continue 'test_5 {}\nwhile continue {}\n'test_6: while let true = continue 'test_6 {}\nwhile let true = continue {}\nloop {\n    'test_7: while continue 'test_7 {}\n}\nloop {\n    while continue {}\n}\nloop {\n    'test_8: while continue 'test_8 {}\n    continue;\n}\nloop {\n    while continue {}\n    continue;\n}\n'test_9: loop {\n    break while continue 'test_9 {};\n}\nloop {\n    break while continue {};\n}",
+      "correct": "All the code snippets are functions that contain loops which will exit immediately upon encountering a `break` or `continue`, with some tests specifically checking for immediate termination.",
+      "distractors": [
+        "Adjusts the span of a predicate based on its kind's bounds and updates it accordingly.",
+        "Calculates and prints out the sum of elements within a vector.",
+        "Increments reference counts for various types of references and weak pointers to shared data in Rust."
+      ]
+    },
+    {
+      "code": "let x = Droppable;\nreturn complex();\ndrop(x);",
+      "correct": "Creates a new instance of `Droppable`, calls an unnamed external function with a result from invoking another non-specified method on it, and then drops (manually deallocates) the resulting value.",
+      "distractors": [
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "Generates a nested constant definition within an annotation structure.",
+        "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances."
+      ]
+    },
+    {
+      "code": "foo();\nfoobar();\n0",
+      "correct": "Runs two separate functions sequentially and then prints zero.",
+      "distractors": [
+        "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
+        "Constructs an array containing three integers and returns it.",
+        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result."
+      ]
+    },
+    {
+      "code": "self.finalize_pending_component();\nlet _ = write!(self.result, \"17h{hash:016x}E\");\nself.result",
+      "correct": "Updates a component's status and writes an encoded hash value to result with hex format",
+      "distractors": [
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "Calculates and prints out the sum of elements within a vector.",
+        "Executes a lookup for the result of an active database transaction's cached value or retrieves it from disk if poisoned and handles errors related to cycles."
+      ]
+    },
+    {
+      "code": "let flow_inits = self.flow_inits();\nlet state = flow_inits.get();\nif state.contains(mpi) {\n    return true;\n}\nlet move_paths = &flow_inits.analysis().move_data().move_paths;\nmove_paths[mpi].find_descendant(move_paths, |mpi| state.contains(mpi)).is_some()",
+      "correct": "Checks if a specific item exists within two nested data structures and returns false if it is found.",
+      "distractors": [
+        "Sets eligibility and related attributes for a provider's hooks, queries, and IDs based on given parameters",
+        "Creates a mutable integer variable with an initial value of three and then assigns it to four after cloning its original state.",
+        "Registers a local variable in the current scope with its corresponding visibility and namespace."
+      ]
+    },
+    {
+      "code": "let variances = self.cx().variances_of(def_id);\nrelate_args_with_variances(self, variances, a_args, b_args)?;\nOk(a_ty)",
+      "correct": "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances.",
+      "distractors": [
+        "Evaluates a global function with an argument at runtime using dynamic lookup and context.",
+        "Creates a new instance of `Droppable`, calls an unnamed external function with a result from invoking another non-specified method on it, and then drops (manually deallocates) the resulting value.",
+        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result."
+      ]
+    },
+    {
+      "code": "let config = &self.tcx.sess.config;\ndebug!(\"check_config(config={:?}, value={:?})\", config, value);\nif config.iter().any(|&(name, _)| name == value) {\n    debug!(\"check_config: matched\");\n    return true;\n}\ndebug!(\"check_config: no match found\");\nfalse",
+      "correct": "Checks if a given configuration matches any item in the list and returns true on finding a match.",
+      "distractors": [
+        "Executes a lookup for the result of an active database transaction's cached value or retrieves it from disk if poisoned and handles errors related to cycles.",
+        "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
+        "Generates a floating-point function call for built-in mathematical operations with 16-bit extended precision arguments and returns the results as 16-bit floats."
+      ]
+    },
+    {
+      "code": "let (coordinator_send, coordinator_receive) = channel();\nlet no_builtins = find_attr!(tcx, crate, NoBuiltins);\nlet regular_config = ModuleConfig::new(ModuleKind::Regular, tcx, no_builtins);\nlet allocator_config = ModuleConfig::new(ModuleKind::Allocator, tcx, no_builtins);\nlet (shared_emitter, shared_emitter_main) = SharedEmitter::new();\nlet (codegen_worker_send, codegen_worker_receive) = channel();\nlet coordinator_thread = start_executing_work(\n    backend.clone(),\n    tcx,\n    shared_emitter,\n    codegen_worker_send,\n    coordinator_receive,\n    Arc::new(regular_config),\n    Arc::new(allocator_config),\n    allocator_module,\n    coordinator_send.clone(),\n);\nOngoingCodegen {\n    backend,\n    codegen_worker_receive,\n    shared_emitter_main,\n    coordinator: Coordinator {\n        sender: coordinator_send,\n        future: Some(coordinator_thread),\n        phantom: PhantomData,\n    },\n    output_filenames: Arc::clone(tcx.output_filenames(())),\n}",
+      "correct": "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules.",
+      "distractors": [
+        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust."
+      ]
+    },
+    {
+      "code": "let mut comments = gather_comments(sm, filename, input);\ncomments.reverse();\nComments {\n    sm,\n    reversed_comments: comments,\n}",
+      "correct": "Collects and reverses a list of comments from an external source into its own structure.",
+      "distractors": [
+        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result.",
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "Updates a data structure with field patterns or wildcards based on an input iterator and formats the updated structure into a string representation."
+      ]
+    },
+    {
+      "code": "let mut parser = cx.new_parser_from_tts(stream);\nlet ty = parser.parse_ty()?;\nparser.expect_keyword(exp!(Is))?;\nlet start = parser.token.span;\nlet pat = if parser.eat(exp!(Bang)) {\n    parser.expect_keyword(exp!(Null))?;\n    ty_pat(TyPatKind::NotNull, start.to(parser.token.span))\n} else {\n    pat_to_ty_pat(\n        cx,\n        parser\n            .parse_pat_no_top_guard(\n                None,\n                RecoverComma::No,\n                RecoverColon::No,\n                CommaRecoveryMode::EitherTupleOrPipe,\n            )?,\n    )\n};\nif parser.token != token::Eof {\n    parser.unexpected()?;\n}\nOk((ty, Box::new(pat)))",
+      "correct": "Parses a type and pattern from input stream, handling optional negation and error checking.",
+      "distractors": [
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "Executes a lookup for the result of an active database transaction's cached value or retrieves it from disk if poisoned and handles errors related to cycles.",
+        "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules."
+      ]
+    },
+    {
+      "code": "let span = cx.with_def_site_ctxt(span);\nlet path = cx.std_path(&[sym::intrinsics, intrinsic]);\ncx.expr_call_global(span, path, args)",
+      "correct": "Evaluates a global function with an argument at runtime using dynamic lookup and context.",
+      "distractors": [
+        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust."
+      ]
+    },
+    {
+      "code": "let dir = dir.as_ref();\n#[cfg(windows)]\nfor wait in 1..11 {\n    match self.builder.tempdir_in(dir) {\n        Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {}\n        t => return t,\n    }\n    std::thread::sleep(std::time::Duration::from_millis(1 << wait));\n}\nself.builder.tempdir_in(dir)",
+      "correct": "Attempts to create a temporary directory repeatedly at increasing intervals until success or permission is denied.",
+      "distractors": [
+        "Registers a local variable in the current scope with its corresponding visibility and namespace.",
+        "Checks if a given configuration matches any item in the list and returns true on finding a match.",
+        "Executes a lookup for the result of an active database transaction's cached value or retrieves it from disk if poisoned and handles errors related to cycles."
+      ]
+    },
+    {
+      "code": "let predicate = &self.predicates[predicate_pos];\nlet bounds = predicate.kind.bounds();\nif bounds.len() == 1 {\n    return self.span_for_predicate_removal(predicate_pos);\n}\nlet bound_span = bounds[bound_pos].span();\nif bound_pos < bounds.len() - 1 {\n    bound_span.to(bounds[bound_pos + 1].span().shrink_to_lo())\n} else {\n    bound_span.with_lo(bounds[bound_pos - 1].span().hi())\n}",
+      "correct": "Adjusts the span of a predicate based on its kind's bounds and updates it accordingly.",
+      "distractors": [
+        "All the code snippets are functions that contain loops which will exit immediately upon encountering a `break` or `continue`, with some tests specifically checking for immediate termination.",
+        "Registers a local variable in the current scope with its corresponding visibility and namespace.",
+        "Parses a type and pattern from input stream, handling optional negation and error checking."
+      ]
+    },
+    {
+      "code": "let mut fields: Vec<_> = (0..self.arity).map(|_| PatOrWild::Wild).collect();\nfor ipat in self.iter_fields() {\n    fields[ipat.idx] = PatOrWild::Pat(&ipat.pat);\n}\nself.ctor().fmt_fields(f, self.ty(), fields.into_iter())",
+      "correct": "Updates a data structure with field patterns or wildcards based on an input iterator and formats the updated structure into a string representation.",
+      "distractors": [
+        "Collects and reverses a list of comments from an external source into its own structure.",
+        "Increments a variable by each element's value from an array.",
+        "Performs an indirect array access through a series of indexes and returns the final memory address."
+      ]
+    },
+    {
+      "code": "let words_per_row = num_words(self.num_columns);\nlet start = row.index() * words_per_row;\n(start, start + words_per_row)",
+      "correct": "Calculates and returns a range of indices for slicing an array based on column count and starting position.",
+      "distractors": [
+        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position.",
+        "Concatenates encoded metadata and full data into a byte stream for transmission or storage.",
+        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result."
+      ]
+    },
+    {
+      "code": "let snapshot = self.start_snapshot();\nlet r = f(&snapshot);\nself.rollback_to(snapshot);\nr",
+      "correct": "Executes a closure with an initialized resource and rolls back to its previous state after execution",
+      "distractors": [
+        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result.",
+        "Collects and reverses a list of comments from an external source into its own structure.",
+        "Replaces an implementation of a trait for a struct and then calls another function with the updated structure."
+      ]
+    },
+    {
+      "code": "let u = self.universe.get().next_universe();\ndebug!(\"create_next_universe {u:?}\");\nself.universe.set(u);\nu",
+      "correct": "Generates a new universe and updates to it as current universe.",
+      "distractors": [
+        "Performs an indirect array access through a series of indexes and returns the final memory address.",
+        "Aligns a pointer to an even address and updates its header with new alignment information.",
+        "Generates a unique identifier for an anonymous lifetime elision candidate and records it with specified bounds."
+      ]
+    },
+    {
+      "code": "let old = mem::replace(&mut self.outer_trait_or_trait_impl, in_trait_or_impl);\nf(self);\nself.outer_trait_or_trait_impl = old;",
+      "correct": "Replaces an implementation of a trait for a struct and then calls another function with the updated structure.",
+      "distractors": [
+        "Creates a mutable integer variable with an initial value of three and then assigns it to four after cloning its original state.",
+        "Executes a closure with an initialized resource and rolls back to its previous state after execution",
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input."
+      ]
+    },
+    {
+      "code": "let normalized_source_len = RelativeBytePos::from_u32(normalized_source_len);\nlet source_file = SourceFile {\n    name: filename,\n    src: None,\n    src_hash,\n    checksum_hash,\n    external_src: FreezeLock::new(ExternalSource::Foreign {\n        kind: ExternalSourceKind::AbsentOk,\n        metadata_index,\n    }),\n    start_pos: BytePos(0),\n    normalized_source_len,\n    unnormalized_source_len,\n    lines: file_local_lines,\n    multibyte_chars,\n    normalized_pos,\n    stable_id,\n    cnum,\n};\nself.register_source_file(stable_id, source_file)\n    .expect(\"not enough address space for imported source file\")",
+      "correct": "Registers an external foreign source file with its properties after normalization and checks available address space.",
+      "distractors": [
+        "Registers a local variable in the current scope with its corresponding visibility and namespace.",
+        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
+        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust."
+      ]
+    },
+    {
+      "code": "let data = Diagnostic::from_errors_diagnostic(diag, self);\nlet result = self.emit(EmitTyped::Diagnostic(data));\nif let Err(e) = result {\n    panic!(\"failed to print diagnostics: {e:?}\");\n}",
+      "correct": "Generates a diagnostic message and emits it as an error if emission fails.",
+      "distractors": [
+        "The code asserts properties of a function that checks if strings are in uppercase camel case and converts them to upper Camel Case, comparing its results against expected outcomes.",
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result."
+      ]
+    },
+    {
+      "code": "let local_def_id = feed.key();\nlet def_id = local_def_id.to_def_id();\nlet ns = match item.kind {\n    ForeignItemKind::Fn(..) => ValueNS,\n    ForeignItemKind::Static(..) => ValueNS,\n    ForeignItemKind::TyAlias(..) => TypeNS,\n    ForeignItemKind::MacCall(..) => unreachable!(),\n};\nlet parent = self.parent_scope.module.expect_local();\nlet expansion = self.parent_scope.expansion;\nlet vis = self.resolve_visibility(&item.vis);\nself.r.define_local(parent, ident, ns, self.res(def_id), vis, item.span, expansion);\nself.r.feed_visibility(feed, vis);",
+      "correct": "Registers a local variable in the current scope with its corresponding visibility and namespace.",
+      "distractors": [
+        "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules.",
+        "Executes a visit action with different visitors on two separate nodes and directly visits another node with an additional visitor.",
+        "Adjusts the span of a predicate based on its kind's bounds and updates it accordingly."
+      ]
+    },
+    {
+      "code": "let id = self.r.next_node_id();\nlet lt = Lifetime {\n    id,\n    ident: Ident::new(kw::UnderscoreLifetime, span),\n};\nself.record_lifetime_res(\n    anchor_id,\n    LifetimeRes::ElidedAnchor {\n        start: id,\n        end: id + 1,\n    },\n    LifetimeElisionCandidate::Ignore,\n);\nself.resolve_anonymous_lifetime(&lt, anchor_id, true);",
+      "correct": "Generates a unique identifier for an anonymous lifetime elision candidate and records it with specified bounds.",
+      "distractors": [
+        "Executes a closure with an initialized resource and rolls back to its previous state after execution",
+        "Generates a nested constant definition within an annotation structure.",
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input."
+      ]
+    },
+    {
+      "code": "let ib = self.ibox(INDENT_UNIT);\nself.word_space(\"const\");\nself.ann.nested(self, Nested::Body(constant.body));\nself.end(ib)",
+      "correct": "Generates a nested constant definition within an annotation structure.",
+      "distractors": [
+        "Creates a new instance of `Droppable`, calls an unnamed external function with a result from invoking another non-specified method on it, and then drops (manually deallocates) the resulting value.",
+        "Adjusts the span of a predicate based on its kind's bounds and updates it accordingly.",
+        "Aligns a pointer to an even address and updates its header with new alignment information."
+      ]
+    },
+    {
+      "code": "assert!(! is_upper_camel_case(\"userData\"));\nassert_eq!(to_upper_camel_case(\"userData\"), \"UserData\");\nassert!(is_upper_camel_case(\"X86_64\"));\nassert!(! is_upper_camel_case(\"X86__64\"));\nassert_eq!(to_upper_camel_case(\"X86__64\"), \"X86_64\");\nassert!(! is_upper_camel_case(\"Abc_123\"));\nassert_eq!(to_upper_camel_case(\"Abc_123\"), \"Abc123\");\nassert!(! is_upper_camel_case(\"A1_b2_c3\"));\nassert_eq!(to_upper_camel_case(\"A1_b2_c3\"), \"A1B2C3\");\nassert!(! is_upper_camel_case(\"ONE_TWO_THREE\"));\nassert_eq!(to_upper_camel_case(\"ONE_TWO_THREE\"), \"OneTwoThree\");\nassert!(! is_upper_camel_case(\"ǇǊaaaǄooo\"));\nassert_eq!(to_upper_camel_case(\"ǇǊaaǈǊaǄooo\"), \"ǈǌaaǈǋaǅooo\");\nassert!(! is_upper_camel_case(\"ΦΙΛΟΣ_ΦΙΛΟΣ\"));\nassert_eq!(to_upper_camel_case(\"ΦΙΛΟΣ_ΦΙΛΟΣ\"), \"ΦιλοςΦιλος\");\nassert!(is_upper_camel_case(\"ΦιλοσΦιλοσ\"));",
+      "correct": "The code asserts properties of a function that checks if strings are in uppercase camel case and converts them to upper Camel Case, comparing its results against expected outcomes.",
+      "distractors": [
+        "Generates a diagnostic message and emits it as an error if emission fails.",
+        "Sets eligibility and related attributes for a provider's hooks, queries, and IDs based on given parameters",
+        "Adjusts the span of a predicate based on its kind's bounds and updates it accordingly."
+      ]
+    },
+    {
+      "code": "self.stub_metadata.encode(s);\nlet slice = self.full();\nslice.encode(s)",
+      "correct": "Concatenates encoded metadata and full data into a byte stream for transmission or storage.",
+      "distractors": [
+        "Calculates and returns a range of indices for slicing an array based on column count and starting position.",
+        "Registers a local variable in the current scope with its corresponding visibility and namespace.",
+        "Generates a nested constant definition within an annotation structure."
+      ]
+    },
+    {
+      "code": "let commit_hash_file = self.compute_path(\"libgccjit.version\");\nlet content = fs::read_to_string(&commit_hash_file)\n    .map_err(|_| {\n        format!(\n            \"Failed to read `{}`. Take a look at `Readme.md` to see how to set up the project\",\n            commit_hash_file.display(),\n        )\n    })?;\nlet commit = content.trim();\nif commit.contains('/') || commit.contains('\\\\') {\n    return Err(\n        format!(\"{}: invalid commit hash `{}`\", commit_hash_file.display(), commit,),\n    );\n}\nOk(commit.to_string())",
+      "correct": "Parses and validates a Git commit hash from the file, returning an error if it is not valid.",
+      "distractors": [
+        "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules."
+      ]
+    },
+    {
+      "code": "let aligned = ptr.add(align - (ptr as usize & (align - 1)));\n*get_header(aligned) = Header(ptr);\naligned",
+      "correct": "Aligns a pointer to an even address and updates its header with new alignment information.",
+      "distractors": [
+        "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+        "The code demonstrates the usage of dynamic dispatch and default implementations with traits in Rust.",
+        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position."
+      ]
+    },
+    {
+      "code": "let f32_type = cx.type_f32();\nlet builtin_name = match name {\n    sym::ceilf16 => \"__builtin_ceilf\",\n    sym::copysignf16 => \"__builtin_copysignf\",\n    sym::expf16 => \"expf\",\n    sym::exp2f16 => \"exp2f\",\n    sym::fabs => \"fabsf\",\n    sym::floorf16 => \"__builtin_floorf\",\n    sym::fmaf16 => \"fmaf\",\n    sym::logf16 => \"logf\",\n    sym::log2f16 => \"log2f\",\n    sym::log10f16 => \"log10f\",\n    sym::powf16 => \"__builtin_powf\",\n    sym::roundf16 => \"__builtin_roundf\",\n    sym::round_ties_even_f16 => \"__builtin_rintf\",\n    sym::sqrtf16 => \"__builtin_sqrtf\",\n    sym::truncf16 => \"__builtin_truncf\",\n    _ => unreachable!(),\n};\nlet func = cx.context.get_builtin_function(builtin_name);\nlet args: Vec<_> = args\n    .iter()\n    .map(|arg| cx.context.new_cast(None, arg.immediate(), f32_type))\n    .collect();\nlet result = cx.context.new_call(None, func, &args);\ncx.context.new_cast(None, result, cx.type_f16())",
+      "correct": "Generates a floating-point function call for built-in mathematical operations with 16-bit extended precision arguments and returns the results as 16-bit floats.",
+      "distractors": [
+        "Initializes eight 1D arrays of single, unsigned integers and floating-point numbers with three elements each in various bit sizes.",
+        "Checks if a given configuration matches any item in the list and returns true on finding a match.",
+        "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules."
+      ]
+    },
+    {
+      "code": "let typ = a.get_type().to_signed(self);\nlet b = self.gcc_int_cast(b, typ);\nself.assign_to_var(self.gcc_sdiv(a, b))",
+      "correct": "Performs integer division and assigns result to variable 'b' after converting type of numerator.",
+      "distractors": [
+        "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances.",
+        "Parses and validates a Git commit hash from the file, returning an error if it is not valid.",
+        "Sets up an ongoing code generation process with a dedicated thread, channels for communication between threads, and configurations excluding built-in modules."
+      ]
+    },
+    {
+      "code": "let result = self.frem(lhs, rhs);\nset_rvalue_location(self, result);\nresult",
+      "correct": "Calculates a value and updates an object's location attribute with that calculated value",
+      "distractors": [
+        "Performs an indirect array access through a series of indexes and returns the final memory address.",
+        "Executes a visit action with different visitors on two separate nodes and directly visits another node with an additional visitor.",
+        "Executes a closure with an initialized resource and rolls back to its previous state after execution"
+      ]
+    },
+    {
+      "code": "let ptr = self.context.new_cast(self.location, ptr, typ.make_pointer());\nlet mut indices = indices.iter();\nlet index = indices.next().expect(\"first index in inbounds_gep\");\nlet mut result = self.context.new_array_access(self.location, ptr, *index);\nfor index in indices {\n    result = self.context.new_array_access(self.location, result, *index);\n}\nresult.get_address(self.location)",
+      "correct": "Performs an indirect array access through a series of indexes and returns the final memory address.",
+      "distractors": [
+        "Calculates a value and updates an object's location attribute with that calculated value",
+        "Updates a data structure with field patterns or wildcards based on an input iterator and formats the updated structure into a string representation.",
+        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position."
+      ]
+    },
+    {
+      "code": "let query_blocked_prof_timer = tcx.prof.query_blocked();\nlet result = latch.wait_on(tcx, current, span);\nmatch result {\n    Ok(()) => {\n        let Some((v, index)) = query.cache.lookup(&key) else {\n            outline(|| {\n                let shard = query.state.active.lock_shard_by_hash(key_hash);\n                match shard.find(key_hash, equivalent_key(key)) {\n                    Some((_, ActiveKeyStatus::Poisoned)) => FatalError.raise(),\n                    _ => {\n                        panic!(\n                            \"query '{}' result must be in the cache or the query must be poisoned after a wait\",\n                            query.name\n                        )\n                    }\n                }\n            })\n        };\n        tcx.prof.query_cache_hit(index.into());\n        query_blocked_prof_timer.finish_with_query_invocation_id(index.into());\n        (v, Some(index))\n    }\n    Err(cycle) => (handle_cycle(query, tcx, key, cycle), None),\n}",
+      "correct": "Executes a lookup for the result of an active database transaction's cached value or retrieves it from disk if poisoned and handles errors related to cycles.",
+      "distractors": [
+        "Parses a type and pattern from input stream, handling optional negation and error checking.",
+        "Checks if a given configuration matches any item in the list and returns true on finding a match.",
+        "Updates a component's status and writes an encoded hash value to result with hex format"
+      ]
+    },
+    {
+      "code": "let res = self.float_round::<F>(self.read_scalar(&args[0])?, mode)?;\nself.write_scalar(res, dest)?;\ninterp_ok(())",
+      "correct": "Calculates and writes a rounded floating-point number to an output destination based on input parameters and returns the result.",
+      "distractors": [
+        "Collects and reverses a list of comments from an external source into its own structure.",
+        "Executes a closure with an initialized resource and rolls back to its previous state after execution",
+        "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances."
+      ]
+    },
+    {
+      "code": "try_visit!(self.0.visit_with(visitor));\ntry_visit!(self.1.visit_with(visitor));\nself.2.visit_with(visitor)",
+      "correct": "Executes a visit action with different visitors on two separate nodes and directly visits another node with an additional visitor.",
+      "distractors": [
+        "Registers a local variable in the current scope with its corresponding visibility and namespace.",
+        "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position.",
+        "Executes a closure with an initialized resource and rolls back to its previous state after execution"
+      ]
+    },
+    {
+      "code": "let index = self.insert_unique(ty, Value::Opaque);\nself.evaluated[index] = Some(None);\nindex",
+      "correct": "Inserts a unique opaque value and updates an evaluated map with its corresponding None result at that position.",
+      "distractors": [
+        "Calculates type variance of an identifier and relates arguments to their respective types based on the calculated variances.",
+        "Calculates and returns a range of indices for slicing an array based on column count and starting position.",
+        "Executes a visit action with different visitors on two separate nodes and directly visits another node with an additional visitor."
+      ]
+    },
+    {
+      "code": "providers.hooks.is_eligible_for_coverage = is_eligible_for_coverage;\nproviders.queries.coverage_attr_on = coverage_attr_on;\nproviders.queries.coverage_ids_info = coverage_ids_info;",
+      "correct": "Sets eligibility and related attributes for a provider's hooks, queries, and IDs based on given parameters",
+      "distractors": [
+        "Checks if a specific item exists within two nested data structures and returns false if it is found.",
+        "The code asserts properties of a function that checks if strings are in uppercase camel case and converts them to upper Camel Case, comparing its results against expected outcomes.",
+        "Concatenates encoded metadata and full data into a byte stream for transmission or storage."
+      ]
+    }
+  ]
+}

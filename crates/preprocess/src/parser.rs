@@ -53,11 +53,14 @@ pub struct CodeChunk {
     pub body: String,
 }
 
+const MAX_DEPTH: usize = 10;
+
 struct ChunkCollector {
     chunks: Vec<CodeChunk>,
     file_path: String,
     min_stmts: usize,
     max_stmts: usize,
+    depth: usize,
 }
 
 impl ChunkCollector {
@@ -67,6 +70,7 @@ impl ChunkCollector {
             file_path,
             min_stmts,
             max_stmts,
+            depth: 0,
         }
     }
 
@@ -103,6 +107,15 @@ impl<'ast> Visit<'ast> for ChunkCollector {
             }
         }
         syn::visit::visit_item_fn(self, node);
+    }
+
+    fn visit_expr(&mut self, node: &'ast syn::Expr) {
+        if self.depth >= MAX_DEPTH {
+            return;
+        }
+        self.depth += 1;
+        syn::visit::visit_expr(self, node);
+        self.depth -= 1;
     }
 }
 

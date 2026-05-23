@@ -46,6 +46,18 @@ struct Args {
 async fn main() -> Result<()> {
     let args = Args::parse();
 
+    let readme_path = args.repo.join("README.md");
+    let title = if readme_path.exists() {
+        println!("=== Step 0: Summarising README.md ===");
+        let content = std::fs::read_to_string(&readme_path)?;
+        match describer::summarize_readme(&content).await {
+            Ok(s) => { println!("Title: {}", s); s }
+            Err(e) => { eprintln!("Warning: failed to summarise README: {}", e); String::new() }
+        }
+    } else {
+        String::new()
+    };
+
     println!("=== Step 1: Parsing .rs files in {:?} ===", args.repo);
     let chunks = parser::iter_chunks_from_repo(&args.repo, args.min_stmts, args.max_stmts);
 
@@ -73,7 +85,7 @@ async fn main() -> Result<()> {
     let entries = distractors::build_quiz_entries(&collection).await?;
 
     println!("\n=== Step 6: Exporting to {:?} ===", args.output);
-    export::export_json(&entries, &args.output)?;
+    export::export_json(&entries, &title, &args.output)?;
 
     println!("\nDone! Run 'trunk serve' in crates/frontend to start the quiz.");
     Ok(())

@@ -12,6 +12,24 @@ sentence describing what the code does functionally. Do not mention variable nam
 function names, or implementation details — only the purpose. \
 Do not include any preamble, explanation, or punctuation beyond the single sentence.";
 
+const README_SYSTEM_PROMPT: &str = "\
+You are a technical writer. When given a README file, respond with exactly one short \
+sentence (max 12 words) suitable as a subtitle for a code quiz about the project. \
+Focus on what the project is or does. No preamble, no punctuation beyond the sentence.";
+
+/// Summarise a README into a single subtitle sentence using the LLM.
+pub async fn summarize_readme(content: &str) -> Result<String> {
+    let client = ollama::Client::new();
+    let agent = client
+        .agent(LLM_MODEL)
+        .preamble(README_SYSTEM_PROMPT)
+        .build();
+
+    let prompt = format!("Summarize this README in one short sentence:\n\n{}", &content[..content.len().min(4000)]);
+    let summary = agent.prompt(prompt.as_str()).await?;
+    Ok(summary.trim().to_string())
+}
+
 pub async fn describe_selected_chunks(collection: &AsyncCollection) -> Result<()> {
     let client = ollama::Client::new();
     let agent = client.agent(LLM_MODEL).preamble(SYSTEM_PROMPT).build();

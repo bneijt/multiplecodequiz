@@ -11,7 +11,13 @@ struct QuizItemJson<'a> {
     distractors: [&'a str; 3],
 }
 
-pub fn export_json(entries: &[QuizEntry], output_path: &Path) -> Result<()> {
+#[derive(Serialize)]
+struct QuizDataJson<'a> {
+    title: &'a str,
+    items: Vec<QuizItemJson<'a>>,
+}
+
+pub fn export_json(entries: &[QuizEntry], title: &str, output_path: &Path) -> Result<()> {
     let items: Vec<QuizItemJson> = entries
         .iter()
         .map(|e| QuizItemJson {
@@ -25,13 +31,14 @@ pub fn export_json(entries: &[QuizEntry], output_path: &Path) -> Result<()> {
         })
         .collect();
 
-    let json = serde_json::to_string_pretty(&items)?;
+    let data = QuizDataJson { title, items };
+    let json = serde_json::to_string_pretty(&data)?;
 
     if let Some(parent) = output_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
 
     std::fs::write(output_path, json)?;
-    println!("Exported {} quiz items to {}", items.len(), output_path.display());
+    println!("Exported {} quiz items to {}", data.items.len(), output_path.display());
     Ok(())
 }
