@@ -1,0 +1,35 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: jetli/trunk-action@v0.5.0
+
+      - name: Build
+        working-directory: crates/frontend
+        run: trunk build --release
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: crates/frontend/dist
+
+      - uses: actions/deploy-pages@v4
+        id: deployment
