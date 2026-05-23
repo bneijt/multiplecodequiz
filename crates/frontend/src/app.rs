@@ -1,9 +1,10 @@
 use gloo_net::http::Request;
+use js_sys;
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::components::{QuizCard, ScoreBoard};
-use crate::quiz::shuffle_answers;
+use crate::quiz::{shuffle_answers, shuffle_items};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuizItem {
@@ -56,6 +57,9 @@ pub fn App() -> impl IntoView {
 
 #[component]
 fn Quiz(items: Vec<QuizItem>) -> impl IntoView {
+    // Shuffle question order using a random seed from the JS runtime.
+    let seed = (js_sys::Math::random() * u64::MAX as f64) as u64;
+    let items = shuffle_items(items, seed);
     let total = items.len();
     let current = RwSignal::new(0usize);
     let score = RwSignal::new(0usize);
