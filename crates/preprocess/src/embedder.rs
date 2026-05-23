@@ -50,6 +50,13 @@ pub async fn embed_and_store(
             .with_field("selected", "0")
             .with_field("description", "");
 
+        // Skip insert if an identical vector already exists in the DB.
+        // This makes re-runs idempotent without needing a separate dedup key.
+        let nearest = collection.search(&vec_f32, 1, None).await;
+        if nearest.first().map_or(false, |r| r.distance < 1e-6) {
+            continue;
+        }
+
         collection.insert_auto(vec_f32, payload).await?;
         count += 1;
 

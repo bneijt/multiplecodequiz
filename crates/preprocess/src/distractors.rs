@@ -41,7 +41,9 @@ pub async fn build_quiz_entries(collection: &AsyncCollection) -> Result<Vec<Quiz
         // Use PolarisDB ANN search to find the 4 nearest neighbours.
         // The first result is the vector itself (distance ~0), so we skip it
         // and take the next 3 as distractors.
-        let neighbors: Vec<SearchResult> = collection.search(vec, 5, None).await;
+
+        let filter = Some(Filter::field("description").ne(""));
+        let neighbors: Vec<SearchResult> = collection.search(vec, 5, filter).await;
 
         let distractors: Vec<String> = neighbors
             .into_iter()
@@ -49,7 +51,11 @@ pub async fn build_quiz_entries(collection: &AsyncCollection) -> Result<Vec<Quiz
             .filter_map(|r| {
                 r.payload.and_then(|p: Payload| {
                     let desc = p.get_str("description")?.to_string();
-                    if desc.is_empty() { None } else { Some(desc) }
+                    if desc.is_empty() {
+                        None
+                    } else {
+                        Some(desc)
+                    }
                 })
             })
             .take(3)

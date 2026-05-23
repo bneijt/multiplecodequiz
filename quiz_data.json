@@ -1,182 +1,56 @@
 [
   {
-    "code": "match item_name {\n    \"rust_eh_personality\" => return item_name.to_owned(),\n    \"__isPlatformVersionAtLeast\" | \"__isOSVersionAtLeast\" => {\n        return item_name.to_owned();\n    }\n    _ => {}\n}\nlet prefix = \"_R\";\nlet mut p: V0SymbolMangler<'_> = V0SymbolMangler {\n    tcx,\n    start_offset: prefix.len(),\n    is_exportable: false,\n    paths: FxHashMap::default(),\n    types: FxHashMap::default(),\n    consts: FxHashMap::default(),\n    binders: vec![],\n    out: String::from(prefix),\n};\np.path_append_ns(\n        |p| {\n            p.push(\"C\");\n            p.push_disambiguator({\n                let mut hasher = StableHasher::new();\n                hasher.write(tcx.sess.cfg_version.as_bytes());\n                let hash: Hash64 = hasher.finish();\n                hash.as_u64()\n            });\n            p.push_ident(\"__rustc\");\n            Ok(())\n        },\n        'v',\n        0,\n        item_name,\n    )\n    .unwrap();\nstd::mem::take(&mut p.out)",
-    "correct": "Generates a mangled symbol name by appending namespace characters and hashing the configuration version.",
+    "code": "let dot: f32 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();\nlet norm_a: f32 = a.iter().map(|x| x * x).sum::<f32>().sqrt();\nlet norm_b: f32 = b.iter().map(|x| x * x).sum::<f32>().sqrt();\nif norm_a == 0.0 || norm_b == 0.0 {\n    return 1.0;\n}\n1.0 - (dot / (norm_a * norm_b))",
+    "correct": "Calculates the cosine similarity between two vectors, returning a value close to zero if either vector is of nearly zero magnitude.",
     "distractors": [
-      "",
-      "",
-      ""
+      "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces.",
+      "Generates a pseudorandom sequence of unique indices to reorder an array in a specific way based on initial seed values and shuffles the original array accordingly.",
+      "Exports a collection of serialized JSON representations of quiz items and writes them into an organized directory."
     ]
   },
   {
-    "code": "self.finalize_pending_component();\nlet _ = write!(self.result, \"17h{hash:016x}E\");\nself.result",
-    "correct": "Finalizes a pending component and writes hexadecimal hash followed by 'E' to result.",
+    "code": "let config = CollectionConfig::new(EMBEDDING_DIMS, DistanceMetric::Cosine);\nlet collection = AsyncCollection::open_or_create(db_path.to_string(), config).await?;\nOk(collection)",
+    "correct": "Creates and opens an asynchronous collection with specified embedding dimensions and cosine distance metric.",
     "distractors": [
-      "",
-      "",
-      ""
+      "The code asynchronously processes and stores text embeddings from files in batches of up to 1000 characters into a collection, flushing the results at intervals.",
+      "Exports a collection of serialized JSON representations of quiz items and writes them into an organized directory.",
+      "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces."
     ]
   },
   {
-    "code": "let linker_with_extension = if cfg!(windows) && linker.extension().is_none() {\n    linker.with_extension(\"exe\")\n} else {\n    linker.to_path_buf()\n};\nfor dir in env::split_paths(&env::var_os(\"PATH\").unwrap_or_default()) {\n    let full_path = dir.join(&linker_with_extension);\n    if full_path.is_file() && !full_path.starts_with(sess.opts.sysroot.path()) {\n        return false;\n    }\n}\ntrue",
-    "correct": "Checks for an executable linker in the system PATH that is not within a specified sysroot directory and returns true if found.",
+    "code": "let client = ollama::Client::new();\nlet model = client.embedding_model(ollama::NOMIC_EMBED_TEXT);\nlet mut count = 0usize;\nfor chunk_result in chunks {\n    let chunk = chunk_result?;\n    if chunk.body.len() > 1000 {\n        continue;\n    }\n    let embeddings = model.embed_texts(vec![chunk.body.clone()]).await?;\n    let vec_f32: Vec<f32> = embeddings[0].vec.iter().map(|&v| v as f32).collect();\n    let payload = Payload::new()\n        .with_field(\"file_path\", chunk.file_path.clone())\n        .with_field(\"fn_name\", chunk.fn_name.clone())\n        .with_field(\"body\", chunk.body.clone())\n        .with_field(\"selected\", \"0\")\n        .with_field(\"description\", \"\");\n    collection.insert_auto(vec_f32, payload).await?;\n    count += 1;\n    if count % 10 == 0 {\n        println!(\"  Embedded {} chunks...\", count);\n    }\n}\ncollection.flush().await?;\nOk(count)",
+    "correct": "The code asynchronously processes and stores text embeddings from files in batches of up to 1000 characters into a collection, flushing the results at intervals.",
     "distractors": [
-      "",
-      "",
-      ""
+      "Generates a pseudorandom sequence of unique indices to reorder an array in a specific way based on initial seed values and shuffles the original array accordingly.",
+      "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces.",
+      "Creates and opens an asynchronous collection with specified embedding dimensions and cosine distance metric."
     ]
   },
   {
-    "code": "self.word(\"/*\");\nself.space();\nself.word(text);\nself.space();\nself.word(\"*/\")",
-    "correct": "Inserts a comment containing 'text' into an XML-like document.",
+    "code": "let wrapper = quote! {\n    fn __wrapper() # block\n};\nlet Ok(ast) = syn::parse2::<syn::File>(wrapper) else {\n    return None;\n};\nlet result = std::panic::catch_unwind(|| prettyplease::unparse(&ast));\nlet formatted = result.ok()?;\nlet start = formatted.find('{').map(|i| i + 1).unwrap_or(0);\nlet end = formatted.rfind('}').unwrap_or(formatted.len());\nlet inner = &formatted[start..end];\nSome(dedent(inner).trim().to_string())",
+    "correct": "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces.",
     "distractors": [
-      "",
-      "",
-      ""
+      "Exports a collection of serialized JSON representations of quiz items and writes them into an organized directory.",
+      "The code asynchronously processes and stores text embeddings from files in batches of up to 1000 characters into a collection, flushing the results at intervals.",
+      "Generates a pseudorandom sequence of unique indices to reorder an array in a specific way based on initial seed values and shuffles the original array accordingly."
     ]
   },
   {
-    "code": "let sp = cx.with_def_site_ctxt(sp);\nlet s = pprust::tts_to_string(&tts);\nExpandResult::Ready(MacEager::expr(cx.expr_str(sp, Symbol::intern(&s))))",
-    "correct": "The function converts a textual expression into an expanded string representation.",
+    "code": "let items: Vec<QuizItemJson> = entries\n    .iter()\n    .map(|e| QuizItemJson {\n        code: &e.body,\n        correct: &e.correct,\n        distractors: [&e.distractors[0], &e.distractors[1], &e.distractors[2]],\n    })\n    .collect();\nlet json = serde_json::to_string_pretty(&items)?;\nif let Some(parent) = output_path.parent() {\n    std::fs::create_dir_all(parent)?;\n}\nstd::fs::write(output_path, json)?;\nprintln!(\"Exported {} quiz items to {}\", items.len(), output_path.display());\nOk(())",
+    "correct": "Exports a collection of serialized JSON representations of quiz items and writes them into an organized directory.",
     "distractors": [
-      "",
-      "",
-      ""
+      "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces.",
+      "The code asynchronously processes and stores text embeddings from files in batches of up to 1000 characters into a collection, flushing the results at intervals.",
+      "Creates and opens an asynchronous collection with specified embedding dimensions and cosine distance metric."
     ]
   },
   {
-    "code": "let predicate = &self.predicates[pos];\nlet span = predicate.span;\nif !predicate.kind.in_where_clause() {\n    return span;\n}\nif pos < self.predicates.len() - 1 {\n    let next_pred = &self.predicates[pos + 1];\n    if next_pred.kind.in_where_clause() {\n        return span.until(next_pred.span);\n    }\n}\nif pos > 0 {\n    let prev_pred = &self.predicates[pos - 1];\n    if prev_pred.kind.in_where_clause() {\n        return prev_pred.span.shrink_to_hi().to(span);\n    }\n}\nself.where_clause_span",
-    "correct": "Determines the range within a SQL WHERE clause based on predicate positions and their inclusion in where clauses.",
+    "code": "let seed = answers[0]\n    .bytes()\n    .fold(0u64, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u64));\nlet n = answers.len();\nlet mut indices: Vec<usize> = (0..n).collect();\nlet mut rng = seed;\nfor i in (1..n).rev() {\n    rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);\n    let j = (rng >> 33) as usize % (i + 1);\n    indices.swap(i, j);\n}\nlet correct_idx = indices.iter().position(|&x| x == 0).unwrap();\nlet shuffled = indices.into_iter().map(|i| answers[i].clone()).collect();\n(shuffled, correct_idx)",
+    "correct": "Generates a pseudorandom sequence of unique indices to reorder an array in a specific way based on initial seed values and shuffles the original array accordingly.",
     "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "assert_eq!(size_of::< MyIdx > (), 4);\nassert_eq!(size_of::< Option < MyIdx >> (), 4);\nassert_eq!(size_of::< Option < Option < MyIdx >>> (), 4);\nassert_eq!(size_of::< Option < Option < Option < MyIdx >>>> (), 4);\nassert_eq!(size_of::< Option < Option < Option < Option < MyIdx >>>>> (), 4);\nassert_eq!(\n    size_of::< Option < Option < Option < Option < Option < MyIdx >>>>>> (), 4\n);\nassert_eq!(\n    size_of::< Option < Option < Option < Option < Option < Option < MyIdx >>>>>>>\n    (), 8\n);",
-    "correct": "The code checks the memory sizes of nested Option types with and without a custom type in Rust.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let mut ret = Self {\n    has_multipart_suggestion: false,\n    all_multipart_suggestions: true,\n    has_normal_suggestion: false,\n    all_applicabilities_static: true,\n};\nfor kind in kinds {\n    if let SubdiagnosticKind::MultipartSuggestion { applicability: None, .. }\n    | SubdiagnosticKind::Suggestion { applicability: None, .. } = kind {\n        ret.all_applicabilities_static = false;\n    }\n    if let SubdiagnosticKind::MultipartSuggestion { .. } = kind {\n        ret.has_multipart_suggestion = true;\n    } else {\n        ret.all_multipart_suggestions = false;\n    }\n    if let SubdiagnosticKind::Suggestion { .. } = kind {\n        ret.has_normal_suggestion = true;\n    }\n}\nret",
-    "correct": "Determines the availability of multipart suggestions and normal suggestions based on their applicability.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let in_pat = mem::replace(&mut self.in_pat, false);\nself.live_symbols.insert(c.def_id);\nlet result = intravisit::walk_anon_const(self, c);\nself.in_pat = in_pat;\nresult",
-    "correct": "Checks and updates an anonymous constant visitor's state during symbol analysis.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let source_file_index = self.lookup_source_file_idx(sp.lo());\nlet source_file = &self.files()[source_file_index];\nsource_file.is_imported()",
-    "correct": "Checks if a file is imported by looking up its index and retrieving it from files storage",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "self.buffer_writer.write_all(&self.buffer)?;\nself.buffer.clear();\nOk(())",
-    "correct": "Flushes data to an underlying writer and clears a buffer.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let data = Diagnostic::from_errors_diagnostic(diag, self);\nlet result = self.emit(EmitTyped::Diagnostic(data));\nif let Err(e) = result {\n    panic!(\"failed to print diagnostics: {e:?}\");\n}",
-    "correct": "Parses errors into a diagnostic and emits them as output; panics if emission fails.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let id = self.r.next_node_id();\nlet lt = Lifetime {\n    id,\n    ident: Ident::new(kw::UnderscoreLifetime, span),\n};\nself.record_lifetime_res(\n    anchor_id,\n    LifetimeRes::ElidedAnchor {\n        start: id,\n        end: id + 1,\n    },\n    LifetimeElisionCandidate::Ignore,\n);\nself.resolve_anonymous_lifetime(&lt, anchor_id, true);",
-    "correct": "The code records an elided lifetime for a node in the context of Rust's borrow checker.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let commit_hash_file = self.compute_path(\"libgccjit.version\");\nlet content = fs::read_to_string(&commit_hash_file)\n    .map_err(|_| {\n        format!(\n            \"Failed to read `{}`. Take a look at `Readme.md` to see how to set up the project\",\n            commit_hash_file.display(),\n        )\n    })?;\nlet commit = content.trim();\nif commit.contains('/') || commit.contains('\\\\') {\n    return Err(\n        format!(\"{}: invalid commit hash `{}`\", commit_hash_file.display(), commit,),\n    );\n}\nOk(commit.to_string())",
-    "correct": "Extracts and validates a trimmed Git commit hash from a file, returning an error if the hash is not valid.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let m128i = builder.context.new_vector_type(builder.i64_type, 2);\nlet field1 = builder.context.new_field(None, builder.u32_type, \"field1\");\nlet field2 = builder.context.new_field(None, m128i, \"field2\");\nlet field3 = builder.context.new_field(None, m128i, \"field3\");\nlet field4 = builder.context.new_field(None, m128i, \"field4\");\nlet field5 = builder.context.new_field(None, m128i, \"field5\");\nlet field6 = builder.context.new_field(None, m128i, \"field6\");\nlet field7 = builder.context.new_field(None, m128i, \"field7\");\nlet encode_type = builder\n    .context\n    .new_struct_type(\n        None,\n        \"EncodeKey128Output\",\n        &[field1, field2, field3, field4, field5, field6, field7],\n    );\n#[cfg(feature = \"master\")] encode_type.as_type().set_packed();\n(encode_type.as_type(), field1, field2)",
-    "correct": "Creates a packed struct type with six fields of different types and makes it public if the master feature is enabled.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let result = self.frem(lhs, rhs);\nset_rvalue_location(self, result);\nresult",
-    "correct": "Computes a value by calling an existing function with two arguments and updates its location to be stored at 'self'.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let x: F = x.to_float()?;\nlet res = x.round_to_integral(mode).value;\nlet res = self.adjust_nan(res, &[x]);\ninterp_ok(res.into())",
-    "correct": "Converts a value to float and integral rounding mode, adjusts for NaN values, interprets the result as valid.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "self.0.generic_visit_with(visitor);\nself.1.generic_visit_with(visitor);\nself.2.generic_visit_with(visitor);",
-    "correct": "Visits nodes of an expression tree recursively with a provided visitor.",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let new = self.new_scopes.start + scope.index();\ntrace!(\"mapping scope `{:?}` to `{:?}`\", scope, new);\nnew",
-    "correct": "Adds an index value to a starting point and traces mapping information for scopes",
-    "distractors": [
-      "",
-      "",
-      ""
-    ]
-  },
-  {
-    "code": "let head = self.renames.unify(lhs, rhs);\nself.original[head] = self.original[rhs];\nhead",
-    "correct": "The function unifies two elements and updates references accordingly.",
-    "distractors": [
-      "",
-      "",
-      ""
+      "The code asynchronously processes and stores text embeddings from files in batches of up to 1000 characters into a collection, flushing the results at intervals.",
+      "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces.",
+      "Calculates the cosine similarity between two vectors, returning a value close to zero if either vector is of nearly zero magnitude."
     ]
   }
 ]

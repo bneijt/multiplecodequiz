@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eo pipefail
 export RUST_BACKTRACE=1
-if [[ ! -e crates/frontend/dist/quiz_data.json ]]; then
+if [[ ! -e quiz_data.json ]]; then
     cargo run -p preprocess -- --repo crates
 fi
 cd crates/frontend && trunk serve
