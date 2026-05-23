@@ -1,56 +1,29 @@
 [
   {
-    "code": "let dot: f32 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();\nlet norm_a: f32 = a.iter().map(|x| x * x).sum::<f32>().sqrt();\nlet norm_b: f32 = b.iter().map(|x| x * x).sum::<f32>().sqrt();\nif norm_a == 0.0 || norm_b == 0.0 {\n    return 1.0;\n}\n1.0 - (dot / (norm_a * norm_b))",
-    "correct": "Calculates the cosine similarity between two vectors, returning a value close to zero if either vector is of nearly zero magnitude.",
+    "code": "let target_os = env::var(\"CARGO_CFG_TARGET_OS\");\nlet target_env = env::var(\"CARGO_CFG_TARGET_ENV\");\nif Ok(\"windows\") == target_os.as_deref() && Ok(\"msvc\") == target_env.as_deref() {\n    set_windows_exe_options();\n} else {\n    println!(\"cargo:rerun-if-changed=build.rs\");\n}",
+    "correct": "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
     "distractors": [
-      "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces.",
-      "Generates a pseudorandom sequence of unique indices to reorder an array in a specific way based on initial seed values and shuffles the original array accordingly.",
-      "Exports a collection of serialized JSON representations of quiz items and writes them into an organized directory."
+      "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+      "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
+      ""
     ]
   },
   {
-    "code": "let config = CollectionConfig::new(EMBEDDING_DIMS, DistanceMetric::Cosine);\nlet collection = AsyncCollection::open_or_create(db_path.to_string(), config).await?;\nOk(collection)",
-    "correct": "Creates and opens an asynchronous collection with specified embedding dimensions and cosine distance metric.",
+    "code": "let stem = path::PathBuf::from(\"rustc_main_resource\");\nlet file_description = \"rustc\";\nlet res_file = compile_windows_resource_file(\n    &stem,\n    file_description,\n    VersionInfoFileType::App,\n);\nprintln!(\"cargo:rustc-link-arg={}\", res_file.display());",
+    "correct": "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
     "distractors": [
-      "The code asynchronously processes and stores text embeddings from files in batches of up to 1000 characters into a collection, flushing the results at intervals.",
-      "Exports a collection of serialized JSON representations of quiz items and writes them into an organized directory.",
-      "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces."
+      "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
+      "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
+      ""
     ]
   },
   {
-    "code": "let client = ollama::Client::new();\nlet model = client.embedding_model(ollama::NOMIC_EMBED_TEXT);\nlet mut count = 0usize;\nfor chunk_result in chunks {\n    let chunk = chunk_result?;\n    if chunk.body.len() > 1000 {\n        continue;\n    }\n    let embeddings = model.embed_texts(vec![chunk.body.clone()]).await?;\n    let vec_f32: Vec<f32> = embeddings[0].vec.iter().map(|&v| v as f32).collect();\n    let payload = Payload::new()\n        .with_field(\"file_path\", chunk.file_path.clone())\n        .with_field(\"fn_name\", chunk.fn_name.clone())\n        .with_field(\"body\", chunk.body.clone())\n        .with_field(\"selected\", \"0\")\n        .with_field(\"description\", \"\");\n    collection.insert_auto(vec_f32, payload).await?;\n    count += 1;\n    if count % 10 == 0 {\n        println!(\"  Embedded {} chunks...\", count);\n    }\n}\ncollection.flush().await?;\nOk(count)",
-    "correct": "The code asynchronously processes and stores text embeddings from files in batches of up to 1000 characters into a collection, flushing the results at intervals.",
+    "code": "static WINDOWS_MANIFEST_FILE: &str = \"Windows Manifest.xml\";\nlet mut manifest = env::current_dir().unwrap();\nmanifest.push(WINDOWS_MANIFEST_FILE);\nprintln!(\"cargo:rerun-if-changed={WINDOWS_MANIFEST_FILE}\");\nprintln!(\"cargo:rustc-link-arg-bin=rustc-main=/MANIFEST:EMBED\");\nprintln!(\n    \"cargo:rustc-link-arg-bin=rustc-main=/MANIFESTINPUT:{}\", manifest.to_str()\n    .unwrap()\n);\nprintln!(\"cargo:rustc-link-arg-bin=rustc-main=/WX\");",
+    "correct": "Generates a list of Cargo configuration files that specify the current directory, re-run-if-changed metadata for Windows Manifest.xml file, and Rust compiler link arguments including an embedded manifest input.",
     "distractors": [
-      "Generates a pseudorandom sequence of unique indices to reorder an array in a specific way based on initial seed values and shuffles the original array accordingly.",
-      "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces.",
-      "Creates and opens an asynchronous collection with specified embedding dimensions and cosine distance metric."
-    ]
-  },
-  {
-    "code": "let wrapper = quote! {\n    fn __wrapper() # block\n};\nlet Ok(ast) = syn::parse2::<syn::File>(wrapper) else {\n    return None;\n};\nlet result = std::panic::catch_unwind(|| prettyplease::unparse(&ast));\nlet formatted = result.ok()?;\nlet start = formatted.find('{').map(|i| i + 1).unwrap_or(0);\nlet end = formatted.rfind('}').unwrap_or(formatted.len());\nlet inner = &formatted[start..end];\nSome(dedent(inner).trim().to_string())",
-    "correct": "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces.",
-    "distractors": [
-      "Exports a collection of serialized JSON representations of quiz items and writes them into an organized directory.",
-      "The code asynchronously processes and stores text embeddings from files in batches of up to 1000 characters into a collection, flushing the results at intervals.",
-      "Generates a pseudorandom sequence of unique indices to reorder an array in a specific way based on initial seed values and shuffles the original array accordingly."
-    ]
-  },
-  {
-    "code": "let items: Vec<QuizItemJson> = entries\n    .iter()\n    .map(|e| QuizItemJson {\n        code: &e.body,\n        correct: &e.correct,\n        distractors: [&e.distractors[0], &e.distractors[1], &e.distractors[2]],\n    })\n    .collect();\nlet json = serde_json::to_string_pretty(&items)?;\nif let Some(parent) = output_path.parent() {\n    std::fs::create_dir_all(parent)?;\n}\nstd::fs::write(output_path, json)?;\nprintln!(\"Exported {} quiz items to {}\", items.len(), output_path.display());\nOk(())",
-    "correct": "Exports a collection of serialized JSON representations of quiz items and writes them into an organized directory.",
-    "distractors": [
-      "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces.",
-      "The code asynchronously processes and stores text embeddings from files in batches of up to 1000 characters into a collection, flushing the results at intervals.",
-      "Creates and opens an asynchronous collection with specified embedding dimensions and cosine distance metric."
-    ]
-  },
-  {
-    "code": "let seed = answers[0]\n    .bytes()\n    .fold(0u64, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u64));\nlet n = answers.len();\nlet mut indices: Vec<usize> = (0..n).collect();\nlet mut rng = seed;\nfor i in (1..n).rev() {\n    rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);\n    let j = (rng >> 33) as usize % (i + 1);\n    indices.swap(i, j);\n}\nlet correct_idx = indices.iter().position(|&x| x == 0).unwrap();\nlet shuffled = indices.into_iter().map(|i| answers[i].clone()).collect();\n(shuffled, correct_idx)",
-    "correct": "Generates a pseudorandom sequence of unique indices to reorder an array in a specific way based on initial seed values and shuffles the original array accordingly.",
-    "distractors": [
-      "The code asynchronously processes and stores text embeddings from files in batches of up to 1000 characters into a collection, flushing the results at intervals.",
-      "Extracts and formats the contents of a Rust function definition between its opening and closing curly braces.",
-      "Calculates the cosine similarity between two vectors, returning a value close to zero if either vector is of nearly zero magnitude."
+      "Generates a Windows resource compiler file and prints the associated Cargo configuration argument.",
+      "The code checks if the current OS is Windows with MSVC and sets specific options for a windows executable; otherwise, it signals to rerun build configuration.",
+      ""
     ]
   }
 ]

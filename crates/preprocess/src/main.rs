@@ -34,11 +34,11 @@ struct Args {
     max_stmts: usize,
 
     /// Number of diverse chunks to select for the quiz
-    #[arg(long, default_value_t = 20)]
+    #[arg(long, default_value_t = 50)]
     target: usize,
 
     /// Number of chunks to embed
-    #[arg(long, default_value_t = 1000)]
+    #[arg(long, default_value_t = 5000)]
     embed: usize,
 }
 

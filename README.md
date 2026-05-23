@@ -1,9 +1,11 @@
-Given a codebase, chunk it up into pieces of code.
-For each piece of code that is unique, generate a description of what the code does and put that an sqlite database.
+Multiplecodequiz
+=============
+A simple online code quiz, mostly AI generated slop.
 
-Frontend quiz part:
-Present the user with a piece of code and four possible descriptions from the database including one correct one from the database. Use vector embedding space to find closely mmatching answers.
+The idea is simple:
+- Take a Rust codebase
+- Chunk it up into pieces of code
+- For each unique piece, generate a description and embed it in a vector database
+- Serve a quiz frontend that presents the user with a piece of code and four possible descriptions from the database, including one correct one from the database
 
-Have the user pick the correct answer.
-
-Keep score, clientside.
+The scoring is completely client-side, no accounts or anything, just a static web page.
